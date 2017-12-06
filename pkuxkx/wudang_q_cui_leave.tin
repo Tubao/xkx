@@ -1,0 +1,82 @@
+#list robbernpc create {tufei}{louluo}{Tufei}{Tu fei}{tufei tou}{Tufei tou};
+#alias ktufei
+{
+	kill tufei;
+	kill louluo;
+	kill Tufei;
+	kill Tu fei;	
+	kill robber;	
+	kill tufei tou;
+};
+#alias cui_kmove
+{
+	#var thismove {%1};
+	#ticker {t_kmove}
+	{
+		a2c id here;
+		#delay {2}
+		{
+			#if {$success_a2c==1}
+			{
+				#var hasnpc 0;
+				#foreach {$robbernpc[%*]} {mynpc}
+				{
+					#var tempv @has_id{$mynpc};
+					#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+				};
+				#if {$hasnpc==0}
+				{
+					#untick {t_kmove};		
+					#send {$thismove};
+					iwalk;				
+				}
+				{
+					ktufei;
+				};	
+			};
+		};
+	}{4};
+};
+#alias cui_leave_init
+{
+	#list inner_Route_list create;
+	#list inner_Route_list add {e};
+	#list inner_Route_list add {busy2};
+	#list cui_leave_moves create {eu}{n}{nd}{w}{s}{se}{w};
+	
+	#foreach {$cui_leave_moves[%*]} {mymove}
+	{
+		#list inner_Route_list add {cui_kmove $mymove};
+		#list inner_Route_list add {stop};
+	};
+	#list inner_Route_list add {cui_leave_finish};
+	inner_walk;
+
+};
+#alias cui_leave_finish
+{
+	#untick {t_kmove};	
+	#class {c_cui_leave} kill;
+	#showme {end of move};	
+	give cui zhuozi;
+	#untick {t_wield};
+	#delay {6} 
+	{
+		#map goto 72;
+		#map run 1;
+		ask chongxu about success;
+		#var is_doing_task 0;
+		get all;
+	};	
+};
+#act {^你逃跑失败}
+{	
+	#math istep {$istep-2};
+	iwalk;
+};
+#act {^这个方向没有出路}
+{	
+	#math istep {$istep-3};
+	iwalk;
+};
+

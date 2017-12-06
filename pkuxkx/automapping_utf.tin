@@ -1,0 +1,255 @@
+#var movemap[down]  {up};
+#var movemap[east]  {west};
+#var movemap[north]  {south};
+#var movemap[northeast]  {southwest};
+#var movemap[northwest]  {southeast};
+#var movemap[south]  {north};
+#var movemap[southeast]  {northwest};
+#var movemap[southwest]  {northeast};
+#var movemap[up]  {down};
+#var movemap[west]  {east};
+#var movemap[northup] {southdown};
+#var movemap[southdown] {northup};
+#var movemap[northdown] {southup};
+#var movemap[southup] {northdown};
+#var movemap[westup] {eastdown};
+#var movemap[eastdown] {westup};
+#var movemap[westdown] {eastup};
+#var movemap[eastup] {westdown};
+#var movemap[enter] {out};
+#var movemap[out] {enter};
+
+#var d2x[down]  {0};
+#var d2x[east]  {1};
+#var d2x[north]  {0};
+#var d2x[northeast]  {1};
+#var d2x[northwest]  {-1};
+#var d2x[south]  {0};
+#var d2x[southeast]  {1};
+#var d2x[southwest]  {-1};
+#var d2x[up]  {0};
+#var d2x[west]  {-1};
+#var d2x[northup] {0};
+#var d2x[southdown] {0};
+#var d2x[northdown] {0};
+#var d2x[southup] {0};
+#var d2x[westup] {-1};
+#var d2x[eastdown] {1};
+#var d2x[westdown] {-1};
+#var d2x[eastup] {1};
+#var d2x[enter] {0};
+#var d2x[out] {0};
+
+#var d2y[down]  {0};
+#var d2y[east]  {0};
+#var d2y[north]  {-1};
+#var d2y[northeast]  {-1};
+#var d2y[northwest]  {-1};
+#var d2y[south]  {1};
+#var d2y[southeast]  {1};
+#var d2y[southwest]  {1};
+#var d2y[up]  {0};
+#var d2y[west]  {0};
+#var d2y[northup] {-1};
+#var d2y[southdown] {1};
+#var d2y[northdown] {-1};
+#var d2y[southup] {1};
+#var d2y[westup] {0};
+#var d2y[eastdown] {0};
+#var d2y[westdown] {0};
+#var d2y[eastup] {0};
+#var d2y[enter] {0};
+#var d2y[out] {0};
+
+#var d2z[down]  {1};
+#var d2z[east]  {0};
+#var d2z[north]  {0};
+#var d2z[northeast]  {0};
+#var d2z[northwest]  {0};
+#var d2z[south]  {0};
+#var d2z[southeast]  {0};
+#var d2z[southwest]  {0};
+#var d2z[up]  {-1};
+#var d2z[west]  {0};
+#var d2z[northup] {-1};
+#var d2z[southdown] {1};
+#var d2z[northdown] {1};
+#var d2z[southup] {-1};
+#var d2z[westup] {-1};
+#var d2z[eastdown] {1};
+#var d2z[westdown] {1};
+#var d2z[eastup] {-1};
+#var d2z[enter] {0};
+#var d2z[out] {0};
+
+#list unexplored create;
+#list explored create;
+#list allrooms create;
+#list boundarylist create {后门} {北侧门} {武当广场};
+#alias mapping_start
+{
+	#var pauss_trave 1;
+	#var mapping_ct %0;
+	#nop gt $mapping_ct;
+	a2c look;
+	#delay {2}
+	{
+		#var fromct {};
+		#var toct {};
+		#var xofct {0};
+		#var yofct {0}; 
+		#var zofct {0}; 
+		@store_unexplored{$mapping_ct|||$fromct|||$toct|||$xofct|||$yofct|||$zofct};	
+		traverse_unexplored;
+	};
+	
+};
+#alias map_go
+{
+	#var pauss_trave 0;
+};
+#alias traverse_unexplored
+{
+	#if {$pauss_trave == 1}
+	{
+		#delay {2}
+		{
+			traverse_unexplored;
+		};
+	}
+	{
+		#var pauss_trave 1;
+		#var rid @get_unexploredId;
+		#if {$rid!=0}
+		{
+			ct2room $rid;
+			#delay {2}
+			{
+				a2c look;
+				#delay {2}
+				{
+					#var roomname @getRoomName{$lines};
+					#var rn $roomname[1];
+					#list boundarylist {find} {$rn} {is_inboundary};
+					#if {$is_inboundary>0}
+					{
+						#list unexplored delete 1;
+						#list explored add {$rid};
+						back2ct $rid;
+						traverse_unexplored;
+					}
+					{
+						store_npcs {$lines};					
+						#var elist @getExits{$lines};
+						#list elist size elist_size;
+						#var exit_cnt 1;
+						#ticker {t_allexit}
+						{
+							#if {$exit_cnt>$elist_size}
+							{
+								#untick {t_allexit};
+								#list unexplored delete 1;
+								#list explored add {$rid};
+								back2ct $rid;
+								traverse_unexplored;
+							}
+							{
+								#var myexit $elist[$exit_cnt];
+								#math exit_cnt $exit_cnt+1;
+								a2c look $myexit;
+								#delay {2}
+								{
+									#var roominfotab @get_roominfo{$rid};
+									#var fromct $roominfotab[fromct]|$myexit;
+									#var toct $movemap[$myexit]|$roominfotab[toct];
+									#math xofct $roominfotab[xofct] + $d2x[$myexit];
+									#math yofct $roominfotab[yofct] + $d2y[$myexit];
+									#math zofct $roominfotab[zofct] + $d2z[$myexit];
+									#var nextrid @store_unexplored{$mapping_ct|||$fromct|||$toct|||$xofct|||$yofct|||$zofct};
+									#if {$nextrid!=0}
+									{
+										store_relation $rid $nextrid $myexit $movemap[$myexit];
+									};
+								};
+							};
+						}{4};
+					};
+				};
+			};	
+		};
+	};
+};
+#function store_unexplored
+{
+	#var p1 %1;
+	#var p2 $lines;	
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/store_roominfo.py "$p1" "$p2"};	
+	#list unexplored {find} {$ret[1]} {is_inunexplored};
+	#list explored {find} {$ret[1]} {is_inexplored};
+	#math is_inset $is_inunexplored + $is_inexplored;
+	#if {$is_inset==0}
+	{
+		#list unexplored add {$ret[1]};
+		#return $ret[1];
+	}
+	{		
+		#return $ret[1];
+	};
+	
+}; 
+#function get_unexploredId
+{
+	#list unexplored size unexplored_size;
+	#if {$unexplored_size>0}
+	{
+		#return $unexplored[1];
+	}
+	{
+		#return 0;
+	};
+};
+#function get_roominfo
+{
+	#var temp_rid %1;
+	#var ret_tab {};
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/get_roominfo.py "$temp_rid"};
+	#var ret_tab[rid] $ret[1];
+	#var ret_tab[area] $ret[2];
+	#var ret_tab[fromct] $ret[3];
+	#var ret_tab[toct] $ret[4];
+	#var ret_tab[xofct] $ret[5];
+	#var ret_tab[yofct] $ret[6];
+	#var ret_tab[zofct] $ret[7];
+	#var ret_tab[rname] $ret[8];
+	#var ret_tab[rdesc] $ret[9];
+	#var ret_tab[exitsdesc] $ret[10];
+	#return $ret_tab;	
+};
+#alias store_npcs
+{
+	#var p1 %1;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/store_npcs.py "$p1"};	
+};
+#alias store_relation
+{
+	#var p1 %1;
+	#var p2 %2;	
+	#var p3 %3;
+	#var p4 %4;	
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/store_relation.py "$p1" "$p2" "$p3" "$p4"};		
+};
+#alias ct2room
+{
+	#var roominfotab @get_roominfo{%0};
+	#var fromctpath $roominfotab[fromct];
+	#replace {fromctpath} {|} {;};	
+	$fromctpath;		
+};
+#alias back2ct
+{
+	#var roominfotab @get_roominfo{%0};
+	#var back2ctpath $roominfotab[toct];	
+	#replace {back2ctpath} {|} {;};	
+	$back2ctpath;		
+};
+

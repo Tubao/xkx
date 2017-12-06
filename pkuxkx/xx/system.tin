@@ -1,0 +1,140 @@
+#nop system set up;
+#var mycharid {xxkfk};
+#var hasSociability {yes};
+#event {SESSION CONNECTED}
+{
+	#var sname %0;
+	#var is_auto_connect 1;
+	#list task_stack add {connected};
+	#var task_status[connected] {normal};
+	#var task_act[connected][normal] {hp};	
+	#delay {5}
+	{
+		special + sociability;
+		special + perceive;
+	};
+};
+#event {SESSION DISCONNECTED}
+{
+	#showme {%0 disconnected!};
+	
+	#if {$is_auto_connect==1 && "%0"=="xkx_xxkfk"}
+	{
+		#showme {ready to autoconnect of xarnold};
+		#gts;		
+		#delay {15}
+		{
+			#showme {after 15 secs...};
+			#ses %0 pkuxkx.net 8080;xxkfk;$auto_connect_pw;			
+			
+		};
+		
+	};	
+};
+
+#act {%*读书写字                │literate                  │%*│%*│%*│}
+{
+	#var myskill[literate] %3;
+};
+#act {%*基本内功                │force                     │%*│%*│%*│}
+{
+	#var myskill[force] %3;
+};
+#act {%*基本掌法                │strike                    │%*│%*│%*│}
+{
+	#var myskill[strike] %3;
+};
+#act {%*基本轻功                │dodge                     │%*│%*│%*│}
+{
+	#var myskill[dodge] %3;
+};
+#act {%*基本杖法                │staff                     │%*│%*│%*│}
+{
+	#var myskill[staff] %3;
+};
+#act {%*基本剑法                │sword                     │%*│%*│%*│}
+{
+	#var myskill[sword] %3;
+};
+#act {%*基本招架                │parry                     │%*│%*│%*│}
+{
+	#var myskill[parry] %3;
+};
+#act {%*基本毒技                │poison                    │%*│%*│%*│}
+{
+	#var myskill[poison] %3;
+};
+#act {%*化功大法                │huagong-dafa              │%*│%*│%*│}
+{
+	#var myskill[huagong-dafa] %3;
+};
+#act {%*天山杖法                │tianshan-zhang            │%*│%*│%*│}
+{
+	#var myskill[tianshan-zhang] %3;
+};
+#act {%*星宿毒掌                │xingxiu-duzhang           │%*│%*│%*│}
+{
+	#var myskill[xingxiu-duzhang] %3;
+};
+#act {%*摘星功                  │zhaixinggong              │%*│%*│%*│}
+{
+	#var myskill[zhaixinggong] %3;
+};
+#act {%*马屁神功                │flatter                   │%*│%*│%*│}
+{
+	#var myskill[flatter] %3;
+};
+#act {%*摘星手                  │zhaixing-shou             │%*│%*│%*│}
+{
+	#var myskill[zhaixing-shou] %3;
+};
+#act {%*基本手法                │hand                      │%*│%*│%*│}
+{
+	#var myskill[hand] %3;
+};
+#prompt {status 精神: %*/%* ; 气血: %*/%* ;内力:%*; 食物: %* ; 饮水: %* ; 状态: %*} {xf:$xf_type status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水: $mystatus[ys_1] ; 状态: $mystatus[zt]};
+#ticker {t_hpbrief} 
+{
+	a2c hpbrief;
+	#delay {2}
+	{		
+		#if {$mystatus[sw_1]<200} {eat gan liang};
+		#if {$mystatus[ys_1]<200} {drink jiudai;};
+		#if {$mystatus[js_2]<300} {eat dan};
+		#nop #if {$mystatus[qx_2]<400} {eat yao};	
+		#if {$mystatus[qx_2]<$mystatus[qx_3]} {#var needqx 1;}{#var needqx 0;};		
+		#if {$mystatus[nl_1]<2000} {#var neednl 1;}{#var neednl 0;};	
+		#showme {status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水:  $mystatus[ys_1] ; 状态: $mystatus[zt]};		
+	};	
+}{10};
+#ticker {t_hp} 
+{
+	hp;
+	#format heatbeat[connected]  %T;
+	#delay {2}
+	{
+		#regexp {"$mystatus[zt]"} {"%*毒%*"} {yun qudu;} {#nop};		
+		#showme {xf:$xf_type status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水:  $mystatus[ys_1] ; 状态: $mystatus[zt]};		
+	};	
+}{$showstatus_time};
+#alias wait2act
+{
+	#var w2a_flag 1;
+	#var keyv {%1};
+	#var fpath {%1.tin};
+	#var p %2;
+	#if {"$p"==""} {#var p 5};#elseif {$p<3} {#var p 3};#else {#nop};
+	#class c_w2a read {./tintin/myscripts/pkuxkx/xx/$fpath};
+	w2a_init;	
+	#ticker {t_act}
+	{
+		look2capture;		
+	}{$p};	
+};
+#alias gs
+{
+	#ticker {t_gs}
+	{
+		ask a zi about 清心散;
+	}{2};
+};

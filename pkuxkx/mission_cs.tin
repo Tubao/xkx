@@ -1,0 +1,156 @@
+#alias entercs
+{
+	s;
+	ask shiwei about 通传;
+	#delay {2}
+	{
+		s;s;s;s;
+	};
+};
+#alias outcs
+{
+	n;n;n;n;n;
+};
+#alias gtcs 
+{	
+	#var destEventHandler {entercs};
+	set_destEventHandler $destEventHandler;
+	pgt jiankfbc zongxq;
+};
+#alias start_cs
+{
+	
+	#untick t_sk;	
+	#class cs open;
+	#alias askcs.job
+	{		
+		ask zhijing about job;	
+		#var csflag 1;			
+	};
+	#act {孟之经说道：「这里人多眼杂，你先到%*等候，我自会通知你。」}
+	{
+		#if {"$csflag"=="1"}
+		{
+			#var csflag 0;	
+			outcs;
+			#delay {2}
+			{
+				ngt 建康府北城%%1;
+			};
+		};
+	};
+	#act {你就知道你要刺杀的人在哪了。}
+	{
+		duizhao;
+	};
+	#alias sl
+	{
+		cs.t %%1;
+	};
+	#act {你定睛一看，%*正是你要找的汉奸卖国贼！}
+	{
+		pauseWalk;
+		#var npcename_cn %%1;			
+		stopt;				
+		speed;
+		look;	
+	};
+	#act {$npcename_cn(%*)}
+	{
+		#unact {$npcename_cn(%%*)};				
+		#format {npcename} {%l} {%%1};
+		follow $npcename;
+	};
+	#alias askcs.over
+	{
+		ask zhijing about finish;
+	};
+	#alias askcs.fail
+	{
+		ask zhijing about fail;
+	};	
+			
+	#act {^{这里不准战斗。|这里禁止战斗。}}
+	{
+		ask $npcename about fight;		
+		#delay {2}
+		{			
+			follow $npcename;			
+		};
+	};
+	#act {^你决定开始跟随}
+	{
+		yun qi;
+		kill $npcename;
+		set ForcedAct 1;
+		#delay {3}
+		{
+			pfcs;
+			unset ForcedAct;
+		};
+	};	
+	#act {^恭喜！你完成了都统制府行刺任务！}
+	{
+		upf;
+		get gold from corpse;
+		gtcs;
+	};
+	#class cs close;
+};
+#alias stop_cs
+{	
+	#var traversal_handler {};
+	#class cs kill;
+};
+#alias cs.t
+{
+	#var r_traversal {traversal %1};	
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		hgt $torid;	
+	
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};			
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal.py "$locdesc" "$depth"};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk2;};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};		
+	};
+};
+#alias r.cs.t
+{
+	$r_traversal %1;	
+};
+

@@ -1,0 +1,256 @@
+#alias q_xx_mz
+{
+	#list worklist create 
+		{pimu}
+		{zhaiguo}
+		{tuimu}
+		{xiaomu}
+		{find_swnt2success};
+	worklist_start;
+};
+#alias q_xx_bz
+{
+	#list worklist create 
+		{pimu}
+		{tuimu}
+		{xiaomu}
+		{makebz}
+		{find_swnt2success};
+	worklist_start;
+};
+#alias q_xx_bpz
+{
+	#list worklist create 
+		{pimu}
+		{tuimu}
+		{xiaomu}
+		{makebz}
+		{getduye}
+		{cuizhang}
+		{find_swnt2success};
+	worklist_start;
+};
+#alias q_xx_duye
+{
+	#list worklist create 		
+		{getduye}
+		{find_swnt2success};
+	worklist_start;
+};
+#alias pimu
+{
+	#map run 18;
+	wield axe;
+	#ticker {t_pimu}
+	{
+		pi;
+	}{2};
+};
+#alias zhaiguo
+{
+	#list zhaiguo_list create
+	{zhai}
+	{w;zhai}
+	{n;zhai}
+	{e;zhai}
+	{s};
+	#var zhaiguo_ind 1;
+	#list zhaiguo_list size zhaiguo_size;
+	#ticker {t_zhaiguo}
+	{
+		#if {$zhaiguo_ind>$zhaiguo_size}
+		{
+			#untick {t_zhaiguo};
+			#map goto 18;
+			#format work_done_flag %T;	
+		}
+		{
+			$zhaiguo_list[$zhaiguo_ind];
+			#math zhaiguo_ind $zhaiguo_ind+1;
+		};
+	}{2};
+};
+#alias tuimu
+{
+	#list tuimu_list create 
+	{tui s}
+	{tui s}
+	{tui e}
+	{tui s}
+	{tui e}
+	{tui ne}
+	{tui e}
+	{tui enter};	
+	#var tuimu_ind 1;
+	#list tuimu_list size tuimu_size;
+	#ticker {t_tuimu}
+	{
+		#if {$tuimu_ind>$tuimu_size}
+		{
+			#untick {t_tuimu};
+			#format work_done_flag %T;	
+		}
+		{
+			$tuimu_list[$tuimu_ind];
+			#math tuimu_ind $tuimu_ind+1;
+		};
+	}{5};
+};
+#alias xiaomu
+{
+	wield dao;
+	#ticker {t_xiaomu}
+	{
+		xiao;
+	}{2};
+};
+#alias find_swnt2success
+{	
+	enter;give zhang to swnt npc;give du ye to swnt npc;
+	n;give zhang to swnt npc;give du ye to swnt npc;
+	s;s;give zhang to swnt npc;give du ye to swnt npc;
+	n;e;give zhang to swnt npc;give du ye to swnt npc;	
+	#delay {2}
+	{
+		w;n;n;s;out;
+		drop dao;
+		drop da futou;
+		#map goto 1;		
+		#format work_done_flag %T;
+		#var is_doing_task 0;		
+	};
+};
+#act {^你刚推过一段路，要歇一会才能}
+{
+	#math tuimu_ind $tuimu_ind-1;
+};
+#act {^你仔细看着手里已成型的木杖}
+{
+	#untick {t_xiaomu};
+	#delay {2}
+	{
+		out;
+		s;
+		#format work_done_flag %T;
+	};
+};
+#act {^古树晃了两晃，终于倒了下来}
+{
+	#untick {t_pimu};	
+	#delay {2}
+	{
+		#format work_done_flag %T;	
+	};	
+};
+#alias makebz
+{
+	#map goto 1;
+	#map run 28;
+	pao zhang;
+	#ticker {t_qz}
+	{
+		qu zhang;		
+	}{10};
+};
+#act {^你从冰冷的湖水中取出了一把冰杖}
+{
+	#delay {2}
+	{
+		#untick {t_qz};
+		n;e;n;e;ne;e;s;
+		#map goto 1;
+		#format work_done_flag %T;
+	};
+};
+
+#alias getduye
+{	
+	#map run 18;
+	xian;
+	#list rdirs create;
+};
+#act {^伯特发现的 %*往%*离开}
+{	
+	#switch {"%1"}
+	{
+		#case "蛤蟆" {#var bug {ha ma}};
+		#case "蜈蚣" {#var bug {wu gong}};
+		#case "蜘蛛" {#var bug {zhi zhu}};
+		#case "蝎子" {#var bug {xie zi}};
+		#default {#var bug {qing she}}
+	};
+	#switch {"%2"}
+	{
+		#case "北" {#var direct {n};#list rdirs insert 1 {s}};
+		#case "南" {#var direct {s};#list rdirs insert 1 {n}};
+		#case "东" {#var direct {e};#list rdirs insert 1 {w}};		
+		#default {#var direct {w};#list rdirs insert 1 {e}};
+	};
+	#send {$direct};
+	#send {kill $bug};
+};
+#act {^伯特发现的 %*往%*落荒而逃了}
+{
+	#switch {"%1"}
+	{
+		#case "蛤蟆" {#var bug {ha ma}};
+		#case "蜈蚣" {#var bug {wu gong}};
+		#case "蜘蛛" {#var bug {zhi zhu}};
+		#case "蝎子" {#var bug {xie zi}};
+		#default {#var bug {qing she}}
+	};
+	#switch {"%2"}
+	{
+		#case "北" {#var direct {n};#list rdirs insert 1 {s}};
+		#case "南" {#var direct {s};#list rdirs insert 1 {n}};
+		#case "东" {#var direct {e};#list rdirs insert 1 {w}};		
+		#default {#var direct {w};#list rdirs insert 1 {e}};
+	};
+	#send {$direct};
+	#send {kill $bug};
+};
+#act {^伯特发现的 %*死了}
+{
+	get du ye from corpse;
+	#delay {2}
+	{
+		#foreach {$rdirs[%*]} {rdir} {#send {$rdir};};
+	};
+	#delay {4}
+	{
+		#map goto 18;
+		#map run 1;
+		#format work_done_flag %T;		
+	};
+};
+#alias cuizhang
+{
+	#map run 4;
+	#delay {2}
+	{
+		cui zhang;
+		#delay {70}
+		{
+			finish;	
+			#delay {2}
+			{
+				#map run 1;
+				#format work_done_flag %T;
+			};	
+		};
+	};
+};
+#act {^你在地上找了半天，却什么也没发现}
+{
+	#delay {1}
+	{
+		xian;
+	};
+};
+#act {^你当真以为星宿海遍地毒虫}
+{
+	#delay {5}
+	{
+		xian;
+	};
+};

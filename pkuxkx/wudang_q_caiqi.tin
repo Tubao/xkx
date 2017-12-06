@@ -1,0 +1,47 @@
+#alias wudang_q_caiqi_bootstrap
+{	
+	#map run 2;
+	ask song about 下山;
+	#delay {2} {
+		#map run 天柱峰下;
+		#delay {1}
+		{
+			#ticker {auto_caiqi} {caiqi} {5};
+		};
+	};
+
+};
+#act {^道%*正在慢慢采集阴阳交替先天混沌之气}
+{
+	caiqi;
+	#untick {auto_caiqi};	
+};
+#act {^道%*大脑一片空明}
+{
+	caiqi;
+	#untick {auto_caiqi};
+	#var test_cq 1;
+	#var cq_success 1;
+	eat gan liang;
+	#delay {3} 
+	{
+		#if {$cq_success==1}
+		{
+			wudang_q_caiqi_success;
+		};
+	};
+};
+#act {{你上一个动作还没有完成|你现在正忙着呢}}
+{
+	#if {&test_cq && $test_cq==1}
+	{
+		#var cq_success 0;
+	};
+};
+#alias wudang_q_caiqi_success
+{
+	#map run 1;
+	ask chongxu about success;
+	#var is_doing_task 0;
+	get all;
+};

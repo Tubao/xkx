@@ -1,0 +1,95 @@
+#nop ==ÐÐ×ßÃüÁî==;
+
+#alias {inner_walk} {
+	#class c_mywalk open;
+	#alias iwalk {
+		#if {$istep==$istepmax} {set brief 2};
+		#if {$istep<=$istepmax} {
+			#var icmd @item{inner_Route_list;$istep};
+			#if {"$icmd"=="stop"} {
+				#math istep {$istep+1};
+				#var istepaccu 1;
+			};
+			#else {
+				#if {"$icmd"=="busy2"} {
+					#math istep {$istep+1};
+					#var istepaccu 1;
+					#delay {2} {iwalk};
+				};
+				#else {
+					$icmd;
+					#math istepaccu {$istepaccu+1};
+					#math istep {$istep+1};
+					#if {$istepaccu>=${xiaoyao.accu}} {
+						#delay {${xiaoyao.delay_long}} {iwalk};
+						#var istepaccu 1;
+					};
+					#else {
+						#delay {${xiaoyao.delay_short}} {iwalk};
+					};
+				};
+			};
+		};
+		#else {			
+			#class c_mywalk kill;			
+			#showme {inner_walk done!}				
+		};
+	};
+
+	
+	
+	
+	
+	
+	#class c_mywalk close;
+
+	#var istep 1;
+	#var istepmax @numitems{inner_Route_list};
+	#var istepaccu 1;
+	set brief 1;
+	iwalk;
+};
+
+#alias gtyz
+{
+	set_dest {yz};
+	gt yz;		
+};
+#alias gtwd
+{
+	set_dest {wd};
+	gt wd;		
+};
+#alias gtxs
+{
+	set_dest {xs};
+	gt xs;		
+};
+#alias set_dest
+{
+	#var dest %1;
+	#event {VARIABLE UPDATE CurrentPosition}
+	{
+		#var cp %%1;
+		#if {"$cp"=="$dest"}
+		{
+			#unevent {VARIABLE UPDATE CurrentPosition};
+			iwalk;
+		}; 	
+	};
+};
+#alias sellall
+{
+	#nop sell all 
+	
+};
+#list Route_yzct_xarnold create {s}{s}{s}{w}{enter xarnold}{find}{stop}{out}{e}{n}{n}{n};
+#list Route_yzct_xarnold_in create {s}{s}{s}{w}{enter xarnold};
+#list Route_yzct_xarnold_out create {out}{e}{n}{n}{n};
+#list Route_yzct_qugold3 create {n}{w}{qu 3 gold}{busy2}{e}{s};
+#list Route_yzct_buyweapon create {e}{e}{s}{buy changjian}{busy2}{buy blade}{busy2}{n}{w}{w};
+#list Route_yzct_buyfood create {s}{e}{buy im_19 for 200}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{w}{n};
+#list Route_yzct_dangpu create {s}{e};
+#list Route_dangpu_yzct create {w}{n};
+
+

@@ -1,0 +1,494 @@
+#var movemap[down]  {up};
+#var movemap[east]  {west};
+#var movemap[north]  {south};
+#var movemap[northeast]  {southwest};
+#var movemap[northwest]  {southeast};
+#var movemap[south]  {north};
+#var movemap[southeast]  {northwest};
+#var movemap[southwest]  {northeast};
+#var movemap[up]  {down};
+#var movemap[west]  {east};
+#var movemap[northup] {southdown};
+#var movemap[southdown] {northup};
+#var movemap[northdown] {southup};
+#var movemap[southup] {northdown};
+#var movemap[westup] {eastdown};
+#var movemap[eastdown] {westup};
+#var movemap[westdown] {eastup};
+#var movemap[eastup] {westdown};
+#var movemap[enter] {out};
+#var movemap[out] {enter};
+
+#var d2x[down]  {0};
+#var d2x[east]  {1};
+#var d2x[north]  {0};
+#var d2x[northeast]  {1};
+#var d2x[northwest]  {-1};
+#var d2x[south]  {0};
+#var d2x[southeast]  {1};
+#var d2x[southwest]  {-1};
+#var d2x[up]  {0};
+#var d2x[west]  {-1};
+#var d2x[northup] {0};
+#var d2x[southdown] {0};
+#var d2x[northdown] {0};
+#var d2x[southup] {0};
+#var d2x[westup] {-1};
+#var d2x[eastdown] {1};
+#var d2x[westdown] {-1};
+#var d2x[eastup] {1};
+#var d2x[enter] {0};
+#var d2x[out] {0};
+
+#var d2y[down]  {0};
+#var d2y[east]  {0};
+#var d2y[north]  {-1};
+#var d2y[northeast]  {-1};
+#var d2y[northwest]  {-1};
+#var d2y[south]  {1};
+#var d2y[southeast]  {1};
+#var d2y[southwest]  {1};
+#var d2y[up]  {0};
+#var d2y[west]  {0};
+#var d2y[northup] {-1};
+#var d2y[southdown] {1};
+#var d2y[northdown] {-1};
+#var d2y[southup] {1};
+#var d2y[westup] {0};
+#var d2y[eastdown] {0};
+#var d2y[westdown] {0};
+#var d2y[eastup] {0};
+#var d2y[enter] {0};
+#var d2y[out] {0};
+
+#var d2z[down]  {1};
+#var d2z[east]  {0};
+#var d2z[north]  {0};
+#var d2z[northeast]  {0};
+#var d2z[northwest]  {0};
+#var d2z[south]  {0};
+#var d2z[southeast]  {0};
+#var d2z[southwest]  {0};
+#var d2z[up]  {-1};
+#var d2z[west]  {0};
+#var d2z[northup] {-1};
+#var d2z[southdown] {1};
+#var d2z[northdown] {1};
+#var d2z[southup] {-1};
+#var d2z[westup] {-1};
+#var d2z[eastdown] {1};
+#var d2z[westdown] {1};
+#var d2z[eastup] {-1};
+#var d2z[enter] {0};
+#var d2z[out] {0};
+
+#list unexplored create;
+#list explored create;
+#list allrooms create;
+#list pausslist create ;
+
+#alias mapping_start
+{
+	#class {c_boundary} {read} {./tintin/myscripts/pkuxkx/mapping_boundary.tin};
+	#untick t_hp;
+	#untick t_hpbrief;
+	#untick t_sk;
+	#var pauss_trave 1;
+	#var mapping_ct %0;
+	
+	a2c look;
+	#delay {2}
+	{
+		#var fromct {};
+		#var toct {};
+		#var xofct {0};
+		#var yofct {0}; 
+		#var zofct {0}; 
+		#var bakid_check 1;
+		#var map_pre_rid @store_unexplored{$mapping_ct|||$fromct|||$toct|||$xofct|||$yofct|||$zofct};	
+		#var failcount 0;		
+		traverse_unexplored;
+	};
+	map_go;
+	
+};
+#alias map_go
+{
+	#ticker {t_mg} {#var pauss_trave 0;} {3};
+};
+#alias traverse_unexplored
+{
+	#if {$pauss_trave == 1}
+	{
+		#delay {2}
+		{
+			traverse_unexplored;
+		};
+	}
+	{
+		#var pauss_trave 1;
+		#var rid @get_unexploredId{};
+		#if {"$rid"!="0"}
+		{
+			map_gt $rid;
+			#act {^donottryagain.}
+			{
+				#unact {^donottryagain.};
+				#list unexplored delete 1;
+				traverse_unexplored;
+			};
+			#act {^dest!}
+			{
+				#unact {^dest!};
+				#delay {1}
+				{			
+				a2c look;
+				#delay {2}
+				{
+					#var roomname @getRoomName{$lines};
+					#var rn $roomname[1];
+					
+					#nop if current room is the same suppose to be;
+					#var pared @comparebakid{$rid};
+					#if {$pared==0}
+					{
+						#var roominfotab @get_roominfo{$rid};
+						#showme {can not goto the room $roominfotab[rname] ! tried $failcount times.};
+						#nop #untick {t_mg};
+						#nop #var pauss_trave 1;
+						#math failcount $failcount+1;
+						#if {$failcount>10}
+						{
+							#showme {failed to explore $roominfotab[rname]};
+							#list unexplored delete 1;
+						};
+						
+						traverse_unexplored;
+						
+					}
+					{
+						#var failcount 0;						
+						#list boundarylist_2 {find} {$rn} {is_inboundary};
+						#if {$is_inboundary>0}
+						{
+							#list unexplored delete 1;
+							#list explored add {$rid};
+							#nop back2ct $rid;
+							traverse_unexplored;
+						}
+						{
+							#list pausslist {find} {$rn} {is_inpauss};
+							#if {$is_inpauss>0}
+							{
+								
+								#showme {came to room $rn,paussed! using map_go to resume};
+								#untick {t_mg};
+								#var pauss_trave 1;
+								#list pausslist {delete} {$is_inpauss};
+								traverse_unexplored;
+							}
+							{
+								store_npcs {$rid} {$lines};					
+								#var elist @getExits{$lines};
+								#list elist size elist_size;
+								#var exit_cnt 1;
+								#var exit_pauss 0;
+								#var lookcount 0;
+								#ticker {t_allexit}
+								{
+									#if {$exit_pauss==1}
+									{
+										#showme {paussed of same bakid,using exit_skip to skip this exit,or exit_exp to explore the exit.looking $myexit};
+									}
+									{
+										#if {$exit_cnt>$elist_size}
+										{
+											#untick {t_allexit};
+											#list unexplored delete 1;
+											#list explored add {$rid};
+											#nop back2ct $rid;
+											traverse_unexplored;
+										}
+										{
+											#var myexit $elist[$exit_cnt];
+											#math exit_cnt $exit_cnt+1;
+											#if {"$myexit"!="$toparent[$rid]"}
+											{
+												a2c look $myexit;
+												#delay {2}
+												{
+													#var roomname @getRoomName{$lines};
+													#var rn $roomname[1];
+													#math lookcount $lookcount+1;
+													#if {"$rn"==""}
+													{														
+														#if {$lookcount<10}
+														{
+															#math exit_cnt $exit_cnt-1;
+														}{#var lookcount 0;#var prebakid 0;};
+													}
+													{																										
+														#var lflag @compareprelook{};
+														#if {"$lflag"=="0"}
+														{
+															#if {$lookcount<10}
+															{
+																#math exit_cnt $exit_cnt-1;
+																
+															}{#var lookcount 0;#var prebakid 0;};
+														}
+														{
+															#list forbidlist {find} {$rn} {is_inforbid};
+															#if {$is_inforbid==0}
+															{
+																#var lookcount 0;#var prebakid 0;														
+																#var roominfotab @get_roominfo{$rid};
+																#if {"$roominfotab[fromct]"!=""}
+																{
+																	#var fromct $roominfotab[fromct]|$myexit;
+																}
+																{
+																	#var fromct $myexit;
+																};
+																#if {"$roominfotab[toct]"!=""}
+																{
+																	#var toct $movemap[$myexit]|$roominfotab[toct];
+																}
+																{
+																	#var toct $movemap[$myexit];
+																};
+																#math xofct $roominfotab[xofct] + $d2x[$myexit];
+																#math yofct $roominfotab[yofct] + $d2y[$myexit];
+																#math zofct $roominfotab[zofct] + $d2z[$myexit];
+													
+																										
+																#var nextrid @store_unexplored{$mapping_ct|||$fromct|||$toct|||$xofct|||$yofct|||$zofct};
+																#if {"$nextrid"!="0"}
+																{
+																	#var bakid_check 1;
+																	#var toparent[$nextrid] $movemap[$myexit];
+																	store_relation $rid $nextrid $myexit $movemap[$myexit];
+																}
+																{
+																	#var exit_pauss 1;
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								}{4};
+							};
+						};
+					};
+				};
+				};
+			};	
+		};
+	};
+};
+#function store_unexplored
+{
+	
+	#list boundarylist_1 size bsize;
+	#var bcount 1;
+	
+	#while {$bcount<=$bsize}
+	{		
+		#var barea $boundarylist_1[$bcount];
+		#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getbakid.py "$lines" "$barea"};
+		#script {ret1} {python ./tintin/myscripts/pkuxkx/gps/getbakid_fromrid.py "$boundarylist_2[$bcount]"};
+		#if {"$ret1[1]"=="$ret[1]"}
+		{
+			#return $boundarylist_2[$bcount];
+		};
+		#math bcount $bcount+1;
+	};
+	
+
+
+	#var p1 %1;
+	#var p2 $lines;	
+	#var p3 $bakid_check;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/store_roominfo.py "$p1" "$p2" "$p3"};
+	#if {"$ret[1]"=="0"}
+	{
+		#return 0;
+	}
+	{	
+		#list unexplored {find} {$ret[1]} {is_inunexplored};
+		#list explored {find} {$ret[1]} {is_inexplored};
+		#math is_inset $is_inunexplored + $is_inexplored;
+		#if {$is_inset==0}
+		{
+			#list unexplored add {$ret[1]};
+			#return $ret[1];
+		}
+		{		
+			#return $ret[1];
+		};
+	};
+	
+}; 
+#alias exit_skip
+{	
+	#var exit_pauss 0;	
+};
+#alias exit_exp
+{	
+	#math exit_cnt $exit_cnt-1;
+	#var bakid_check 0;
+	#var exit_pauss 0;	
+};
+#function comparebakid
+{
+	#var p1 %1;
+	#var p2 $lines;	
+	#var p3 $mapping_ct;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/comparebakid.py "$p1" "$p2" "$p3"};
+	#return $ret[1];	
+};
+#function get_unexploredId
+{
+	#list unexplored size unexplored_size;
+	#if {$unexplored_size>0}
+	{
+		#return $unexplored[1];
+	}
+	{
+		#return 0;
+	};
+};
+#function get_roominfo
+{
+	#var temp_rid %1;
+	#var ret_tab {};
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/get_roominfo.py "$temp_rid"};
+	#var ret_tab[rid] $ret[1];
+	#var ret_tab[area] $ret[2];
+	#var ret_tab[fromct] $ret[3];
+	#var ret_tab[toct] $ret[4];
+	#var ret_tab[xofct] $ret[5];
+	#var ret_tab[yofct] $ret[6];
+	#var ret_tab[zofct] $ret[7];
+	#var ret_tab[rname] $ret[8];
+	#var ret_tab[rdesc] $ret[9];
+	#var ret_tab[exitsdesc] $ret[10];
+	#return $ret_tab;	
+};
+#function compareprelook
+{	
+	#var p1 $lines;	
+	#var p2 $mapping_ct;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getbakid.py "$p1" "$p2"};
+	#var lbid $ret[1];
+	#if {"$prebakid" == "0"}
+	{
+		#var prebakid $lbid;
+		#return 0;
+	}
+	{
+		#if {"$prebakid" == "$lbid"}
+		{
+			#return 1;
+		}
+		{
+			#var prebakid $lbid;
+			#return 0;
+		};
+	};
+};
+#alias store_npcs
+{
+	#var p1 %1;
+	#var p2 %2;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/store_npcs.py "$p1" "$p2"};	
+};
+#alias store_relation
+{
+	#var p1 %1;
+	#var p2 %2;	
+	#var p3 %3;
+	#var p4 %4;	
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/store_relation.py "$p1" "$p2" "$p3" "$p4"};		
+};
+#alias update_room
+{
+	#var old_rid %1;
+	#var lookcount 0;
+	#var mapping_ct {nospecified};
+	#var prebakid 0;
+	#tick {t_updatelook}
+	{	
+		a2c look;
+		#delay {2}
+		{	
+			#var roomname @getRoomName{$lines};
+			#var rn $roomname[1];
+			#math lookcount $lookcount+1;
+			#if {"$rn"==""}
+			{														
+				#if {$lookcount>10}
+				{
+					#showme {can not update!};
+					#untick {t_updatelook};
+				};
+			}
+			{																										
+				#var lflag @compareprelook{};
+				#if {"$lflag"=="0"}
+				{
+					#if {$lookcount>10}
+					{
+						#showme {can not update!};
+						#untick {t_updatelook};
+					};
+				}
+				{
+					#untick {t_updatelook};
+					#script {ret} {python ./tintin/myscripts/pkuxkx/gps/update_roominfo.py "$old_rid" "$lines"};									
+					#if {"$ret[1]"=="0"}
+					{
+						#showme {updated error};						
+					}
+					{	
+						store_npcs {$ret[1]} {$lines};
+						#showme {room info updated};
+					};
+				};
+			};
+		};
+	}{4};
+};
+#alias ct2room
+{
+	#var roominfotab @get_roominfo{%0};
+	#var fromctpath $roominfotab[fromct];
+	#replace {fromctpath} {|} {;};	
+	$fromctpath;		
+};
+#alias back2ct
+{
+	#var roominfotab @get_roominfo{%0};
+	#var back2ctpath $roominfotab[toct];	
+	#replace {back2ctpath} {|} {;};	
+	$back2ctpath;		
+};
+#alias map_gt
+{
+	#showme {start to go};
+	#var torid %1;
+	#var hererid $map_pre_rid;
+	#var map_pre_rid $torid;
+	#var hgtcount 0;
+	#math hgtcount $hgtcount+1;
+	igt $hererid $torid;			
+};
+#alias get_to_dest
+{
+	#showme {dest!};
+	#var hgtcount 0;
+};
+

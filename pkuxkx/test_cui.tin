@@ -1,0 +1,39 @@
+#list robbernpc create {tufei}{louluo}{Tufei}{Tu fei}{Coin};
+#alias ktufei
+{
+	#showme {let us kill tufei!};
+	get coin;
+};
+#alias w2a_init
+{
+	#list moves create {n}{w}{w};
+	#list moves size movesize;	
+	#var movestep 0;	
+};
+#alias w2a_finish
+{
+	#showme {end of move};
+};
+#function w2a_getAct
+{
+	#var hasnpc 0;
+	#foreach {$robbernpc[%*]} {mynpc}
+	{
+		#var tempv @has_dangerousNpc{$mynpc};
+		#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+	};
+	#if {$hasnpc==0}
+	{		
+		#math movestep $movestep+1;
+		#if {$movestep>$movesize}
+		{
+			#return {-1};
+		}
+		{
+			#return $moves[$movestep];
+		};
+	}
+	{
+		#return {ktufei};
+	};
+};

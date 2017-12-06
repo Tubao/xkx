@@ -1,0 +1,81 @@
+#alias gtwxb
+{
+	hgt f61d8c0611463ca4ea80a3b1a3e99c91;
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		give sai zi to xiaobao;
+	};
+};
+#act {^这个地方的描述中含有这样的字眼：%s,%s}
+{
+	
+};
+#act {^看起来%s想杀死你！}
+{
+	stopt;
+	#var istep $istepmax;
+	#action { %%1(%D)} {
+			#format npcid %l %%%1;
+			killall $npcid;
+			#ticker t_pfh {pfh} {2};
+		};
+	#act {^%%1叹了口气，我认栽。}
+	{
+		#untick t_pfh;
+	};
+};
+#alias start_mrx
+{
+	#var traversal_handler {stopTbyNpc jiazei};
+	#class mrx open;
+	#act {^这里没有这个人。}
+	{
+		gtmrx;
+	};
+	#act {^仆人叹道：家贼难防，有人偷走了少爷的信件，据传曾在『%*』附近出现}
+	{
+		#var tra {traversal %%1};
+		#echo {$tra};
+		$tra;
+	};
+	#act {^慕容世家家贼死了。}
+	{
+		#untick t_pfh;
+		#delay {1}
+		{
+			get all from corpse;
+		};
+		#delay {3}
+		{
+			gtmrx;
+			#act {^dest!}
+			{
+				#unact {^dest!};
+				give xin to pu ren;
+			};
+		};
+	};
+	#act {^这里不准战斗。}
+	{
+		ask jiazei about fight;
+		#delay {1}
+		{
+			killall jiazei;			
+		};
+	};
+	#act {^你决定开始跟随慕容世家家贼一起行动。}
+	{
+		killall jiazei;
+		#ticker t_pfh {pfh} {2};
+	};
+	#class mrx close;
+};
+#alias stop_mrx
+{
+	#var traversal_handler {};
+	#class mrx kill;
+};
+
+
+

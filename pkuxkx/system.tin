@@ -1,0 +1,552 @@
+#nop system set up;
+
+#var is_auto_connect 1;
+#var re_auto_quest 0;
+#var auto_connect_charactor {davidss};
+#var auto_connect_pw {xkx4128};
+#var showstatus_time {30};
+#var sname {};
+#var mycharid {xarnold};
+#var hasSociability {yes};
+
+#list task_stack create;
+#event {SESSION CONNECTED}
+{
+	#var sname %0;
+	#var is_auto_connect 1;
+	#list task_stack add {connected};
+	#var task_status[connected] {normal};
+	#var task_act[connected][normal] {hp};	
+	#delay {5}
+	{
+		special + sociability;
+	};
+};
+#ticker t_hbcheck
+{
+	#format tnow %T;
+	#var curr_task $task_stack[1];
+	#var maxdiff 120;
+	#if {$task_chkDelay[$curr_task]>120}
+	{
+		#var maxdiff $task_chkDelay[$curr_task];
+	};
+	#math diff $tnow - $heatbeat[$curr_task];
+	#showme {task stack: $task_stack};
+	#showme {task status: $task_status[$curr_task]};
+	#showme {hbdiff is $diff};
+	#showme {if hbcheck fail for $maxdiff seconds,this act will be execute:$task_act[$curr_task][$task_status[$curr_task]]};	
+	#if {$diff>$maxdiff}
+	{		
+		$task_act[$curr_task][$task_status[$curr_task]];
+	};
+}{60};
+#act {^您要将另一个连线中的相同人物赶出去，取而代之吗？}
+{
+	y;
+	get all;
+};
+#act {^有人从别处(}
+{
+	#unevent {SESSION DISCONNECTED};
+};
+#event {SESSION DISCONNECTED}
+{
+	#showme {%0 disconnected!};	
+	#if {$is_auto_connect==1 && "%0"=="xkx_xarnold"}
+	{
+		#showme {ready to autoconnect of xarnold};
+		#gts;		
+		#delay {15}
+		{
+			#showme {after 15 secs...};
+			#ses %0 www.pkuxkx.com 6666;xarnold;xkx4128;			
+			hi;
+		};		
+	
+	};
+	#if {$is_auto_connect==1 && "%0"=="xkx_davidss"}
+	{
+		#showme {ready to autoconnect of davidss};
+		#gts;		
+		#delay {15}
+		{
+			#showme {after 15 secs...};
+			#ses %0 www.pkuxkx.com 6666;davidss;xkx4128;			
+			hi;
+		};
+		
+	};
+
+};
+#nop get status;
+#act {^【 精神 】 %*/ %*[%*]  【 精力 】 %*/ %*(%*)}
+{
+	#var mystatus[js_1] %1;
+	#var mystatus[js_2] %2;	
+	#var mystatus[jl_1] %4;
+	#var mystatus[jl_2] %5;
+	#var mystatus[jl_3] %6;
+};
+#act {^【 气血 】 %*/ %*[%*]  【 内力 】 %*/ %*(%*)}
+{
+	#var mystatus[qx_1] %1;
+	#var mystatus[qx_2] %2;	
+	#var mystatus[nl_1] %4;
+	#var mystatus[nl_2] %5;
+	#var mystatus[nl_3] %6;
+};
+#act {^【 食物 】 %*/ %*[%*]  【 潜能 】 %*}
+{
+	#var mystatus[sw_1] %1;
+	#var mystatus[sw_2] %2;
+	#var mystatus[sw_3] %3;
+	#var mystatus[qn] %4;
+};
+#act {^【 饮水 】 %*/ %*[%*]  【 经验 】 %*}
+{
+	#var mystatus[ys_1] %1;
+	#var mystatus[ys_2] %2;
+	#var mystatus[ys_3] %3;
+	#var mystatus[jy] %4;
+};
+#act {^【 状态 】 %*}
+{
+	#var mystatus[zt] %1;
+};
+#function get_status
+{
+	hp;	
+	#delay {2}
+	{
+		#return mystatus;
+	};
+};
+#split;
+#prompt {xf:%* status 精神: %*/%* ; 气血: %*/%* ;内力:%*; 食物: %* ; 饮水: %* ; 状态: %*} {xf:$xf_type status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水: $mystatus[ys_1] ; 状态: $mystatus[zt]};
+#ticker {t_hp} 
+{
+	hp;
+	#format heatbeat[connected]  %T;
+	#delay {2}
+	{
+		#regexp {"$mystatus[zt]"} {"%*毒%*"} {eat san;} {#nop};		
+		#showme {xf:$xf_type status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水:  $mystatus[ys_1] ; 状态: $mystatus[zt]};		
+	};	
+}{$showstatus_time};
+#ticker {t_hpbrief} 
+{	
+	a2c hpbrief;
+	#delay {2}
+	{
+		#if {"$sname"=="xkx_xarnold"}
+		{	
+			
+			#if {$mystatus[js_2]<500} {eat dan};
+			#if {$mystatus[qx_2]<3300} {eat yao};
+			
+		};
+		#if {$mystatus[sw_1]<200} {eat gan liang};
+		#if {$mystatus[ys_1]<200} {drink jiudai;};
+		#showme {xf:$xf_type status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水:  $mystatus[ys_1] ; 状态: $mystatus[zt]};		
+	};	
+}{10};
+#act {%*读书写字                │literate                  │%*│%*│%*│}
+{
+	#var myskill[literate] %3;
+};
+#act {%*道家养生术              │taoism                    │%*│%*│%*│}
+{
+	#var myskill[taoism] %3;
+};
+#act {%*基本内功                │force                     │%*│%*│%*│}
+{
+	#var myskill[force] %3;
+};
+#act {%*基本拳法                │cuff                      │%*│%*│%*│}
+{
+	#var myskill[cuff] %3;
+};
+#act {%*基本轻功                │dodge                     │%*│%*│%*│}
+{
+	#var myskill[dodge] %3;
+};
+#act {%*基本刀法                │blade                     │%*│%*│%*│}
+{
+	#var myskill[blade] %3;
+};
+#act {%*基本剑法                │sword                     │%*│%*│%*│}
+{
+	#var myskill[sword] %3;
+};
+#act {%*基本招架                │parry                     │%*│%*│%*│}
+{
+	#var myskill[parry] %3;
+};
+#act {%*太极神功                │taiji-shengong            │%*│%*│%*│}
+{
+	#var myskill[taiji-shengong] %3;
+};
+#act {%*太极拳                  │taiji-quan                │%*│%*│%*│}
+{
+	#var myskill[taiji-quan] %3;
+};
+#act {%*太极剑法                │taiji-jian                │%*│%*│%*│}
+{
+	#var myskill[taiji-jian] %3;
+};
+#act {%*梯云纵                  │tiyunzong                 │%*│%*│%*│}
+{
+	#var myskill[tiyunzong] %3;
+};
+#act {%*玄虚刀法                │xuanxu-dao                │%*│%*│%*│}
+{
+	#var myskill[xuanxu-dao] %3;
+};
+#act {%*英雄剑法                │hero-jianfa               │%*│%*│%*│}
+{
+	#var myskill[hero-jianfa] %3;
+};
+#ticker {t_sk} 
+{
+	sk;	
+}{30};
+
+#act {^%*(%*)告诉你：show sk}
+{
+	 tell %2 {$myskill};
+};
+#act {^%*(%*)告诉你：show hp}
+{
+	 tell %2 {$mystatus};
+};
+#act {^下课行(davidss)告诉你：quit 333}
+{
+	 save;
+	 quit;
+};
+#act {^下课行(davidss)告诉你：cmd %*$}
+{
+	 #var cmd2exec %1;
+	$cmd2exec;
+};
+#ALIAS {capture_multiline} 
+{ 
+   #var capture_till {%0}; 
+   #var line { }; 
+   #var lines {};   
+   #class multiline_capture read ./tintin/myscripts/pkuxkx/multiline_capture.tin;
+};
+#ALIAS {look2capture} 
+{ 
+   capture_multiline >; 
+   look %0;
+};
+#alias {a2c}
+{
+	#var myact %0;
+	capture_multiline >;
+	%0;
+};
+#function {has_npc}
+{
+	#var ret 0;
+	#var npclist {@getNpcs{$lines}};
+	#foreach {$npclist[%*]} {npc}
+	{		
+		#regexp {"$npc[ename]"} {"%*%1%*"} {#var ret 1;#break;} {#nop};
+	};
+	#return $ret;
+};
+#function {has_dangerousNpc}
+{
+	#var ret 0;
+	#var npclist {@getNpcs{$lines}};
+	#list npclist size {npcsize};
+	#if {$npcsize==0}
+	{
+		#return 0;
+	};	
+	#foreach {$npclist[%*]} {npc}
+	{		
+		#regexp {"$npc[ename]"} {"%*%1%*"} 
+		{			
+			#var ret 1;#break;			
+		} {#nop};
+	};
+	#return $ret;
+};
+#alias {init_mydelay}
+{
+	#class c_mydelay kill;
+	#class c_mydelay read ./tintin/myscripts/pkuxkx/mydelay.tin;
+};
+#function {getExits}
+{
+	#var tmp %1;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/getExits.py "$tmp"};
+	#return $ret;
+};
+#function {getRoomName}
+{
+	#var tmp %1;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/getRoomName.py "$tmp"};
+	#return $ret;
+};
+#function {getNpcs}
+{
+	#var tmp %1;
+	#var ret_tab {};
+	#list ret_list create;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/getNpcs.py "$tmp"};
+	#list ret size {retsize};
+	#var tmp_cnt {1}; 
+	#var t_cnt {1}; 
+	#while {$retsize>0 && $t_cnt<=$retsize}
+	{
+		#var ret_tab[num] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[title1] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[title2] $ret[$t_cnt];		
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[title3] $ret[$t_cnt];		
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[cname] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[ename] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[status] $ret[$t_cnt];		
+		#math t_cnt $t_cnt+1;
+		#var ret_list[$tmp_cnt] {$ret_tab};
+		#math tmp_cnt $tmp_cnt+1;
+	};
+	
+	#return $ret_list;
+};
+#function {getIs}
+{
+	#var tmp %1;
+	#var ret_tab {};
+	#list ret_list create;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/getIs.py "$tmp"};
+	#list ret size {retsize};
+	#var tmp_cnt {1}; 
+	#var t_cnt {1}; 
+	#while {$retsize>0 && $t_cnt<=$retsize}
+	{
+		#var ret_tab[num] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;		
+		#var ret_tab[cname] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[ename] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;		
+		#var ret_list[$tmp_cnt] {$ret_tab};
+		#math tmp_cnt $tmp_cnt+1;
+	};
+	
+	#return $ret_list;
+};
+#function {getIds}
+{
+	#var tmp %1;
+	#var ret_tab {};
+	#list ret_list create;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/getIds.py "$tmp"};
+	#list ret size {retsize};
+	#var tmp_cnt {1}; 
+	#var t_cnt {1}; 
+	#while {$retsize>0 && $t_cnt<=$retsize}
+	{		
+		#var ret_tab[cname] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;
+		#var ret_tab[ename] $ret[$t_cnt];
+		#math t_cnt $t_cnt+1;		
+		#var ret_list[$tmp_cnt] {$ret_tab};
+		#math tmp_cnt $tmp_cnt+1;
+	};
+	
+	#return $ret_list;
+};
+#function {has_id}
+{
+	#var ret 0;
+	
+	#list idlist size {idsize};
+	#if {$idsize==0}
+	{
+		#return 0;
+	};	
+	#foreach {$idlist[%*]} {myid}
+	{		
+		#regexp {"$myid[ename]"} {"%s%1%s"} 
+		{			
+			#var ret 1;#break;			
+		} {#nop};
+	};
+	#return $ret;
+};
+#function {getItemNum}
+{	
+	#var ret 0;
+	#foreach {$ilist[%*]} {item}
+	{
+		#if {"$item[ename]"=="%1"}
+		{
+			#var ret $item[num];#break;
+		};
+	};
+	#return $ret;
+};
+#event {VARIABLE UPDATE w2a_capture_flag}
+{
+	#if {$w2a_flag==1}
+	{
+		#var myact @w2a_getAct{$lines};
+		#if {"$myact"=="-1"}
+		{
+			#untick {t_act};
+	                #var w2a_flag 0;			
+			w2a_finish;
+		}
+		{			
+			$myact;
+		};
+		
+	};
+};
+#alias wait2act
+{
+	#var w2a_flag 1;
+	#var keyv {%1};
+	#var fpath {%1.tin};
+	#var p %2;
+	#if {"$p"==""} {#var p 5};#elseif {$p<3} {#var p 3};#else {#nop};
+	#class c_w2a read {./tintin/myscripts/pkuxkx/$fpath};
+	w2a_init;	
+	#ticker {t_act}
+	{
+		look2capture;		
+	}{$p};	
+};
+#alias worklist_start
+{
+	#var worklist_ind 1;	
+	#list worklist size worklist_size;
+	#var is_doing_worklist 1;
+	$worklist[1];
+};
+#alias worklist_pause
+{
+	#var is_doing_worklist 0;
+};
+#event {VARIABLE UPDATE work_done_flag}
+{
+	#if {$is_doing_worklist==1}
+	{
+		#math worklist_ind $worklist_ind+1;
+		#if {$worklist_ind>$worklist_size}
+		{
+			#showme {end of worklist};
+			#var is_doing_worklist 0;
+		}
+		{
+			$worklist[$worklist_ind];
+		};
+	};
+};
+#alias start_ch
+{
+	#ticker {t_ch} {chanhui} {10};
+};
+#alias stop_ch
+{
+	#unticker {t_ch};
+};
+#alias get_nb
+{
+	d;out;draw cloth;draw boots;draw surcoat;draw head;remove all;draw armor;
+wear zhankui;wear zhanjia;wear zhanyi;wear zhanpao;wear zhanxue;
+enter;up;
+};
+#alias filljd
+{
+	#10 {fill jiudai;drop jiudai;};		
+	#delay {2}
+	{
+		get all;
+	};
+};
+#alias set_mb
+{
+	#var mb_flag 1;
+};
+#act {^http://pkuxkx.net/antirobot/robot.php?filename=%*$}
+{
+	#var fid %1;
+	#if {$mb_flag==1}
+	{
+		#script {ret} {python ./tintin/myscripts/pkuxkx/getFullme_mb.py "$fid"};
+	}
+	{
+		#script {ret} {python ./tintin/myscripts/pkuxkx/getFullme.py "$fid"};
+	};
+};
+#alias start_fm
+{
+	#var fullme_flag 0;
+	#tick t_fullmecheck
+	{
+		#script {ret} {python ./tintin/myscripts/pkuxkx/checkFullme.py};
+		#if {"$ret[1]"=="" && "$fullme_flag"=="0"}
+		{
+			#send {fullme};
+			#var fullme_flag 1;
+		}
+		{
+			#if {"$ret[1]"!="" && "$fullme_flag"=="1"}
+			{
+				#var fullme_flag 0;
+				fullme $ret[1];
+				stop_fm;
+				#delay {2700}
+				{
+					start_fm;
+				};
+			};
+		};
+	}{10};
+};
+#alias stop_fm
+{
+	#untick t_fullmecheck;	
+};
+#act {^( 你摇头晃脑、歪歪斜斜地站都站不稳，眼看就要倒在地上。 )}
+{
+	levelup;yes;
+};
+#act {^伯特子%*走了过来。}
+{
+	yell bridge;
+};
+#alias cunall
+{
+	cun all cash;
+	#delay {2}
+	{
+		cun all gold;
+		#delay {2}
+		{
+			cun all silver;
+			#delay {2}
+			{
+				cun all coin;
+				#delay {2}
+				{
+					qu 2 gold;
+				};
+			};
+		};
+	};
+};
+

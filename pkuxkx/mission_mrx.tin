@@ -1,0 +1,161 @@
+#alias gtmrx
+{
+	hgt bffdafab4df6cdbe66c1689dcdfa0f55;
+};
+#alias start_mrx
+{
+	#untick t_sk;
+	#class c_kill kill;	
+	#var traversal_handler {stopTbyNpc jiazei};
+	#class mrx open;
+	#alias askmrx.job
+	{
+		#var bmrxover_flag 0;
+		ask pu ren about job;
+	};
+	#act {^你手上持有的武器并不能用来发动%*}
+	{
+		wield staff;
+		wield staff 2;
+		wield staff 3;
+	};	
+	#act {^仆人叹道：家贼难防，有人偷走了少爷的信件，据传曾在『%*』附近出现}
+	{
+		#var tra {m.t %%1};
+		#echo {$tra};
+		$tra;
+	};
+	#act {^慕容世家%*死了。}
+	{
+		#untick t_pfh;
+		#delay {1}
+		{
+			get all from corpse;
+		};
+		#delay {3}
+		{
+			drop changjian;
+			#if {$bxs_flag==0 || $bmrxover_flag==1}
+			{
+				gtmrx;
+				#act {^dest!}
+				{
+					#unact {^dest!};
+					give xin to pu ren;
+					#delay {3}
+					{
+						drop shi tan;
+					};
+					#if {$bxs_flag==1}
+					{
+						#delay {1}
+						{
+							stop_mrx;
+							#var bxs_mrx_flag 3;
+							#var bmrxover_flag 0;
+							bxs.next;
+						};
+					};				
+				};
+			}
+			{
+				stop_mrx;
+				#var bxs_mrx_flag 2;
+				bxs.next;
+			};
+		};
+	};
+	#act {^{这里不准战斗。|这里禁止战斗。}}
+	{
+		ask jiazei about fight;
+		yun qi;
+		#delay {2}
+		{			
+			killall jiazei;			
+		};
+	};
+	#act {^你决定开始跟随慕容世家%*一起行动。}
+	{
+		yun qi;
+		killall jiazei;
+		#ticker t_pfh {pfh} {0.5};
+	};	
+	#class mrx close;
+};
+#alias stop_mrx
+{
+	#var traversal_handler {};
+	#class mrx kill;
+};
+#alias m.t
+{
+	#var r_traversal {traversal %1};	
+	#var hererid {bffdafab4df6cdbe66c1689dcdfa0f55};
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		igt $hererid $torid;	
+		#delay {2}
+		{
+			#if {$bxs_flag==1 && $mycost<100}
+			{
+				#var bmrxover_flag 1;	
+			};
+		};
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#nop #script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal.py "$locdesc" "$depth"};
+						#if {&traversal_table[$locdesc]}
+						{
+							#list ret create {$traversal_table[$locdesc]};
+						}
+						{
+							#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal_opt.py "$locdesc" "$depth"};
+						};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk;};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};
+		#act {^traversal_finished}
+		{
+			#unact {^traversal_finished};
+			r.m.t 5;
+		};
+	};
+};
+#alias r.m.t
+{
+	$r_traversal %1;	
+};
+

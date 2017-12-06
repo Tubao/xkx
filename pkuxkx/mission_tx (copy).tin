@@ -1,0 +1,146 @@
+#alias start_mrtx
+{
+	#config {LOG} {PLAIN};
+	#untick t_sk;	
+	#class mrtx open;
+	#alias askmrtx.job
+	{
+		#list zs_list create;
+		#config {BUFFER SIZE} {100};	
+		ask fu about job;					
+	};
+	#alias askmrtx.over
+	{
+		ask fu about finish;
+	};
+	#alias askmrtx.fail
+	{
+		ask fu about fail;
+	};
+	#act {^你手上持有的武器并不能用来发动%*}
+	{
+		wield zhang;
+		wield zhang 2;
+		wield staff;
+	};	
+	#act {^慕容复在你的耳边悄声说道：其人名曰%*，正在%*一带活动。}
+	{	
+		#buffer write {./tintin/myscripts/pkuxkx/txzs.tin};
+		#config {BUFFER SIZE} {20000};	
+		#script {ret} {python ./tintin/myscripts/pkuxkx/mrtxParser.py};
+		#if {"$ret[1]"=="1"}{#showme {zs ready!};};
+		#var targetNpc {%%1};
+		#var tra {mtx.t %%2};
+		#var traversal_handler {stopTbyNpc_cn $targetNpc};
+		#echo {$tra};
+		$tra;
+	};
+	#act {^tx:%* %*}
+	{	
+		#buffer write {./tintin/myscripts/pkuxkx/txzs.tin};
+		#config {BUFFER SIZE} {20000};
+		#script {ret} {python ./tintin/myscripts/pkuxkx/mrtxParser.py};
+		#if {"$ret[1]"=="1"}{#showme {zs ready!};};
+		#var targetNpc {%%1};
+		#var tra {mtx.t %%2};
+		#var traversal_handler {stopTbyNpc_cn $targetNpc};
+		#echo {$tra};
+		$tra;
+	};
+	#alias settx
+	{
+		#showme {tx:%%0};
+	};		
+	#act {^{这里不准战斗。|这里禁止战斗。}}
+	{
+		ask $npcename about fight;
+		yun recover;
+		#delay {2}
+		{			
+			#nop fight $npcename;			
+		};
+	};
+	#act {^你决定开始跟随}
+	{
+		yun recover;
+		#nop fight $npcename;
+	};	
+	#act {^你恐怕没有偷学机会了。}
+	{
+		#class c_txtri kill;
+		#5 halt;
+		#delay {2}
+		{
+			set_destEventHandler askmrtx.over;
+			gtmrx;
+		};
+	};
+	#alias tx.ft
+	{
+		#nop #class c_txtri read ./tintin/myscripts/pkuxkx/tx_tri.tin;
+		#class c_txtri read ./tintin/myscripts/pkuxkx/auto_tx.tin;
+		bei none;
+		fight $npcename;		
+	};
+	#class mrtx close;
+};
+#alias stop_mrtx
+{
+	#config {LOG} {RAW};
+	#var traversal_handler {};
+	#class mrtx kill;
+};
+#alias mtx.t
+{
+	#var r_traversal {traversal %1};	
+	#var hererid {bffdafab4df6cdbe66c1689dcdfa0f55};
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		igt $hererid $torid;	
+	
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal.py "$locdesc" "$depth"};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk2;};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};		
+	};
+};
+#alias r.mtx.t
+{
+	$r_traversal %1;	
+};
+

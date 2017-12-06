@@ -1,0 +1,113 @@
+#list robbernpc create {tufei}{louluo}{Tufei}{Tu fei}{tufei tou}{Tufei tou};
+#alias ktufei
+{
+	kill tufei;
+	kill louluo;
+	kill Tufei;
+	kill Tu fei;	
+	kill robber;	
+	kill tufei tou;
+};
+#var movemap[down]  {up};
+#var movemap[east]  {west};
+#var movemap[north]  {south};
+#var movemap[northeast]  {southwest};
+#var movemap[northwest]  {southeast};
+#var movemap[south]  {north};
+#var movemap[southeast]  {northwest};
+#var movemap[southwest]  {northeast};
+#var movemap[up]  {down};
+#var movemap[west]  {east};
+#var movemap[northup] {southdown};
+#var movemap[southdown] {northup};
+#var movemap[northdown] {southup};
+#var movemap[southup] {northdown};
+#var movemap[westup] {eastdown};
+#var movemap[eastdown] {westup};
+#var movemap[westdown] {eastup};
+#var movemap[eastup] {westdown};
+#var movemap[enter] {out};
+#var movemap[out] {enter};
+#alias w2a_init
+{	
+	#var pre_move {enter};	
+};
+#alias w2a_finish
+{
+	#untick {t_act};
+	#class c_w2a kill;
+	#showme {end of move};
+	w;
+	pu;
+	jiali max;
+	kill robber;	
+	#delay {2}
+	{
+		perform dodge.zong;
+	};
+	#delay {4}
+	{
+		pfc;
+	};
+	#delay {6}
+	{
+		pfc;
+	};
+	
+};
+#function w2a_getAct
+{
+	#var lines %1;
+	#var hasnpc 0;
+	#foreach {$robbernpc[%*]} {mynpc}
+	{
+		#var tempv @has_dangerousNpc{$mynpc};
+		#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+	};
+	#if {$hasnpc==0}
+	{		
+		#var roomname @getRoomName{$lines};
+		#var rn $roomname[1];
+		#showme {current location:$rn};
+		#if {"$rn"=="ɽկ"}
+		{
+			#return {-1};
+		}
+		{			
+			#var mlist @getExits{$lines};
+			#list mlist size {n_exits};
+			#if {$n_exits==0}
+			{
+				#return {#showme noexits};	
+			}
+			#list mlist {find} {enter} {enter_index};
+			#if {$enter_index>0}
+			{
+				#var pre_move {enter};
+				#return {enter};
+			};
+			#var thismove $mlist[1];
+			#foreach {$mlist[%*]} {myexit}
+			{
+				#if {"$myexit" != "$movemap[$pre_move]"}
+				{
+					#var pre_move $myexit;
+					#return {$myexit};
+				};
+			};
+			#var pre_move $thismove;
+			#return {$thismove};
+		};
+	}
+	{
+		#return {ktufei};
+	};
+};
+#act {^    狱卒(Yu zu)}
+{
+	give zu 10 silver;
+	#delay {3}
+	{
+		s;
+	};
+};

@@ -1,0 +1,131 @@
+#alias qpage {#var mypage %1;page %1;};
+#var q_sj_content {"not specified content"};
+#alias q_wd_sj {
+	#map run 复真观二层;
+	jie $q_sj_book;
+	chanting 1 1;
+};
+#act {^任务诵经任务要求你拿着%1在%2诵唱%3}
+{
+	#var q_sj_loc %2;
+	#var q_sj_book %1;
+	#var q_sj_content %3;
+	#var q_sj_start 0;
+	#act {^$q_sj_content}
+	{
+		#var pagefinded 1;		
+		#var q_sj_start 1;
+		#var q_sj_flag 0;
+		#var neirong {};
+	} ;
+	#var v_is_in_map @f_is_in_map{$q_sj_loc};
+	#var v_is_forbid 0;
+	#regexp {$q_sj_loc} {{小屋|小园|竹林小院|乌鸦岭|五老峰|绝义谷}} 
+	{	
+		#var v_is_forbid 1;
+	};
+	#if {$v_is_in_map==1 && $v_is_forbid==0}
+	{
+		#map run 2;
+		ask song about 下山;
+		#delay {destroy_sj}
+		{
+			#unact {^$q_sj_content};
+			#untick {t_startfindpage};	
+			#map run 复真观二层;
+			give zhike zhuang zi;
+			give zhike jing;
+			#delay {2} 
+			{			
+				wudang_q_songjing_fail;
+			};
+		}{540};
+		#delay {1} 
+		{
+			#map run $q_sj_loc;
+			#delay {1} {q_findpage;};
+		};
+	}
+	{
+		#unact {^$q_sj_content};	
+		#map run 复真观二层;
+		give zhike zhuang zi;
+		give zhike jing;
+		#delay {2} 
+		{			
+			wudang_q_songjing_fail;
+		};
+	};	
+	#showme {please to $q_sj_loc and look for page: q_sj_content};
+	#delay {1} {#showme {#map run $q_sj_loc};};
+};
+#act {^== %*} 
+{
+	#if {$q_sj_start==1}
+	{
+		#var neirong $neirong%1;
+	};	
+};
+#act {^===========}
+{
+	#if {$q_sj_start==1 && $q_sj_flag==0}
+	{
+		#var q_sj_flag 1;
+	}
+	{
+		#if {$q_sj_start==1 && $q_sj_flag==1}
+		{
+			#var q_sj_start 0;
+			#replace {neirong} {=}{};
+			#replace {neirong} { }{};
+			#unact {^$q_sj_content};
+			chanting $mypage $neirong;
+		}
+	};
+};
+#act {朗诵经文已经结束}
+{
+	wudang_q_songjing_success;
+};
+
+#alias q_findpage {
+	#var pagecnt 0;
+	#var pagefinded 0;
+	#ticker {t_startfindpage} 
+	{
+		#if {$pagefinded==0} 
+		{
+			#math pagecnt {$pagecnt+1};
+			qpage $pagecnt;
+		}
+		{
+			#untick {t_startfindpage};
+		};
+	}{0.5};
+};
+#alias wudang_q_songjing_bootstrap {q_wd_sj;};
+#alias wudang_q_songjing_fail 
+{
+	#map run 1;	
+	ask chongxu about cancel;
+	#var is_doing_task 0;
+};
+#alias wudang_q_songjing_success 
+{
+	#undelay destroy_sj;
+	#map run 1;
+	ask chongxu about success;
+	get all;	
+	#delay {2} 
+	{
+		#map run 复真观二层;
+		give zhike zhuang zi;
+		give zhike jing;
+		#delay {2} 
+		{			
+			#map run 1;
+			#var is_doing_task 0;			
+		};				
+	};
+};
+ 

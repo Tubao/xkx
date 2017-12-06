@@ -1,0 +1,18 @@
+1\build map database
+ 1\using bfs to explore locations
+ 2\location properties:id/area/roomname/roomdesc/exits/npcs/path from ct/path back to ct/xyz coordiate from ct
+   ct: the xiaoyaoyou ct.the initial location to explore the area
+   id:digest from area+roomname+roomdesc+exits+num
+  0: init:go to xiaoyaoyou ct,put ct in unexplored set.(a list) store the info of the room .
+  1: get first room from unexplored set.,look exits to get the following rooms,store the relations.put the following rooms in unexplored set(at tail).put previous room in explored set.
+	if the room got from unexplored set is on the bordary,put it in explored set directly.
+   loop step 1 untill the unexplored set is empty. or the pre-defined depth is reached. 
+
+maintain the unexplored / explored set in tintin,tt also store very room's path from ct/path back to ct/xy coordiate from ct
+store room info/relation in python
+using #log file to transfer data between tt and python.include path from ct/path back to ct/xy coordiate from ct
+python return room id to tt
+
+2、routine
+ 1\using bfs to get shortest path
+

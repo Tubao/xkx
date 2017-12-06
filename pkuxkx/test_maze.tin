@@ -1,0 +1,86 @@
+#list robbernpc create {tufei}{louluo}{Tufei}{Tu fei}{Coin};
+#alias ktufei
+{
+	#showme {let us kill tufei!};
+	get coin;
+};
+#var movemap[down]  {up};
+#var movemap[east]  {west};
+#var movemap[north]  {south};
+#var movemap[northeast]  {southwest};
+#var movemap[northwest]  {southeast};
+#var movemap[south]  {north};
+#var movemap[southeast]  {northwest};
+#var movemap[southwest]  {northeast};
+#var movemap[up]  {down};
+#var movemap[west]  {east};
+#var movemap[northup] {southdown};
+#var movemap[southdown] {northup};
+#var movemap[northdown] {southup};
+#var movemap[southup] {northdown};
+#var movemap[westup] {eastdown};
+#var movemap[eastdown] {westup};
+#var movemap[westdown] {eastup};
+#var movemap[eastup] {westdown};
+#var movemap[enter] {out};
+#var movemap[out] {enter};
+#alias w2a_init
+{	
+	#var pre_move {south};	
+};
+#alias w2a_finish
+{
+	#showme {end of move};
+};
+#function w2a_getAct
+{
+	#var lines %1;
+	#var hasnpc 0;
+	#foreach {$robbernpc[%*]} {mynpc}
+	{
+		#var tempv @has_dangerousNpc{$mynpc};
+		#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+	};
+	#if {$hasnpc==0}
+	{		
+		#var roomname @getRoomName{$lines};
+		#var rn $roomname[1];
+		#if {"$rn"=="后门"}
+		{
+			#return {-1};
+		}
+		{
+			#if {"$rn"=="天柱峰下"}
+			{
+				#var pre_move {south};
+				#return {south};
+			};
+			#var mlist @getExits{$lines};
+			#list mlist size {n_exits};
+			#if {$n_exits==0}
+			{
+				#return {#showme noexits};	
+			}
+			#list mlist {find} {enter} {enter_index};
+			#if {$enter_index>0}
+			{
+				#var pre_move {enter};
+				#return {enter};
+			};
+			#var thismove $mlist[1];
+			#foreach {$mlist[%*]} {myexit}
+			{
+				#if {"$myexit" != "$movemap[$pre_move]"}
+				{
+					#var pre_move $myexit;
+					#return {$myexit};
+				};
+			};
+			#var pre_move $thismove;
+			#return {$thismove};
+		};
+	}
+	{
+		#return {ktufei};
+	};
+};

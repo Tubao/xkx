@@ -1,0 +1,66 @@
+#event {RECEIVED LINE}
+{
+	#var line {%1}; 
+   	#var lines {$lines|||$line};    
+};
+#ACTION {^$capture_till}
+{      
+     #unevent {RECEIVED LINE};
+     #if {$w2a_flag==1}
+     {
+     	#var w2a_capture_flag 1;
+     };
+     #if {$flag_map_auto_name==1}
+     {
+     	#var roomname_capture_flag 1;
+     };
+     #if {$v_loadingmap==1}
+     {
+     	#var roomname_capture_flag 1;
+     };
+     #if {"$myact"=="i"}
+     {
+	#var ilist {@getIs{$lines}};
+     };     
+     #if {"$myact"=="id here"}
+     {
+	#var success_a2c 0;
+	#regexp {"$lines"} {"%*在这个房间中, 生物及物品的%*"} {#var success_a2c 1;#var idlist {@getIds{$lines}};} {#var success_a2c 0;};	
+     };
+     #if {"$myact"=="hpbrief"}
+     {
+	#var success_a2c 0;	
+	#regexp {"$lines"} {"%*#%*,%*,%*,%*,%*,%*|||#%*,%*,%*,%*,%*,%*|||%*"} 
+	{
+		#var success_a2c 1;
+		#var mystatus[jy] &2;
+		#var mystatus[qn] &3;
+		#var mystatus[nl_2] &4;
+		#var mystatus[nl_1] &5;
+		#var mystatus[jl_2] &6;
+		#var mystatus[jl_1] &7;
+		#var mystatus[qx_3] &8;
+		#var mystatus[qx_2] &9;
+		#var mystatus[qx_1] &10;
+		#var mystatus[js_3] &11;
+		#var mystatus[js_2] &12;
+		#var mystatus[js_1] &13;		
+	} 
+	{#var success_a2c 0;};	
+     };
+     #if {"$myact"=="look lupai"}
+     {
+	#var success_a2c 1;
+	#unvariable direct_cname;
+	#replace {lines} {|||} {};
+	#replace {lines} {这条路} {};
+	#replace {lines} {，} {;};
+	#showme $lines;
+	#foreach {$lines} {line}
+	{
+		#regexp {"$line"} {"%*边通向%*"} {#var direct_cname[&1] {&2};} {};	
+	};
+     };
+     #class multiline_capture kill;   	
+} {0};
+

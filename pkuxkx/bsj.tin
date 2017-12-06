@@ -1,0 +1,46 @@
+#list robbernpc create {tong}{lu}{nong fu};
+#alias ktufei
+{
+	hit tong;
+	hit lu;	
+	pu;
+	#5 ask nong fu about 华山派;
+	kill nong fu;
+};
+#act {^农夫死了}
+{
+	get tu from corpse;
+};
+#alias w2a_init
+{
+	#list moves create {n;w;w;open door;w;n;}{s;e;e;s};
+	#list moves size movesize;	
+	#var movestep 0;	
+};	
+#alias w2a_finish
+{
+	wait2act wudang_q_cui_maze 5;
+};
+#function w2a_getAct
+{
+	#var hasnpc 0;
+	#foreach {$robbernpc[%*]} {mynpc}
+	{
+		#var tempv @has_dangerousNpc{$mynpc};
+		#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+	};
+	#if {$hasnpc==0}
+	{		
+		#math movestep {$movestep+1};
+		#if {$movestep>$movesize}
+		{
+			#return {-1};
+		}
+		{
+			#return $moves[$movestep];
+		};
+	}
+	{
+		#return {ktufei};
+	};
+};

@@ -1,0 +1,51 @@
+#CONFIG           {256 COLORS}  {ON}
+#CONFIG           {AUTO TAB}  {5000}
+#CONFIG           {BUFFER SIZE}  {20000}
+#CONFIG           {CHARSET}  {ASCII}
+#CONFIG           {COLOR PATCH}  {OFF}
+#CONFIG           {COMMAND COLOR}  {<078>}
+#CONFIG           {COMMAND ECHO}  {ON}
+#CONFIG           {CONNECT RETRY}  {15}
+#CONFIG           {HISTORY SIZE}  {1000}
+#CONFIG           {LOG}  {RAW}
+#CONFIG           {PACKET PATCH}  {0.05}
+#CONFIG           {REPEAT CHAR}  {!}
+#CONFIG           {REPEAT ENTER}  {OFF}
+#CONFIG           {SCROLL LOCK}  {ON}
+#CONFIG           {SPEEDWALK}  {OFF}
+#CONFIG           {TINTIN CHAR}  {#}
+#CONFIG           {VERBATIM}  {OFF}
+#CONFIG           {VERBATIM CHAR}  {\}
+#CONFIG           {VERBOSE}  {OFF}
+#CONFIG           {WORDWRAP}  {ON}
+#PATHDIR          {d}  {u}  {32}
+#PATHDIR          {e}  {w}  {2}
+#PATHDIR          {n}  {s}  {1}
+#PATHDIR          {ne}  {sw}  {3}
+#PATHDIR          {nw}  {se}  {9}
+#PATHDIR          {s}  {n}  {4}
+#PATHDIR          {se}  {nw}  {6}
+#PATHDIR          {sw}  {ne}  {12}
+#PATHDIR          {u}  {d}  {16}
+#PATHDIR          {w}  {e}  {8}
+#pathdir {nu} {sd} {17};
+#pathdir {sd} {nu} {36};
+#pathdir {nd} {su} {33};
+#pathdir {su} {nd} {20};
+#pathdir {wu} {ed} {24};
+#pathdir {ed} {wu} {34};
+#pathdir {wd} {eu} {40};
+#pathdir {eu} {wd} {18};
+#pathdir {enter} {out} {50};
+#pathdir {out} {enter} {51};
+#macro {\eOQ} {#ses xkx_gpu 123.57.24.152 8080;*;*};
+#macro {\e[5~} {#buffer up};
+#macro {\e[6~} {#buffer down};
+#split;
+#class {pingdiao_ywm} {read} {./tintin/myscripts/pkuxkx/pingdiao.tin};
+#class {mysystem} {read} {./tintin/myscripts/pkuxkx/system.tin};
+#class {goto} {read} {./tintin/myscripts/pkuxkx/goto.tin};
+#class {c_innerwalk} {read} {./tintin/myscripts/pkuxkx/mywalk.tin};
+#class {c_automapping} {read} {./tintin/myscripts/pkuxkx/automapping.tin};
+#class {c_mygps} {read} {./tintin/myscripts/pkuxkx/mygps.tin};
+#class {c_fish} {read} {./tintin/myscripts/pkuxkx/fish.tin};

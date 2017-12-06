@@ -1,0 +1,57 @@
+#alias fish_start
+{
+	#list task_stack insert {1} {fish};	
+	#var task_act[fish][s1] {fish_s1};
+	#var task_status[fish] {s1};
+	
+	hgt 9c0784bb9b2938dc638474a7c0db496b;
+	#ticker {t_fish}
+	{
+		gua yuer;
+		diao yu;
+	}{30};
+	#act {^你一提杆，}
+	{
+		#format heatbeat[fish] %T;
+		hgt 94cfd5ad28417048573437f2c11a2a23;
+		#act {^你说道：「dest!」}
+		{
+			#unact {^你说道：「dest!」};
+			sell fish;
+			#delay {2}
+			{
+				sell fish;
+			};
+			#delay {4}
+			{
+				buy im_3498;
+			};
+			#delay {6}
+			{
+				buy im_3498;
+			};			
+			#delay {8}
+			{
+				hgt 9c0784bb9b2938dc638474a7c0db496b;
+				#act {^你说道：「dest!」}
+				{
+					#unact {^你说道：「dest!」};
+					gua yuer;
+					diao yu;
+				};
+			};
+		};
+			
+	};
+};
+#alias fish_stop
+{
+	#list task_stack delete {1};	
+	#untick {t_fish};
+	#unact {^你一提杆，};
+};
+#alias fish_s1
+{
+	#format heatbeat[fish] %T;
+	hgt 9c0784bb9b2938dc638474a7c0db496b;
+};

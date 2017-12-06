@@ -1,0 +1,93 @@
+#alias gls1
+{
+	gtdangpu;
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		buy im_2731;
+		#delay {2}
+		{ 
+			hgt fab8ee6c714d6fd430123cc24cf27751;
+			#act {^dest!}
+			{
+				#unact {^dest!};
+				fill jiudai;
+				#delay {2}
+				{
+					hgt 2f8968b0f07d2f6e47d3d09ebd5d7016;
+					#act {^dest!}
+					{
+						#unact {^dest!};
+						move wood;
+						#delay {2}
+						{
+							give qu jiudai;
+						};
+						#delay {4}
+						{
+							hgt 3b5c9d553e09e039114ec1ccc83303b5;
+							#act {^dest!}
+							{
+								#unact {^dest!};
+								ask ren about Áîºü³å;
+								#delay {1}
+								{
+									hgt 67d219ee868585e5ee3238fbcda126fa;
+									#act {^dest!}
+									{
+										#unact {^dest!};
+										climb xuanya;
+										#delay {2}
+										{
+											up;
+										}
+										#delay {4}
+										{
+											up;
+										}
+										#delay {8}
+										{
+											climb west;
+										};
+										#delay {12}
+										{
+											give chong xin;
+											hit chong;
+										};	
+										#delay {18}
+										{
+											get chong;					
+										};
+				
+									};
+								};	
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+
+#alias gls2
+{
+	wd;nu;ed;e;se;
+	hgt 3b5c9d553e09e039114ec1ccc83303b5;
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		drop chong;
+		#delay {2}
+		{
+			ask ren about Çú³¤ÀÏ;
+		};
+		#delay {3}
+		{
+			give ren book;
+		};
+	};
+};
+
+
+

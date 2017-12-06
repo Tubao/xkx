@@ -1,0 +1,155 @@
+#alias gtbxs
+{
+	hgt 6756af7b90442b676beecc9d659ee80e;
+};
+#var Nickname {伯特子};
+#var bxs_flag 0; 
+#alias start_bxs
+{	
+	#untick t_sk;	
+	#class c_kill kill;	
+	#nop 0:not start,1:started,2:finished,3:ask over,4:give up;		
+	#class bxs open;	
+	#alias askbxs.job
+	{			
+		ask bai about 挑战;		
+	};
+	#act {^百晓生微微颔首道：“口令无误，请接受挑战吧}
+	{
+		#var bxs_tc_flag 0;
+		#var bxs_hsz_flag 0;
+		#var bxs_mrx_flag 0;
+		#var bxs_hyd_flag 0;	
+		#var bxs_flag 1;	
+		btc.start;
+		#nop btc.mxstart;
+	};
+	#alias askbxs.over
+	{
+		ask bai about finish;
+	};
+	#alias btc.ask
+	{
+		tc_reset;
+		ask $biaotou about job;
+		#var tc_flag 1;
+		#var ref_rid $start_rid;
+		#var checkloc 0;		
+		#var tc_finished 0; 
+	};
+	#alias btc.start
+	{
+		start_tc;
+		set_destEventHandler btc.ask;
+		gttc;		
+	};
+	#alias btc.mx
+	{
+		give cai wu to $biaotou;		
+		#var bxs_tc_flag 3;
+		bxs.next;
+	};
+	#alias btc.mxstart
+	{		
+		set_destEventHandler btc.mx;
+		gttc;
+	};
+	#alias bhsz.ask
+	{
+		askhsz.job;		
+	};
+	#alias bhsz.start
+	{
+		start_hsz;
+		set_destEventHandler bhsz.ask;
+		gthsz;
+	};
+	#alias bmrx.start
+	{
+		start_mrx;
+		set_destEventHandler askmrx.job;
+		gtmrx;
+	};
+	#alias bhyd.start
+	{
+		start_hyd;
+		set_destEventHandler askhyd.job;
+		gthyd;
+	};
+	#alias bxs.next
+	{
+		#if {$bxs_tc_flag>=3 && $bxs_hsz_flag==0}
+		{			
+			bhsz.start;
+		};
+		#if {$bxs_hsz_flag==3 && $bxs_mrx_flag==0}
+		{			
+			bmrx.start;
+		};
+		#if {$bxs_tc_flag==4 && $bxs_mrx_flag==2}
+		{
+			bmrx.askover;			
+		};
+		#if {$bxs_tc_flag==4 && $bxs_mrx_flag==3}
+		{			
+			btc.start;		
+		};
+		#if {$bxs_tc_flag==3 && $bxs_mrx_flag>=2 && $bxs_hyd_flag==0}
+		{						
+			bhyd.start;
+		};
+		#if {$bxs_hyd_flag==1 || $bxs_hyd_flag==2}
+		{
+			bhyd.resume;
+		}; 		
+		#if {$bxs_hyd_flag==3 && $bxs_mrx_flag==2}
+		{			
+			bmrx.askover;
+		};		
+		#if {$bxs_hyd_flag==3 && $bxs_mrx_flag==3 && $bxs_tc_flag==3}
+		{
+			set_destEventHandler askbxs.over;
+			gtbxs;
+		};
+	};
+	#alias bmo
+	{
+		#var bmrxover_flag 1;
+	};
+	#alias bmrx.askover
+	{
+		gtmrx;
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			give xin to pu ren;			
+			#var bxs_mrx_flag 3;
+			#var bmrxover_flag 0;
+			#delay {2}
+			{
+				drop shi tan;	
+				bxs.next;			
+			};			
+		};
+	};
+	#alias bhyd.resume
+	{
+		#if {$bxs_hyd_flag==1}
+		{
+			#var pp_first 1;
+			ppdbr;
+		}
+		{
+			#var destEventHandler {askhyd.over};
+			set_destEventHandler $destEventHandler;
+			gthyd;
+		};
+	};	
+	#class bxs close;
+};
+#alias stop_bxs
+{	
+	#class bxs kill;
+};
+
+

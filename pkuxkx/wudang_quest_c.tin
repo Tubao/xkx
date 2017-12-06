@@ -1,0 +1,245 @@
+#alias {askcx}{ask chongxu about quest};
+#alias {zwj}{zouwei 金};
+#alias {zwm}{zouwei 木};
+#alias {zws}{zouwei 水};
+#alias {zwh}{zouwei 火};
+#alias {zwt}{zouwei 土};
+#alias {askyu}{ask yu about 炼丹};
+#alias {cy}{change H};
+#alias {cp}{change M};
+#alias {cr}{change L};
+#var is_in_auto_quest 0;
+#var is_doing_task 1;
+#var dosubmission 0;
+#var submission {xx_start};
+#var submission_period {60};
+#var mybook {du shu};
+#alias setbook
+{
+	#var mybook %1;
+};
+#alias getNewbieStaff
+{
+d;out;#2 draw sword;draw cloth;draw boots;draw surcoat;draw head;remove all;draw armor;draw blade;
+wield sword;wield dao;wear zhankui;wear zhanjia;wear zhanyi;wear zhanpao;wear zhanxue;
+enter;up;
+};
+#alias getbsj
+{
+	gt ry;
+	#delay {20}
+	{
+		wait2act bsj 5;
+	};
+};
+#list Route_yzct_qugold5 create {n}{w}{qu 5 gold}{busy2}{e}{s};
+#list Route_yzct_questbuy create {s}{e}{buy im_1765}{busy2}{buy im_1765}{busy2}{buy im_19 for 100}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{buy im_59}{busy2}{w}{n};
+#alias auto_quest_prepare
+{
+	loadmap wd;
+	#delay {4}
+	{
+		#map run 2;
+		ask song about 下山;
+		#delay {2} 
+		{	
+			#map run 1;	
+			#map leave;
+			#delay {2}		
+			{
+				#list inner_Route_list create;
+				#list inner_Route_list add {gtyz};
+				#list inner_Route_list add {stop};
+				#list inner_Route_list add {busy2};
+				#list inner_Route_list add {getNewbieStaff};
+				#list inner_Route_list add {busy2};
+				#list inner_Route_list add $Route_yzct_xarnold[%*];
+				#list inner_Route_list add $Route_yzct_qugold5[%*];
+				#list inner_Route_list add $Route_yzct_questbuy[%*];
+				#list inner_Route_list add {gtwd};
+				#list inner_Route_list add {stop};
+				#list inner_Route_list add {#map goto 1;};
+				inner_walk;
+			};
+		};
+	};
+	#class c_qp open;
+	#action {{\d+}{\s+}{.+}} {#list boxitem_inds add {%%1};#list boxitem_names add {%%3};};
+	#action {^柜子里目前存放的物品有：$} 
+	{
+		#list boxitem_inds create;
+		#list boxitem_names create;
+		#var item2get {玄铁剑};
+		#delay {2} 
+		{
+			#class c_qp kill;
+			#list sortlist create;
+			
+			#var item_ind @ismember{$item2get;boxitem_names};
+			#if {$item_ind >0}
+			{
+				#list sortlist sort $item_ind;					
+			};
+			
+			#list sortlist size {sortsize};
+			#if {$sortsize>0}
+			{				
+				#loop $sortsize 1 cnt
+				{					
+					getout $boxitem_inds[$sortlist[$cnt]];
+				};
+			};
+			unwield all;
+			wield xuantie sword;
+			wield dao;
+			iwalk;
+		};
+	};	
+	#class c_qp close;
+};
+#alias auto_quest
+{
+	loadmap wd;
+	#var is_in_auto_quest 1;
+	#var is_doing_task 0;
+	#var has_askcx 0;
+	#var is_sleeping 0;	
+};
+#alias unauto_quest
+{
+	#var is_in_auto_quest 0;
+};
+#ticker {t_auto_quest} 
+{		
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $is_sleeping==0}
+	{					
+		#map run 1;
+		save;			
+		askcx;	
+	}{#nop};	
+}{50};
+#act {^你向冲虚道长打听有关『quest』的消息}
+{
+	#var has_askcx 1;	
+};
+#act {^冲虚道长说道：「现在还没有新的工作可以分配给你，请稍等。}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askcx==1}
+	{
+		#var has_askcx 0;
+		eat gan liang;
+		#map run 龟泉;
+		drink;
+		#var is_healing 1;
+		#var healing_cnt 0;	
+		#ticker {t_heal}
+		{
+			#math healing_cnt $healing_cnt+1;
+			#if {$healing_cnt>15}
+			{
+				#untick {t_heal};
+				#var is_healing 0;
+			};
+			#if {$mystatus[qx_2]<$mystatus[qx_3] || $mystatus[js_2]<$mystatus[js_3]} 
+			{
+				yun heal;
+				yun inspire;				
+			}
+			{
+				#untick {t_heal};	
+				yun regenerate;
+				#delay {2}
+				{
+					yun recover;					
+					#var is_healing 0;					
+				};
+			};	
+		}{2};
+						 
+	};
+};
+#act {^冲虚道长说道：「道%*还有任务在身}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askcx==1}
+	{
+		#var has_askcx 0;
+		ask chongxu about cancel;
+	};
+};
+#act {^冲虚道长说道：「今天全派弟子要在%*熟读典籍，据说要诵唱%*的%*} 
+{	
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askcx==1}
+	{
+		#var q_sj_loc %1;
+		#var q_sj_book %2;
+		#var q_sj_content %3;		
+		#var has_askcx 0;
+		#var is_doing_task 1;
+		q_wd_sj;		
+	};
+};
+#act {^冲虚道长说道：「到天柱峰脚下采气}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askcx==1}
+	{			
+		#var has_askcx 0;
+		#var is_doing_task 1;
+		#var is_healing 1;	
+		#ticker {t_heal}
+		{
+			#if {$mystatus[qx_2]<$mystatus[qx_3] || $mystatus[js_2]<$mystatus[js_3]} 
+			{
+				yun heal;
+				yun inspire;
+			}
+			{	
+				#untick {t_heal};
+				yun regenerate;
+				#delay {2}
+				{
+					yun recover;						
+					#var is_healing 0;	
+					#delay {5}
+					{
+						wudang_q_caiqi_bootstrap;
+					};	
+				};
+			};	
+		}{2};
+					
+	};
+};
+#act {^冲虚道长说道：「武当三侠最近迷上了炼丹}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askcx==1}
+	{			
+		#var has_askcx 0;
+		#var is_doing_task 1;
+		wudang_q_liandan_bootstrap;
+	};	
+};
+#act {^冲虚道长说道：「武当派以真武七截阵闻名天下}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askcx==1}
+	{			
+		#var has_askcx 0;
+		#var is_doing_task 1;
+		#map leave;
+		wudang_q_zhenfa_bootstrap;
+	};	
+};
+#act {^冲虚道长说道：「山下双井子村的崔老汉}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askcx==1}
+	{
+		#var has_askcx 0;
+		#var is_doing_task 1;	
+		#ticker {t_wield}
+		{
+			wield sword;
+			wield dao;
+		}{30};
+		wudang_q_cui_bootstrap;		
+	};
+};
+

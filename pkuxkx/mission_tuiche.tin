@@ -1,0 +1,688 @@
+#list tc_mps create {星宿}{丐帮}{桃花岛}{全真}{华山}{武当}{少林};
+#var Nickname {伯特子};
+#var mydummy {xarnold};
+#var mytcid {xxkfk};
+#nop suz 昌隆镖局;
+#alias gttc {hgt e58a2e0463aecd29950b91c4a2ea2fb0};
+#var tc_count 1;
+#var biaotou {zuo};
+#alias start_tc
+{	
+	jiali 0;
+	special + sociability;	
+	#untick t_sk;	
+	#class tuiche open;
+	#ALIAS ge {gan che to east};
+	#ALIAS genter {gan che to enter};
+	#ALIAS geu {gan che to eastup};
+	#ALIAS gn {gan che to north};
+	#ALIAS gne {gan che to northeast};
+	#ALIAS gnu {gan che to northup};
+	#ALIAS gnw {gan che to northwest};
+	#ALIAS gout {gan che to out};
+	#ALIAS gs {gan che to south};
+	#ALIAS gse {gan che to southeast};
+	#ALIAS gsu {gan che to southup};
+	#ALIAS gsw {gan che to southwest};
+	#ALIAS gw {gan che to west};
+	#ALIAS gwu {gan che to westup};
+	#ALIAS ged {gan che to eastdown};
+	#ALIAS gnd {gan che to northdown};
+	#ALIAS gwd {gan che to westdown};
+	#ALIAS gsd {gan che to southdown};	
+	#ALIAS gd {gan che to down};
+	#ALIAS gup {gan che to up};
+	#var start_rid {e58a2e0463aecd29950b91c4a2ea2fb0};
+	#var tc_flag 0;	
+	#var byhand 0;
+	#class c_kill kill;
+	#alias tc_reset
+	{
+		ask $biaotou about 重置任务;
+		#var tc_count 1;
+	};	
+	#act {^%S%s%S%s%S秒%s待认领%s0}
+	{
+		#if {"%%3"!="峨嵋毗卢殿"}
+		{		
+			getesc %%1;	
+			#var tc_flag 1;	
+			#untick t_listesc;
+		};
+	};
+	#alias asktc.job
+	{
+		
+		#showme {推车第$tc_count轮};			
+		listesc;	
+		#var ref_rid $start_rid;
+		#var checkloc 0;		
+		#var tc_finished 0;
+		#ticker t_listesc
+		{
+			listesc;
+		}{3};			
+	};
+	#alias asktc.over
+	{
+		#var tc_flag 0;
+		#unact {劫匪突然从暗处跳了出来，阴笑道：“红货和人命都留下来吧！。”};
+		ask $biaotou about finish;
+		#if {$bxs_flag==0}
+		{
+			#if {$tc_count>24}
+			{
+				tc_reset;
+			};			
+			#delay {2}
+			{
+				drop shi tan;
+				drop xuan bing;
+				#if {$needqx==1}
+				{
+					#var needqx 0;
+					yun heal;
+					#delay {1}
+					{
+						yun heal;
+					};
+				};		
+			};
+		
+			#if {$mystatus[nl_1]>10000}
+			{
+				yun recover;
+				#delay {4}
+				{
+					asktc.job;
+				};
+			}
+			{
+				#tick t_tcdz
+				{
+					dazuo max;
+				}{5};
+			};
+			#class tcover open;		
+			#act {^{你运功完毕，深深吸了口气，站了起来。|你现在内力接近圆满状态。}}
+			{
+				#untick t_tcdz;
+				halt;
+				#class tcover kill;
+				yun recover;
+				#delay {2}
+				{
+					asktc.job;
+				};
+			};
+			#class tcover close;
+		}
+		{
+			stop_tc;
+			#var bxs_tc_flag 3;
+			bxs.next;
+		};
+	};
+		
+	#alias asktc.fail
+	{		
+		#unact {劫匪突然从暗处跳了出来，阴笑道：“红货和人命都留下来吧！。”};
+		ask $biaotou about fail;
+		#var tc_flag 0;	
+		#var tc_count 0;
+		#if {$bxs_flag==1}
+		{
+			stop_tc;
+			#var bxs_tc_flag 4;
+			bxs.next;
+		};
+	};
+	#alias move_next
+	{
+		#act {^一片浓雾中，什么也看不清。}
+		{
+			#unact {^一片浓雾中，什么也看不清。};
+			#delay {30}
+			{
+				tcauto;
+			};
+		};		
+		#math tc_step_count $tc_step_count+1;
+		#if {$tc_step_count==10}
+		{
+			#var tc_step_count 0;
+			#var checkloc 1;
+		};
+		#if {$checkloc==1}
+		{
+			#var checkloc 0;
+			upf;
+			start_lochere;
+			#act {^located!}
+			{
+				#unact {^located!};
+				#list inner_Route_list create;
+				#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_sbs2.py "$hererid" "$destrid"};
+				#list ret size retsize;
+				#if {$retsize>0 && "$ret[1]"!="0"}
+				{	
+					#var ref_rid $ret[1];			
+					#list ret delete {1};	
+					#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};			
+					#list inner_Route_list add {#showme {hasmoved}};
+					#nop showme $inner_Route_list;
+					inner_walk;
+				}
+				{
+					#var checkloc 1;
+					#var tc_step_count -1;
+					move_next;
+				};
+			};
+		}
+		{
+			#list inner_Route_list create;
+			#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_sbs2.py "$ref_rid" "$destrid"};
+			#list ret size retsize;
+			#if {$retsize>0 && "$ret[1]"!="0"}
+			{	
+				#var ref_rid $ret[1];			
+				#list ret delete {1};	
+				#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};			
+				#list inner_Route_list add {#showme {hasmoved}};
+				#nop showme $inner_Route_list;
+				inner_walk;
+			}
+			{
+				#math tc_step_count $tc_step_count-1;
+				#var checkloc 1;
+				move_next;
+			};
+		};
+	};
+	#act {^hasmoved}
+	{
+		#showme {推车：第$tc_count轮};
+		yun qi;		
+		#delay {1.5} 
+		{
+			#ticker t_shou
+			{
+				shou $mytcid's robber;
+			}{1.5};
+		};
+	};
+	#act {^这个方向过不去。}
+	{
+		#var byhand 0;
+		#var tc_step_count 9;
+	};
+	#act {^这是一位%*弃徒。}
+	{
+		#list tc_npc_enames add {$mytcid's robber $robberindex};
+		#var temp %%1;
+		#replace {temp} {派} {};				
+		#list tc_npc_mps add {$temp};	
+		#math robberindex $robberindex+1;
+	};
+	#act {^劫匪个起纵遁入暗里不见了。}
+	{
+		#showme {one robber killed!};
+		#list tc_npc_killorders size killsize;
+		#if {$killsize>1}
+		{
+			#list tc_npc_enames create;
+			#list tc_npc_mps create;
+			#list tc_npc_killorders create;
+			#var robberindex 1;
+			#delay {0.5}
+			{
+				look $mytcid's robber 1;
+				look $mytcid's robber 2;
+				look $mytcid's robber 3;
+			};
+			#delay {2}
+			{
+				#list tc_npc_mps size npcsize;			
+				#foreach {$tc_mps[%*]} {mp}
+				{
+					#var tempi 1;				
+					#foreach {$tc_npc_mps[%*]} {npcmp}
+					{								
+						#if {"$npcmp"=="$mp"}
+						{
+							#list tc_npc_killorders add {$tempi};	
+							#showme $tc_npc_killorders;					
+						};
+						#math tempi $tempi+1;					
+					};					
+				};
+				#showme $tc_npc_enames;				
+				#showme $tc_npc_mps;
+				#showme $tc_npc_killorders;
+			};
+		};
+	};
+	#act {^你想收谁作弟子？}
+	{
+		#untick t_shou;
+		#untick t_pf;		
+		#delay {1}
+		{
+			#if {$tc_finished==1}
+			{
+				hgt $start_rid;
+				#act {^dest!}
+				{
+					#unact {^dest!};
+					asktc.over;
+				};
+			}
+			{
+				#if {$neednl==1}
+				{
+					#var neednl 0;
+					#tick t_tcdz
+					{
+						dazuo max;
+					}{5};
+					#class tcdz open;					
+					#act {^你运功完毕，深深吸了口气，站了起来。}
+					{
+						#untick t_tcdz;
+						#class tcdz kill;
+						yun recover;
+						#if {$byhand==0}
+						{
+							move_next;
+						};
+					};
+					#class tcdz close;
+				}
+				{
+					#if {$byhand==0}
+					{
+						move_next;
+					};
+				};
+				#nop #showme {can move_next};
+			};
+		};
+	};
+	#alias bh
+	{
+		#var tcact %%0;
+		#var byhand 1;
+		$tcact;
+		#showme {hasmoved};
+	};
+		
+	#alias tcauto
+	{			
+		#var byhand 0;
+		#var tc_step_count 4;
+		move_next;		
+	};
+	#alias tracehj
+	{
+		#var tra {tc.t $localdesc};
+	    	#var traversal_handler {stopTbyNpc_cn $targetNpc};
+	    	#echo {$tra};
+	    	$tra;
+	};
+	#alias tell_dummy
+	{		
+		#act {劫匪突然从暗处跳了出来，阴笑道：“红货和人命都留下来吧！。”}
+		{
+			#list tc_npc_enames create;
+			#list tc_npc_mps create;
+			#list tc_npc_killorders create;
+			#var robberindex 1;
+			#delay {0.5}
+			{
+				look $mytcid's robber 1;
+				look $mytcid's robber 2;
+				look $mytcid's robber 3;
+			};
+			#delay {2}
+			{
+				#list tc_npc_mps size npcsize;			
+				#foreach {$tc_mps[%*]} {mp}
+				{
+					#var tempi 1;				
+					#foreach {$tc_npc_mps[%*]} {npcmp}
+					{								
+						#if {"$npcmp"=="$mp"}
+						{
+							#list tc_npc_killorders add {$tempi};	
+							#showme $tc_npc_killorders;					
+						};
+						#math tempi $tempi+1;					
+					};					
+				};
+				#showme $tc_npc_enames;				
+				#showme $tc_npc_mps;
+				#showme $tc_npc_killorders;
+			};
+			#delay {2}
+			{
+				#ticker t_pf
+				{
+					#list tc_npc_killorders size killsize;
+					#if {$killsize>1}
+					{
+						pfh $tc_npc_enames[$tc_npc_killorders[1]];
+					}
+					{
+						pfh;
+					};		
+				}{0.2};
+			};
+		};
+		tell $mydummy xkxtc $localdesc $destrid $targetNpc;
+		#var tc_step_count 0;
+		#var checkloc 1;
+		#delay {10}
+		{
+			move_next;
+		};
+	};
+	#act {^%*告诉你：xkxtc %* %* %*}
+	{
+		#untick t_hpbrief;
+		#untick t_tellloc;
+		#unact {劫匪突然从暗处跳了出来，阴笑道：“红货和人命都留下来吧！。”};
+		#var localdesc  {%%2};
+		#var ref_rid {%%3};
+	    	#var targetNpc {%%4};
+	    	#delay {10}
+	    	{
+	    		tracehj;
+	    	};
+	};
+	#act {%*tcfinish}
+	{
+		#untick t_tellloc;
+		#class c_tc_follow kill;
+		#if {"$mycharid"=="$mydummy"}
+		{
+			gthsz;
+		};			
+	};
+	
+	#act {告诉你：hjloc %*}
+	{
+		#if {"%%1"!=""}		
+		{
+			#var destrid  {%%1};	
+		};	    	
+	};
+	#act {^你累了个半死，终于把镖运到了地头。} 
+	{
+		#math tc_count $tc_count+1;		
+		#var tc_finished 1;
+		#var tc_flag 0;	
+		tell $mydummy tcfinish;
+		#if {$bxs_flag==1}
+		{
+			tell $mydummy tohsz;
+		};
+	};
+	#act {劫匪趁你不注意，推着镖车就跑，你赶紧追了上去。}
+	{
+		#showme {乱入};
+		#var checkloc 1;
+		#var tc_step_count 0;
+	};
+	#act {^你上次运镖太辛苦了，下去休息休息吧。}
+	{
+		#delay {10}
+		{
+			asktc.job;
+		};
+	};
+	#ACTION {%*递给你一封密信。} {stop_tc;s; s; s; xian xin};
+	#action {$Nickname把这批红货送到扬州醉仙楼%*那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #nop #var localdesc  {%%3};
+	    #nop #var destrid {b55a81f6888c5cb8081aa0297abe0ecd};
+	    #nop #var targetNpc {%%2};
+	    #nop tell_dummy;
+	    asktc.fail;	    
+	};
+	#action {$Nickname把这批红货送到建康府车马行%*那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%3};
+	    #var destrid {20976beb71384afa713d83e44430ad23};
+	    #var targetNpc {%%2};
+	    tell_dummy;
+	};
+	#action {$Nickname把这批红货送到峨嵋毗卢殿%*那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #nop #var localdesc  {%%3};
+	    #nop #var destrid {91e6cd1bd3939ba999848729dfc96e91};
+	    #nop #var targetNpc {%%2};
+	    #nop tell_dummy;
+	    asktc.fail;	    
+	};
+	#action {$Nickname把这批红货送到福州福威镖局%*那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%3};
+	    #var destrid {d9c50fdb3f9943a448865a67b62dd5ec};
+	    #var targetNpc {%%2};
+	    tell_dummy;
+	};
+	#action {$Nickname把这批红货送到岳阳车马行%*那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%3};
+	    #var destrid {84706361e7ccab4dc0fad983cee84967};
+	    #var targetNpc {%%2};
+	    tell_dummy;
+	};
+	#action {$Nickname把这批红货送到泉州当铺王福贵那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {888028bf893204bf96b95048b2ea46bb};
+	    #var targetNpc {%%1};
+	    tell_dummy;
+	};
+	#action {$Nickname把这批红货送到嘉兴陆家庄大厅陆立鼎那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {d690776f215ec9e60b7314839f1365cc};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到江州天福镖局王小月那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {b54a9096e5698168dbc963f7ea946277};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到归云庄太湖街商人那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {c3cb4bd21c43da4f6c3d48fbc4f263e7};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到岳王墓墓前广场包打听那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {aeb118fe2bed4e18dc074063b8351edd};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到牙山小荒地黄毛鬼那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {dc791906fd40a37ef42435e3c972862c};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到临安府江南钱庄金乞儿那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {e774007ac7be8f669693fac10a97364d};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到苏州聚宝斋孙剥皮那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {478df74cce2658601f36bdcd8bdb1b37};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到镇江飞龙镖局张经那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {978dd91452cfa9ca80d8816822786374};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到南昌飞虎镖局楚大业那里，他已经派了个伙计名叫%*到%*附近接你} {
+	     #var localdesc  {%%2};
+	     #var destrid {0c8c3797aa6224ed192803d4f5c68939};
+	      #var targetNpc {%%1};
+	      tell_dummy;
+	};
+	#ACTION {$Nickname把这批红货送到嘉兴钱庄包方圆那里，他已经派了个伙计名叫%*到%*附近接你} {
+	    #var localdesc  {%%2};
+	    #var destrid {d1013449893c5a09661043ef64bfe3bc};
+	     #var targetNpc {%%1};
+	     tell_dummy;
+	};
+		
+	#act {^你决定开始跟随}
+	{
+		#class c_tc_follow open;
+		#act {^$targetNpc向%*离开。}
+		{
+			#untick t_tellloc;
+			tracehj;
+		};
+		#act {^这里没有%*}
+		{
+			#untick t_tellloc;
+			tracehj;
+		};
+		#class c_tc_follow close;
+		#tick t_tellloc
+		{
+			start_lochere;
+			#act {^located!}
+			{
+				#unact {^located!};
+				#var destrid $hererid;	
+				tell $mytcid hjloc $destrid;
+				follow $npcename; 
+			};					
+		}{15};		
+	};	
+	#class tuiche close;
+};
+#alias tc_resume
+{
+	#var ref_rid $start_rid;
+	#var checkloc 0;
+	#var tc_flag 1;	
+	#var tc_finished 0;
+	#var tc_step_count 4;
+	move_next;
+};
+#alias stop_tc
+{	
+	#var traversal_handler {};
+	#class tuiche kill;
+	#class tcover kill;
+	#untick t_tcdz;
+	#untick t_pf;
+};
+#alias tc.t
+{		
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 6;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByRName.py "$ref_rid" "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		hgt $torid;	
+	
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			#var traversal_flag 0;
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#showme {"$ref_rid" "$locdesc" "$depth"};
+						#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal_rid.py "$ref_rid" "$locdesc" "$depth"};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk2;};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};
+		#act {^traversal_finished}
+		{
+			#unact {^traversal_finished};
+			r.tc.t 10;
+		};		
+	};
+};
+#alias r.tc.t
+{
+	#var traversal_flag 0;
+	tc.t $locdesc 10;	
+};
+#alias set_tc
+{
+	#var tc_count %1;
+};
+#alias tcmx
+{
+	#class c_tcmx open;
+	#act {卷走%*财物的伙计 %*(%*)}
+	{
+		#format huoji %l {%%3};
+		#5 ask $huoji about treasure;
+	};
+	#act {%*把一包财物砸向你，一转眼不见了。}
+	{
+		#class c_tcmx kill;
+		set_destEventHandler tcmx.over;
+		gttc;
+	};
+	#class c_tcmx close;
+	set_destEventHandler tcmx.zhao;
+	pgt %0;
+};
+#alias tcmx.zhao
+{
+	zhao;
+	#delay {1}
+	{
+		look;
+	};
+};
+#alias tcmx.over
+{
+	start_tc;
+	give cai wu to $biaotou;
+	#delay {2}
+	{
+		asktc.job;
+	};
+};
+
+

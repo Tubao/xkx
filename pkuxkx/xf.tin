@@ -1,0 +1,197 @@
+#alias start_xf
+{
+	#untick t_sk;
+	#var traversal_handler {stopTbyNpc shashou};
+	#class xf open;
+	
+	#alias qx {fight shashou;jifa sword taiji-jian;wield sword;perfor sword.chan;unwield sword;l shashou;quest};
+	#alias fs {follow shashou};
+	#alias askss {ask shashou about 认输};
+	#alias gy {halt;give shashou yao};
+	#alias yls {yun lifeheal shashou};
+	#act {^蒙面杀手深深地叹了口气。} 
+	{
+		get all;
+		#delay {3}
+		{
+			gtxf;
+			#act {^dest!}
+			{
+				#unact {^dest!};
+				ask xiao about finish;
+			};
+		};
+	};
+	#act {^你提起手中的%*对准}
+	{
+		#delay {2}
+		{
+			get all;
+			#delay {2}
+			{
+				gtxf;
+				#act {^dest!}
+				{
+					#unact {^dest!};
+					give xiao shou ji;
+				};
+			};
+		};
+	};
+	#alias zc {zhan corpse;get shouji};
+	#act {西夏一品堂 %1(%2 %3) <昏迷不醒>}
+	{
+		get %3;
+	};
+	
+	#alias askxf.job
+	{			
+		#act {^萧峰道：「传闻西夏一品堂派出了若干蒙面杀手，最近出现在%*附近的%*。}
+		{
+			#unact {^萧峰道：「传闻西夏一品堂派出了若干蒙面杀手，最近出现在%*附近的%*。};
+			#class c_xf_type open;
+			#act {此人气焰甚是嚣张，你去给他点颜色瞧瞧，让他认输就好。}
+			{
+				#var xf_type {askss};
+				jiali 0;
+				#class c_xf_type kill;
+			};
+			#act {此人于中原武林颇为有用，你去将他擒回这里交给我。打晕其之后若他再醒来，可直接点晕(dian)他。}
+			{
+				#var xf_type {qing};
+				jiali 0;
+				#class c_xf_type kill;
+			};
+			#act {此人加入西夏一品堂不久，尚可教化，你去劝劝(quan)他吧。}
+			{
+				#var xf_type {quan};
+				jiali 0;
+				#class c_xf_type kill;
+			};
+			#act {此人为非作歹，早已恶贯满盈。你去将他除掉，取其首级回来。}
+			{
+				#var xf_type {kill};
+				jiali max;
+				#class c_xf_type kill;
+			};
+			#class c_xf_type close;
+			
+			#alias showtype
+			{
+				#showme $xf_type;
+			};
+			
+			
+			#var xf_loc {$xf_type %%1 %%2};
+			#echo {$xf_loc};			
+			
+		};		
+		#act {^这里不准战斗。}
+		{
+			ask shashou about fight;		
+		};		
+		ask xiao about job;
+	};
+	#alias askxf.over
+	{
+		ask xiao about finish;
+	};
+	#alias askxf.fail
+	{
+		ask xiao about fail;
+	};
+	
+	#class xf close;
+	
+};
+#act {『蒙面杀手(damage:%* 气血:%d%%/%d%%)』}
+{
+	#var ss_qx1 %2;
+	#var ss_qx2 %3;
+	#if {"$xf_type"=="quan" && $ss_qx2 < 30}
+	{
+		#5 halt;
+	};
+	#if {"$xf_type"=="askss" && $ss_qx2 < 30}
+	{
+		#5 halt;
+	};
+};
+#act {^劝人走入正道，只有一招一式的打才能让人心服，你此时不便出手。}
+{
+	quan;
+};
+#alias stop_xf
+{
+	#var traversal_handler {};
+	#class xf kill;	
+};
+#alias xf.tra
+{
+	#var xf_type {%1};	
+	#if {"$xf_type"=="kill"}
+	{
+		jiali max;
+	}
+	{
+		jiali 0;
+	};
+	ptraversal %2 %3 %4;
+};
+#alias x.t
+{
+	#var r_traversal {ptraversal %2 %3};	
+	#var hererid {661d3fe4eb38ec8a55d35890b2d156aa};
+	#var xf_type {%1};
+	#if {"$xf_type"=="kill"}
+	{
+		jiali max;
+	}
+	{
+		jiali 0;
+	};
+	#var locdesc {%2 %3};
+	#var depth %4;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByPy.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		igt $hererid $torid;	
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			look;		
+			#delay {2}
+			{
+				#if {$traversal_flag == 0}
+				{	
+					#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_ptraversal.py "$locdesc" "$depth"};
+					#list inner_Route_list create;
+					#list inner_Route_list add {#showme {traversal_start};};
+					#list inner_Route_list add {setSlowWalk;};
+					#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+					#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+					#list inner_Route_list add {setNormalWalk;};					
+					inner_walk;
+	
+				};
+			};
+		};
+	};
+};
+#alias r.x.t
+{
+	$r_traversal %1;
+};

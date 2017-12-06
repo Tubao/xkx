@@ -1,0 +1,33 @@
+#alias q_wd_ld {
+#act {##########}{
+#class c_wd_ld open;
+#act {~\e[1;35m^}{#class c_wd_ld kill;cp};
+#act {~\e[1;33m^}{#class c_wd_ld kill;cy};
+#act {~\e[1;31m^}{#class c_wd_ld kill;cr};
+#class c_wd_ld close;
+};
+#act {丹炉里传出来一阵清香，看来已经成丹了！赶紧向俞岱岩报告！}{wudang_q_liandan_success;};
+n;n;n;n;e;e;askyu;s;zuo;kan;
+#config {convert meta} {on};
+};
+#alias wudang_q_liandan_bootstrap {q_wd_ld;#delay {d_liandan} {wudang_q_liandan_fail;} {360};};
+#alias wudang_q_liandan_success 
+{
+	#undelay {d_liandan};
+	#config {convert meta} {off};
+	#class {c_wd_ld} {kill};
+	zhan;n;askyu;w;w;s;s;s;s;
+	ask chongxu about success;
+	#var is_doing_task 0;
+	get all;
+};
+#alias wudang_q_liandan_fail
+{
+	#undelay {d_liandan};
+	#config {convert meta} {off};
+	#class {c_wd_ld} {kill};
+	zhan;n;w;w;s;s;s;s;
+	ask chongxu about cancel;
+	#var is_doing_task 0;	
+};
+

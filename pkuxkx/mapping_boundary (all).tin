@@ -1,0 +1,327 @@
+#nop xy;
+#list boundarylist_1 create {0}{jb1}{0}{xiny}{0};
+#list boundarylist_2 create {半山坡}{3677e0ebb8e875b1dfd68d0a8efbf12a}{青石大道}{98f6474fcf42be1790412abad8da052d}{蒙古营门};
+
+#nop wdc;
+#list boundarylist_1 create {0}{xy}{0};
+#list boundarylist_2 create {林间小路}{01a7226c759de006399c7d1228f3c3e9}{石阶};
+
+#nop wd;
+#list boundarylist_1 create {0}{wdc}{0};
+#list boundarylist_2 create {密林}{f6e866bb08a09bfdbe15cdfe7c818168}{北侧门};
+
+#nop ssb;
+#list boundarylist_1 create {xiny}{0}{yz};
+#list boundarylist_2 create {a233de5a05668c56afa3efdac5e29162}{效忠楼}{c9c985feed328835b5002ee2def32d74};
+#list forbidlist create {果林};
+
+#nop qf;
+#list boundarylist_1 create {yz}{0}{0};
+#list boundarylist_2 create {9ffb79515a80d8016fc200c326a57a84}{大驿道}{黄河渡口};
+#list forbidlist create {许昌城};
+
+#nop ny;
+#list boundarylist_1 create {0}{xiny}{qf}{xy}{0}{0};
+#list boundarylist_2 create {汝州城}{673ddc54d4c47abb46419822a1a00f1c}{86b7cd6b9ba3aa61cb3165e813470121}{27c4307d21a207c82614ac64953d93ae}{伊阙}{南村口};
+
+#nop xc
+#list boundarylist_1 create {0}{ny};
+#list boundarylist_2 create {东村口}{2270a9ed1329ea8550c76754d7cbdee4};
+#list forbidlist create {石阶};
+#nop ly
+#list boundarylist_1 create {0}{ny}{ny}{0}{0}{0};
+#list boundarylist_2 create {小路}{05c0f4ae0ee5892b14c706a5ee574641}{3eb1c60f4c4ae038eed0f1a6be15934d}{函谷关}{洛水}{武门};
+#list forbidlist create {黄河南岸};
+
+#nop hn2
+#list boundarylist_1 create {ly}{ly}{qf_2}{0}{0}{0};
+#list boundarylist_2 create {f8506a5e31b00684203032c59406af03}{7814ca57372ccd4ae816ccc57e40fe5a}{114d98ffa2a659e41b09dfef747ef10c}{土路}{黄土地}{渭水河畔};
+#list forbidlist create ;
+
+#nop ca
+#list boundarylist_1 create {0}{0}{0}{0}{0}{0}{0}{0}{0}{0};
+#list boundarylist_2 create {明德门}{金光门}{春明门}{通阳门}{兴庆门}{通化门}{丹凤门}{延喜门}{安福门}{安远门};
+#list forbidlist create {承天门大街}{外城墙}{内城墙};
+
+#nop ca_2
+#list boundarylist_1 create {hn2}{ca}{0}{ca}{ca}{ca}{ly}{ca};
+#list boundarylist_2 create {b9c41bcfbe4c88de8a3545d7e0207e28}{223606639c55081a41db577d862f6468}{大道}{038c4644da07da8ed38dc646f87276f6}{9a33c05a041bc7f9d842614c08a362b1}{a4dd379bbab8cf9082902726b2a0a835}{47cc915962158b22b44d00e88ff61c33}{5309f9f3970dc5d0d16afb3859be41a8};
+#list forbidlist create {玄武殿}{六盘山}{金牛道}{山道}{苍龙岭};
+
+#nop hs_cll
+#list boundarylist_1 create {xc}{ca_2}{0};
+#list boundarylist_2 create {22f7a1862dcc81ad154640134d19fcd0}{8067dfad18295e54766d9a1d74bca553}{客厅};
+#list forbidlist create ;
+
+#nop hs
+#list boundarylist_1 create {hs_cll};
+#list boundarylist_2 create {fc24f9a5ce03e88c81e6d04b51aa00c0};
+#list forbidlist create ;
+
+#nop tais
+#list boundarylist_1 create {qf_2};
+#list boundarylist_2 create {a850bd2d54c0d156922f2847afe57c1d};
+#list forbidlist create {玉皇顶};
+
+#nop qzh
+#list boundarylist_1 create {xc};
+#list boundarylist_2 create {c6658a39372c9f69760466bcf9450373};
+#list forbidlist create {九仙楼}{飞鸾阁}{说法院}{乘云阁}{小道};
+
+#nop gm
+#list boundarylist_1 create {qzh}{ca_2};
+#list boundarylist_2 create {c49d15f988b69bef5d1977f23037621b}{7f0fd923d02b4fa3662bb074d8926c31};
+#list forbidlist create {石阶};
+
+#nop sl
+#list boundarylist_1 create {gm}{ny};
+#list boundarylist_2 create {5073d84f22cfe2b32ee4d4cb6c0abf15}{05c0f4ae0ee5892b14c706a5ee574641};
+#list forbidlist create {松树林};
+
+#nop sl_2/3
+#list boundarylist_1 create {sl};
+#list boundarylist_2 create {25bdaa1100ec23edd34f2818c4f7565b};
+#list forbidlist create {练武场}{竹林小道};
+
+#nop xz
+#list boundarylist_1 create {hn2}{ca_2}{ca_2};
+#list boundarylist_2 create {3e405daa1c69d2699450b231030146ad}{9bf65b4e3e75c990b25370188e3d7e48}{c58f43226599dbc5bc4cae3b2578eb00};
+#list forbidlist create {黑店}{小沙漠}{大漠}{小路};
+
+#nop cd
+#list boundarylist_1 create {ca_2}{0}{0}{0}{0};
+#list boundarylist_2 create {9f585cd65f17e49058bc6745c5bab8aa}{洞庭湖}{石阶}{羊肠小路}{川西土路};
+#list forbidlist create {锦江};
+
+#nop yy
+#list boundarylist_1 create {cd}{0}{0}{0};
+#list boundarylist_2 create {b9a5e4b194f9efc4dfe5c919ae37d55c}{北门}{泥泞土路}{苗岭边缘};
+#list forbidlist create ;
+
+#nop jz
+#list boundarylist_1 create {yy}{0}{0}{0};
+#list boundarylist_2 create {67a8c12ca9638eb55fffa5ff3e013abd}{浔阳楼}{锁江楼}{南昌北门};
+#list forbidlist create {清凉门};
+
+#nop dl
+#list boundarylist_1 create {cd_3}{0}{0};
+#list boundarylist_2 create {1f50d97940d84a683051d6c762df1601}{王府大门}{双鹤桥};
+#list forbidlist create {天龙寺山脚};
+
+#nop lz
+#list boundarylist_1 create {0}{xz}{0}{hn2};
+#list boundarylist_2 create {缥缈峰山脚}{594589b7c3b366489bc9d0d3a21fbd91}{黄羊滩}{63b1b26452eb5d6fda89474498108997};
+#list forbidlist create {皇宫广场};
+
+#nop zp
+#list boundarylist_1 create {lz}{cd};
+#list boundarylist_2 create {3b1e6a2b16f78215c890409a7351d566}{7d54ce2a298f206e27612c53700b4b9b};
+#list forbidlist create {湖边小路}{牧场}{雪坡};
+
+#dls
+#list boundarylist_1 create {dls}{dls}{dls};
+#list boundarylist_2 create {3b8504cc1711a5065fdc4dc7b93ba75c}{ba278c0fca851c66bd80962dcbd4a957}{3eceb90de4cb6ae062aec09c80d1111e};
+#list forbidlist create {日木伦殿};
+
+#lj
+#list boundarylist_1 create {lj_2}{0};
+#list boundarylist_2 create {acd1534fedb62c28d347b0e650632ce1}{小屋};
+#list forbidlist create ;
+
+#lxc
+#list boundarylist_1 create {xs};
+#list boundarylist_2 create {b0eec8f657dad4976ce8e4b185bcfc32};
+#list forbidlist create {石板路}{王大力记};
+
+#nop jk
+#list boundarylist_1 create {0}{0}{0}{jz_2};
+#list boundarylist_2 create {湖畔}{大湖之畔}{东山头}{59f41966a4b28adb01b3c843d39feebd};
+#list forbidlist create {城墙}{长江渡口}{大沼泽}{沼泽}{回廊}{青石官道}{太湖边}{登云门}{前厅}{后庭};
+
+#nop sz
+#list boundarylist_1 create {jk};
+#list boundarylist_2 create {36608d6f90d56353eeef19b609276c5d};
+#list forbidlist create {城墙}{义兴县城}{土路}{长江岸边}{北门};
+
+#nop sz_2
+#list boundarylist_1 create {sz};
+#list boundarylist_2 create {a0c0a9c485e1bbf58017b366553ab57e};
+#list forbidlist create {城墙}{宝带桥}{草地}{山谷};
+
+#nop sz_3
+#list boundarylist_1 create {sz_2}{sz_2}{sz_2};
+#list boundarylist_2 create {549ba7c0210e34361e944f16092ec310}{c1373437be8e350afbb903a555f02cf1}{eeb92e2b3c445a9ea394baabb93a8359};
+#list forbidlist create {城墙}{嘉兴城};
+
+#nop jn
+#list boundarylist_1 create {jk}{sz};
+#list boundarylist_2 create {ea32ffb207e12ace71256578f1f2b2a3}{bff2ff2b1ac40f7f5d8f6bba9848a2ba};
+
+#nop zj
+#list boundarylist_1 create {0}{jk};
+#list boundarylist_2 create {鸡笼山下}{f82bef7fa2b4c060804e312d8b422fe1};
+#list forbidlist create {广场}{青阳门}{青石官道}{长江渡口}{小沙};
+
+#nop taih
+#list boundarylist_1 create {sz_2};
+#list boundarylist_2 create {dfb4e850920a1381f414951e44c67c3d};
+#list forbidlist create {树林}{归云庄大门};
+
+#nop jx
+#list boundarylist_1 create {sz_3}{jk};
+#list boundarylist_2 create {6be7c4b3e4f50f6063360150d20be611}{b138fa53dbea3f5cf05e2997045d7dc3};
+#list forbidlist create {金鸡亭}{驿道}{山路};
+
+#nop ys
+#list boundarylist_1 create {jx};
+#list boundarylist_2 create {a83e8098bbedcb0e55e548246994e1d7};
+#list forbidlist create {天封塔};
+
+#nop mz
+#list boundarylist_1 create {ys}{0}{jx};
+#list boundarylist_2 create {2859edf91012ff97ac0c4b686d5f630d}{小院}{db7382cbb6e2a8152fc20643bc56566d};
+#list forbidlist create ;
+
+#nop hz
+#list boundarylist_1 create {jk};
+#list boundarylist_2 create {c7c43f8be4f17698b6293308e66e1b43};
+#list forbidlist create {榷场}{八字桥}{北大街}{段家桥}{山路};
+
+#nop hz_4
+#list boundarylist_1 create {hz}{hz};
+#list boundarylist_2 create {9e1685b700c6ace92264cc64a687edbd}{dfd32d4a362871f31b9dcc5f1343de12};
+#list forbidlist create {西湖}{长桥}{小径}{御道}{和宁门瓮城}{西南宫墙}{提督府正门}{老林}{段家桥};
+
+#nop xh
+#list boundarylist_1 create {hz}{hz_4};
+#list boundarylist_2 create {969cf574eedac1746d02da9b2ea819a2}{d1dadd8dc0f3314b5d3bff693e4839a6};
+#list forbidlist create {西里湖}{花港观鱼}{曲院风荷}{北里湖}{西湖};
+
+#nop qz
+#list boundarylist_1 create {jx}{hz};
+#list boundarylist_2 create {b3358b5d66955453bbbc129ac09fa61f}{cb590144a16cfed447bda0b09a43d6c6};
+#list forbidlist create {山路};
+
+#nop fz
+#list boundarylist_1 create {jx}{hz}{qz}{qz};
+#list boundarylist_2 create {b3358b5d66955453bbbc129ac09fa61f}{cb590144a16cfed447bda0b09a43d6c6}{383d63a9508379fab9fb40892d37b114}{29fbecb20e74c10217c64599959977c1};
+#list forbidlist create {小道};
+
+#list boundarylist_1 create {em_2}{em_2}{em_2};
+#list boundarylist_2 create {7c63713740a49fe51eae9be3ea9c9666}{85aec8f461043fb83f7d0b40ddef0736}{8b97b0d7897234f7a3b91df11ce06934};
+#list forbidlist create {云海};
+
+#nop ywm
+#list boundarylist_1 create {fz};
+#list boundarylist_2 create {e105374fb38657c20c1aab3cbeaf4db6};
+#list forbidlist create {碎石路};
+
+#nop nc
+#list boundarylist_1 create {qz}{jz}{yy};
+#list boundarylist_2 create {29fbecb20e74c10217c64599959977c1}{05fddbdcca052e2621acad63c9d983e8}{970a947110c7df1bd9eb02918fb95cf4};
+#list forbidlist create {老林};
+
+#nop ty
+#list boundarylist_1 create {cd};
+#list boundarylist_2 create {b9a5e4b194f9efc4dfe5c919ae37d55c};
+#list forbidlist create {小路}{黑沼};
+
+#nop km
+#list boundarylist_1 create {dl};
+#list boundarylist_2 create {214b341654a783143a7201a347a6896a};
+#list forbidlist create {大道}{苗岭山林};
+
+#nop px
+#list boundarylist_1 create {km};
+#list boundarylist_2 create {5019761c1b35be797f8353ebac240eaf};
+
+#nop tls
+#list boundarylist_1 create {tls};
+#list boundarylist_2 create {343c9e3e29278d79493b978cf7208f0c};
+
+#nop wl
+#list boundarylist_1 create ;
+#list boundarylist_2 create ;
+#list forbidlist create {书房};
+
+#nop hb
+#list boundarylist_1 create ;
+#list boundarylist_2 create ;
+#list forbidlist create {濮阳}{官道}{废墟}{大沙漠}{黄土路}{青石官道}{丝绸之路};
+
+
+#nop jy
+#list boundarylist_1 create {hb}{0};
+#list boundarylist_2 create {bc0bf8f1c16fdba63b11af7d840e970e}{雁门关};
+#list forbidlist create {城墙}{东大街}{羊市}{泰宁寺}{土路}{广安门};
+
+#nop zjk
+#list boundarylist_1 create {jy};
+#list boundarylist_2 create {efdd704621ee5315d5f1efd3d28c41d8};
+#list forbidlist create {德胜门}{土路};
+
+#nop huangz
+#list boundarylist_1 create {0}{0}{xx}{hb};
+#list boundarylist_2 create {南城外土路}{宫城}{01e5a130264c55e49cb329acb32e72fa}{ff58fc899cff78515ee600cd9028ed03};
+#list forbidlist create {黄沙地}{绿柳山庄小路}{兰州西门};
+
+#nop mj
+#list boundarylist_1 create {mj};
+#list boundarylist_2 create {62c9548c84c6795e98978c12576cb7c2};
+#list forbidlist create ;
+
+#nop lanz
+#list boundarylist_1 create {lanz_3}{lanz_3}{lanz_3}{lanz_3}{lanz_3}{lanz_3}{lanz_3};
+#list boundarylist_2 create {549202f6ff13bc9f5be11635bc0c047b}{b6df4fd5831906ff01c93223fbe33f00}{b2b8f5dce641859e8e57a4b5376c203b}{441c445eceb996a13d88cead5ce6042b}{e0d70e933c31de3bbca193cb8957c5b7}{f96de17c8a9a3c34c42983e25bf63252}{01e1188605e1ac31b677ea4375615b63};
+#list forbidlist create {楼橹}{密林}{山脊};
+
+#nop jyg
+#list boundarylist_1 create {hb};
+#list boundarylist_2 create {8d74467e323efb8b3d20755634b0e5e4};
+#list forbidlist create {大沙漠};
+
+#nop bt
+#list boundarylist_1 create {bt};
+#list boundarylist_2 create {048a9846eb14a9e47a06b38d26dfc301};
+#list forbidlist create {大沙漠}{草丛}{北大街};
+
+#nop mr
+#list boundarylist_1 create {mr_3};
+#list boundarylist_2 create {0c58667ab5876d8b0c2cc0cbaceb0db9};
+#list forbidlist create {琅镮福地}{茶花林};
+
+#nop bj
+#list boundarylist_1 create {hb};
+#list boundarylist_2 create {d67e95af8e3a2269a8aea4f711563463};
+#list forbidlist create {永安门};
+
+#nop sld
+#list boundarylist_1 create ;
+#list boundarylist_2 create ;
+#list forbidlist create {树林}{竹林};
+
+#nop bj_2
+#list boundarylist_1 create {bj_7}{bj_3}{bj_5}{bj_5}{bj_4}{bj_4}{bj_4}{bj_3}{bj_3}{bj_3}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2}{bj_2};
+#list boundarylist_2 create {6a7598041562a2e343ed74bebb653ba2}{d1899b9d9bef258d564d39ad8302040c}{c8274f234cc2b7b88e3a387e10308970}{a2f27ce9fb75099e056ced0a87241631}{92ff064fd92b09a60bc80f143cbfdf67}{73c97915b43cc2db5b40ad2ad016512c}{d9b7498a28fbdda0bb214abdfa04f7bd}{a63b4b4d0dbeb656110b977fd55f4ff8}{8aceaa6db0860bf317f9b32255fb3cab}{d1899b9d9bef258d564d39ad8302040c}{dbfdd79f8243af10bd235db9c829f7d4}{152a8e9616324154ad5a91737c8033bb}{1e39a794515d7931c0bcb0d5731e70de}{1b92c1d59d23043b0f54cf96eb8797fc}{574454eaa88339f8689ece591de1325d}{2599a31dc01ba8c6b017610f1335a929}{92e47a1863c93baa9793bd6ac30e3d5a}{5b4c23db963d8be0315bc344cceb9c29}{1ec7d5f86cbbb654ea9fdb5c6e51bfeb}{26530c7564a31e933e72b3176146dcfb}{838bd7729daa3a63bb600c3bc579d7fa}{27ed2f5512e8722544711d266cb1d20e}{6d47bb7ed3a93fc4db593ba9f0eb59a4}{64e11ce88f85bce8770ede4f6d3a7e86};
+#list forbidlist create {康亲王书房}{石屋}{石板路}{内金水桥}{鳌府大院}{通道}{顺贞门}{官道}{宣武门城楼}{崇文门城楼}{正阳门城楼}{广渠门城楼}{东便门城楼}{朝阳门城楼}{东直门城楼}{安定门城楼}{得胜门城楼}{西直门城楼}{阜成门城楼}{西便门城楼}{广安门城楼};
+
+#nop gb
+#list boundarylist_1 create {xs}{dls};
+#list boundarylist_2 create {5f059d0e0dce34420ea32cc0519095cc}{eab3c5ab27e72cf4c6d238600afd5c12};
+#list forbidlist create {树洞下}{青竹林};
+
+#no zjc
+#list boundarylist_1 create {bj_3}{bj_4};
+#list boundarylist_2 create {831daa15f9bd2d3d5ce62ad89e62e15b}{a277ab51c3a18aa879914e081532b6d8};
+#list forbidlist create {殿前广场}{小广场}{右翼门}{左翼门};
+
+#list boundarylist_1 create {zjc}{zjc}{zjc}{zjc}{zjc}{zjc}{zjc};
+#list boundarylist_2 create {4751601692467eae40bde729d2dd3a27}{1394504d20b60f3e6bbd0806fde9ff28}{4d95fb74cd45b142dabea00f1205e578}{b63a17def9a0cf9f62741c3d4933e0fb}{e602cfaf6036c0ac22764647cf433c18}{cfb47e7b0e0f586762b892b12fec4ce5}{3edc241bf92de5c5c2e7cb3d91bcf3a4};
+#list forbidlist create {乾清门};
+
+#list boundarylist_1 create {bj_3}{zjc_2}{zjc_2}{zjc_2};
+#list boundarylist_2 create {831daa15f9bd2d3d5ce62ad89e62e15b}{2b506697b1270bd4ef77c1ee48f1f0c1}{7d2e69ef640b0b85360a2f2588a75ee0}{0d78c7e899978c485defd1e4a03001b6};
+#list forbidlist create {通道};
+
+
+

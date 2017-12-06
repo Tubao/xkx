@@ -1,0 +1,175 @@
+#alias {askjob}{ask swnt npc about job};
+#alias {askbiandu}{ask swnt npc about biandu};
+#var biandu_or_job 0;
+#var is_in_auto_quest 0;
+#var is_doing_task 1;
+#var dosubmission 0;
+#var submission {xx_start};
+#var submission_period {60};
+#var mybook {du shu};
+#alias setbook
+{
+	#var mybook %1;
+};
+#alias getNewbieStaff
+{
+d;out;#5 draw sword;draw cloth;draw boots;draw surcoat;draw head;draw armor;remove all;
+wield sword;wield blade;wear zhankui;wear zhanjia;wear zhanyi;wear zhanpao;wear zhanxue;
+enter;up;
+};
+#alias find_swnt2askjob
+{
+	enter;askjob;
+	n;askjob;
+	s;s;askjob;
+	n;e;askjob;
+	w;out;
+};
+#alias find_swnt2askbiandu
+{
+	enter;askbiandu;
+	n;askbiandu;
+	s;s;askbiandu;
+	n;e;askbiandu;
+	w;out;
+};
+#alias auto_quest
+{
+	loadmap xx_new;
+	#var is_in_auto_quest 1;
+	#var is_doing_task 0;
+	#var has_askjob 0;
+	#var is_sleeping 0;	
+};
+#alias unauto_quest
+{
+	#var is_in_auto_quest 0;
+};
+#ticker {t_auto_quest} 
+{	
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $is_sleeping==0}
+	{					
+		#map run 1;
+		save;
+		s;
+		drink;
+		eat fruit;
+		n;
+		#if {$biandu_or_job==0}
+		{
+			find_swnt2askbiandu;
+		}
+		{
+			find_swnt2askjob;
+		};
+		#var has_askjob 1;
+	}{#nop};	
+}{50};
+#act {^英雄无敌说道：「你刚刚辛苦过}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+		#var has_askjob 0;
+		#var is_doing_task 1;
+		#delay {2}
+		{
+			#map goto 1;
+			xx_q_lianwu;
+		};						 
+	};
+};
+#act {^英雄无敌说道：「你去帮我弄根木杖过来吧%*} 
+{	
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+				
+		#var has_askjob 0;
+		#var is_doing_task 1;
+		#delay {2}
+		{
+			q_xx_mz;
+		};		
+	};
+};
+#act {^英雄无敌说道：「你去帮我弄根冰杖过来吧}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+				
+		#var has_askjob 0;
+		#var is_doing_task 1;
+		#delay {2}
+		{
+			q_xx_bz;
+		};		
+	};
+};
+#act {^英雄无敌说道：「你去帮我弄根冰魄杖过来吧}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+		#var has_askjob 0;
+		#var is_doing_task 1;
+		#delay {2}
+		{
+			q_xx_bpz;
+		};							 
+	};
+};
+#act {^英雄无敌说道：「你去帮我弄滴毒液过来吧}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+		#var has_askjob 0;
+		#var is_doing_task 1;
+		#delay {2}
+		{
+			q_xx_duye;
+		};						 
+	};
+};
+#act {^英雄无敌说道：「南边小湖里有一条鳄鱼}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+		#var has_askjob 0;
+		#delay {2}
+		{
+			#map goto 1;
+			xx_q_lianwu;
+		};						 
+	};
+};
+#act {^英雄无敌道，我派弟子毒技是为基础，你去山林给我挖根%*色%*来吧}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+				
+		#var has_askjob 0;
+		#var is_doing_task 1;
+		#if {"%2"=="三叶草"}
+		{
+			#var biandu_type 3;
+		}
+		{
+			#var biandu_type 1;
+		};
+		#delay {2}
+		{
+			q_xx_biandu;
+		};		
+	};
+};
+#act {^英雄无敌说道：「你刚刚辨识过毒草，过会再来吧}
+{
+	#if {$is_in_auto_quest==1 && $is_doing_task==0 && $has_askjob==1}
+	{
+		#var has_askjob 0;
+		#var is_doing_task 1;
+		#delay {2}
+		{
+			#map goto 1;
+			xx_q_lianwu;
+		};						 
+	};
+};

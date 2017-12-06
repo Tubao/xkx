@@ -1,0 +1,857 @@
+#var movemap[down]  {up};
+#var movemap[east]  {west};
+#var movemap[north]  {south};
+#var movemap[northeast]  {southwest};
+#var movemap[northwest]  {southeast};
+#var movemap[south]  {north};
+#var movemap[southeast]  {northwest};
+#var movemap[southwest]  {northeast};
+#var movemap[up]  {down};
+#var movemap[west]  {east};
+#var movemap[northup] {southdown};
+#var movemap[southdown] {northup};
+#var movemap[northdown] {southup};
+#var movemap[southup] {northdown};
+#var movemap[westup] {eastdown};
+#var movemap[eastdown] {westup};
+#var movemap[westdown] {eastup};
+#var movemap[eastup] {westdown};
+#var movemap[enter] {out};
+#var movemap[out] {enter};
+
+#var d2x[down]  {0};
+#var d2x[east]  {1};
+#var d2x[north]  {0};
+#var d2x[northeast]  {1};
+#var d2x[northwest]  {-1};
+#var d2x[south]  {0};
+#var d2x[southeast]  {1};
+#var d2x[southwest]  {-1};
+#var d2x[up]  {0};
+#var d2x[west]  {-1};
+#var d2x[northup] {0};
+#var d2x[southdown] {0};
+#var d2x[northdown] {0};
+#var d2x[southup] {0};
+#var d2x[westup] {-1};
+#var d2x[eastdown] {1};
+#var d2x[westdown] {-1};
+#var d2x[eastup] {1};
+#var d2x[enter] {0};
+#var d2x[out] {0};
+
+#var d2y[down]  {0};
+#var d2y[east]  {0};
+#var d2y[north]  {-1};
+#var d2y[northeast]  {-1};
+#var d2y[northwest]  {-1};
+#var d2y[south]  {1};
+#var d2y[southeast]  {1};
+#var d2y[southwest]  {1};
+#var d2y[up]  {0};
+#var d2y[west]  {0};
+#var d2y[northup] {-1};
+#var d2y[southdown] {1};
+#var d2y[northdown] {-1};
+#var d2y[southup] {1};
+#var d2y[westup] {0};
+#var d2y[eastdown] {0};
+#var d2y[westdown] {0};
+#var d2y[eastup] {0};
+#var d2y[enter] {0};
+#var d2y[out] {0};
+
+#var d2z[down]  {1};
+#var d2z[east]  {0};
+#var d2z[north]  {0};
+#var d2z[northeast]  {0};
+#var d2z[northwest]  {0};
+#var d2z[south]  {0};
+#var d2z[southeast]  {0};
+#var d2z[southwest]  {0};
+#var d2z[up]  {-1};
+#var d2z[west]  {0};
+#var d2z[northup] {-1};
+#var d2z[southdown] {1};
+#var d2z[northdown] {1};
+#var d2z[southup] {-1};
+#var d2z[westup] {-1};
+#var d2z[eastdown] {1};
+#var d2z[westdown] {1};
+#var d2z[eastup] {-1};
+#var d2z[enter] {0};
+#var d2z[out] {0};
+#var traversal_flag 1;
+#var traversal_table[丐帮暗道] {north;northwest;northwest;northwest;north;northwest;southeast;south;southeast;southeast;southeast;south;south;up;gb_andao 2;northeast;southwest;southwest;up;gb_andao 3;northeast;southwest;southwest;up;gb_andao 4;west;east;east;up;gb_andao 5;southwest;northeast;northeast;up;gb_andao 7;north;northeast;northeast;southwest;southwest;south;south;up;gb_andao 9;southwest;south;southwest;southwest};
+#var traversal_table[古墓墓道] {north;north;north;north;east;enter;out;north;south;east;west;west;west;north;north;east;west;north;north;south;south;west;east;south;south;west;east;east;north;south;south;south;south;west;west;east;north;north;south;south;east;south;ban stone;busy2;south;east;northeast;northeast;east;swim river;n;n;e;n;n;w;w;n;n;east;north;west;ban stone;busy2;w;west;up;out;juan picture;south;south;east;south;ban stone;busy2;south;south;south;north;north;west};
+#var traversal_table[姑苏慕容小路] {east;east;north;north;south;jump west;west;north;south;east;north;south;northwest;southeast;jump east;north;north;tan qin;row mantuo;stop;mr_mantuo;west;west;south;west;southwest;west;west;east;east;northeast;northwest;west;west;southwest;northeast;east;east;southeast;east;north;east;east;mr_mantuob;enter boat;stop;west;north;north;north;tan qin;row tingxiang;stop;west;north;west;northwest;north;north};
+#var traversal_table[镇江土路] {northeast;northwest;southeast;east;north;north;east;east;east;east;south;south;south;south;west;west;west;west;north;north;east;east;east;east;east;east;east;southeast};
+#var traversal_table[长江长江岸边] {southeast;southeast;northwest;northwest;west;west;west;west;west;northwest;west;west;west;west;southwest;southwest;southwest;west;northwest;northwest;northwest;west;west;southwest;southwest;southwest;southwest;west;west;west;west;northwest};
+#var traversal_table[长江北岸长江岸边] {west;west;west;west;west;northwest;west;west;west;west;southwest;southwest;southwest;west;northwest;northwest;northwest;west;west;southwest;southwest;southwest;southwest;west;west;west;west;northwest};
+#var traversal_table[黄河南岸黄河南岸] {northwest;northwest;northwest;north;north;northeast;north;northwest;west;southwest;southwest;southwest;southwest;southwest;southwest;southwest;southwest;southwest;west;east;northeast;northeast;northeast;northeast;northeast;northeast;northeast;northeast;northeast;east;southeast;south;southwest;south;south;southeast;southeast;southeast;east;east;southeast;east;east};
+#var traversal_table[黄河北岸黄河北岸] {northwest;northwest;north;north;northeast;north;northwest;west;southwest;southwest;southwest;southwest;southwest;southwest;southwest;southwest;southwest;west;east;northeast;northeast;northeast;northeast;northeast;northeast;northeast;northeast;northeast;east;southeast;south;southwest;south;south;southeast;southeast;southeast;south;east;southeast;east;east;northeast};
+#var traversal_table[襄阳乡间土路] {west;west;north;north;north;east;west;south;south;south;west;west;south;south;south;east;west;north;north;north;east;east;east;east;east;east;east;east;east;east;east;east;east;east;south;south;south;south;north;north;north;north;west;west;west;west;west;north;north;north;north;north;north;west;west;east;east;south;south;south;south;south;south;south;south;south;south;south;south;south;south;west;east;east;east};
+#var traversal_table[北京土路] {northwest;north;northeast;northeast;north;east;east;east;east;east;north;north;north;north;north;north;north;north;north;north;north;west;west;west;west;west;southwest;south;south;south;south;south;south;south;south;south;south;south;south;south;east;east;east};
+#var traversal_table[全真走廊] {east;west;west;west;west;west;west;east;east;east;east;north;north;north;east;east;north;north;north;west;west;north;north;north;west;west;west;south;west;south;south;south;south;south;south;east;east;east;east;north;north;west;west;east;east;open door;busy2;north;north;east;east;east;north;north;west};
+#var traversal_table[长安城官道] {east;east;east;south;south;south;south;east;south;west;east;south;north;north;southeast;east;west;northwest;south;west;west;west;west;west;west;west;west;west;west;west;west;southwest;southup;southdown;southeast;east;east;northeast;northeast;northeast;northeast;north;south;southeast};
+#var traversal_table[长安城小道] {east;east;south;south;south;north;north;north;west;west;west;west;southwest;southwest;west;south;south;south};
+#var traversal_table[峨嵋禅房] {east;north;west;east;north;north;south;west;north;south;west;west;north;south;west;north;south;south;east;west;west;east;south;east;west;west;east;south;south;east;west;west;east;south;east;west;west;east;north;north;east;east;east;east;south;west;east;south;west};
+#var traversal_table[少林寺石阶] {northup;northup;northup;southdown;southdown;southdown;westdown;west;southdown;southdown;southdown;eastdown;southdown;southdown};
+#var traversal_table[灵鹫密道] {northdown;northdown;eastdown;south;southwest;southeast;eastdown;northdown;southup;westup;northwest;northeast;east;west;north;east};
+
+#alias kmove
+{	
+	#var knpc {%1};
+	#var thismove {%2};
+	#if {"$hasSociability"=="yes"}
+	{
+		#delay {2}
+		{
+			#send {$thismove};
+			iwalk;	
+		};
+	}
+	{
+		#ticker {t_kmove}
+		{
+			a2c id here;
+			#delay {2}
+			{
+				#if {$success_a2c==1}
+				{
+					#var hasnpc 0;
+					#script {splitret} {python ./tintin/myscripts/pkuxkx/gps/mysplit.py "$knpc" ","};				
+					#foreach {$splitret[%*]} {mynpc}
+					{
+						#var tempv @has_id{$mynpc};
+						#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+					};
+					#if {$hasnpc==0}
+					{
+						#untick {t_kmove};		
+						#send {$thismove};
+						iwalk;				
+					}
+					{
+						#foreach {$splitret[%*]} {mynpc} 
+						{						
+							killall $mynpc;
+						};
+					};	
+				};
+			};
+		}{4};
+	};
+};
+#alias igt
+{
+	#nop rid gt rid;	
+	#var fromrid %1;
+	#var torid %2;
+	#list inner_Route_list create;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_p2p.py "$fromrid" "$torid"};
+	#var mycost $ret[1];	
+	#showme {cost:$ret[1]};
+	#list ret delete {1};	
+	#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};
+	#nop #list inner_Route_list add {busy2};
+	#list inner_Route_list add {#showme {here?}};
+	#nop showme $inner_Route_list;
+	inner_walk;
+};
+#act {^here?}
+{	
+	#var roominfotab @get_roominfo{$torid};
+	#var torname $roominfotab[rname];
+	#var here_flag 0;
+	#act {^$torname%s - }
+	{
+		#unact {^$torname%s - };
+		#format walk_done_flag %T;
+		#showme {dest!};
+		#var hgtcount 0;
+		#var here_flag 1;
+	};
+	#delay {1}
+	{
+		a2c look;
+		#delay {2}
+		{
+			#nop if current room is the same suppose to be;			
+			#if {$here_flag==0}
+			{
+				#unact {^$torname%s - };
+				#if {$hgtcount<15}
+				{	
+					#math hgtcount $hgtcount+1;		
+					#showme {here is not the room $roominfotab[rname] ! try to go again.};
+					#script {ret} {python ./tintin/myscripts/pkuxkx/gps/locatebylines2.py "$lines"};
+					#var ltype $ret[1];			
+					#var hererid $ret[2];
+					#if {"$ltype"=="0"}
+					{
+						#math hgtcount $hgtcount-1;
+						#showme {here?};
+					}
+					{
+						#if {"$ltype"=="1"}
+						{
+							#showme {not here!};
+							igt $hererid $torid;	
+						}
+						{
+							#nop random walk;
+							#var elist @getExits{$lines};
+							#list elist size elist_size;
+							#var thismove $elist[1];
+							#foreach {$elist[%*]} {myexit}
+							{
+								#if {"$myexit"!="$movemap[$premove]"}
+								{
+									#var thismove $myexit;
+									#break;
+								};
+							};							
+							#send {$thismove};
+							#var premove $thismove;
+							#showme {here?};							
+						};				
+					};
+				}{
+					#showme {donottryagain.};									
+				};
+			};
+		};
+	};
+};
+#alias hgt
+{
+	#showme {start to go};
+	#var torid %1;
+	#var hgtcount 0;
+	#delay {1}
+	{
+		a2c look;
+		#delay {2}
+		{
+			#nop #showme $lines;
+			#script {ret} {python ./tintin/myscripts/pkuxkx/gps/locatebylines2.py "$lines"};
+			#if {"$ret[1]"=="1"}
+			{			
+				#var hererid $ret[2];
+				#math hgtcount $hgtcount+1;
+				igt $hererid $torid;
+			}
+			{
+				#if {"$ret[1]"=="0"}
+				{
+					#showme {here?};
+				}
+				{
+					#nop random walk;
+					#var elist @getExits{$lines};					
+					#list elist size elist_size;
+					#math cidx {1d$elist_size};					
+					#send {$elist[$cidx]};
+					#var premove $elist[$cidx];
+					#showme {here?};
+				};
+			};
+		};
+	};
+};
+#alias start_lochere
+{
+	#var moves {};
+	#list movelist create;
+	#var premove {};
+	#var loccount 0;
+	lochere;
+};
+#alias goback
+{	
+	#foreach {$movelist[%*]} {mymove}
+	{
+		#send {$movemap[$mymove]};
+	};
+};
+#alias lochere
+{
+	#if {$loccount<10}
+	{
+		a2c look;
+		#delay {2}
+		{
+			#nop #showme $lines;
+			#script {ret} {python ./tintin/myscripts/pkuxkx/gps/locatebylines2.py "$lines"};
+			#if {"$ret[1]"=="1"}
+			{			
+				#var temprid $ret[2];				
+				#if {"$moves"==""}
+				{
+					#var hererid $temprid;
+				}
+				{
+					#script {ret} {python ./tintin/myscripts/pkuxkx/gps/locatehere_unique.py "$temprid" "$moves"};
+					goback;
+					#var hererid $ret[1];
+				};
+				#delay {1}
+				{
+					#showme {located!};
+					#showme {$hererid};
+				};
+			}
+			{
+				#if {"$ret[1]"=="0"}
+				{
+					#math loccount $loccount+1;
+					#delay {1}
+					{
+						lochere;
+					};
+				}
+				{
+					#nop random walk;
+					#var elist @getExits{$lines};
+					#list elist size elist_size;
+					#var thismove $elist[1];
+					#if {"$premove" != ""}
+					{
+						#foreach {$elist[%*]} {myexit}
+						{
+							#if {"$myexit"!="$movemap[$premove]"}
+							{
+								#var thismove $myexit;
+								#break;
+							};
+						};
+					};							
+					#send {$thismove};
+					#var premove $thismove;
+					#var moves {$thismove|||$moves};
+					#list movelist insert {1} {$thismove};									
+					#delay {1}
+					{
+						lochere;
+					};
+				};
+			};
+		};
+	};
+};
+#alias ngt
+{
+	#var locdesc %1;		
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		hgt $torid;
+	};
+};
+#alias stopTbyNpc
+{
+	#var npcename %0;		
+	#act {(%*$npcename%*)}
+	{		
+		#unact {(%*$npcename%*)};
+		pauseWalk;		
+		#format {npcename} {%l} {$npcename};
+		follow $npcename;		
+		stopt;				
+		speed;				
+	};
+};
+#alias stopTbyNpcTitle
+{
+	#var npceTitle %0;		
+	#act {$npceTitle %*(%*)}
+	{		
+		#unact {$npceTitle %*(%*)};
+		pauseWalk;				
+		stopt;				
+		speed;				
+	};
+};
+#alias stopTbyNpc_cn
+{
+	#var npcename_cn %0;		
+	#act {$npcename_cn(%*)}
+	{		
+		#unact {$npcename_cn(%%*)};
+		pauseWalk;		
+		#format {npcename} {%l} {%%1};
+		follow $npcename;		
+		stopt;				
+		speed;				
+	};
+};
+#alias stopTbyNpc_nofollow
+{
+	#var npcename %0;		
+	#act {(%*$npcename%*)}
+	{		
+		#unact {(%*$npcename%*)};
+		pauseWalk;		
+		#format {npcename} {%l} {$npcename};			
+		stopt;				
+		speed;				
+	};
+};
+#alias gthere
+{	
+	a2c look;
+	#delay {2}
+	{		
+		#script {ret} {python ./tintin/myscripts/pkuxkx/gps/locatehere.py "$lines"};			
+		#showme {$ret};
+	};
+	
+};
+#alias pgt
+{
+	#var locdesc %0;		
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByPy.py "$locdesc"};
+	#list ret {size} {retsize};
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		hgt $torid;
+	};
+};
+#alias rgt
+{
+	hgt $torid;
+};
+#alias fstop
+{
+	set brief 2;
+	#var istep $istepmax;
+};
+#alias stop_go
+{
+	#var hgtcount 100;
+};
+#alias tra_deh
+{
+	#showme {stopt to stop traversal.};
+	$traversal_handler;						
+	#delay {1}
+	{
+		look;
+		#delay {1}
+		{
+			#if {$traversal_flag == 0}
+			{	
+				#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal.py "$locdesc" "$depth"};
+				#list inner_Route_list create;
+				#list inner_Route_list add {#showme {traversal_start};};
+				#list inner_Route_list add {setSlowWalk;};
+				#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+				#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+				#list inner_Route_list add {setNormalWalk;};					
+				inner_walk;
+
+			};
+		};
+	};
+};
+#alias traversal
+{
+	
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#var destEventHandler {tra_deh};
+		set_destEventHandler $destEventHandler;
+		hgt $torid;	
+	};
+	
+};
+#alias ptra_deh
+{
+	#showme {stopt to stop traversal.};
+	$traversal_handler;
+	look;
+	#delay {1}
+	{
+		#if {$traversal_flag == 0}
+		{	
+			#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_ptraversal.py "$locdesc" "$depth"};
+			#list inner_Route_list create;
+			#list inner_Route_list add {#showme {traversal_start};};
+			#list inner_Route_list add {setSlowWalk;};
+			#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+			#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+			#list inner_Route_list add {setNormalWalk;};					
+			inner_walk;
+
+		};
+	};
+};
+#alias ptraversal
+{
+	
+	#var locdesc {%1 %2};
+	#var depth %3;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByPy.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#var destEventHandler {ptra_deh};
+		set_destEventHandler $destEventHandler;
+		hgt $torid;		
+	};
+	
+};
+#alias pt {ptraversal};
+#alias rtraversal
+{
+	traversal $locdesc $depth;
+};
+#nop traversal from here;
+#alias htraversal
+{
+	#var depth %1;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	start_lochere;
+	#act {^located!}
+	{
+		#unact {^located!};		
+		#var traversal_flag 0;		
+		#showme {stopt to stop traversal.};
+		$traversal_handler;
+		look;
+		#delay {1}
+		{
+			#if {$traversal_flag == 0}
+			{	
+				#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_htraversal.py "$hererid" "$depth"};
+				#list inner_Route_list create;
+				#list inner_Route_list add {#showme {traversal_start};};
+				#list inner_Route_list add {setSlowWalk;};
+				#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+				#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+				#list inner_Route_list add {setNormalWalk;};					
+				inner_walk;
+			};
+		};		
+	};
+};
+#alias stopt
+{
+	#var traversal_flag 1;
+	#var istep_bak $istep;
+	#var istep $istepmax;	
+};
+
+#alias set_destEventHandler
+{	
+	#var destEventHandler %0;
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		$destEventHandler;
+	};
+};
+#list stack_torid create;
+#list stack_destEventHandler create;
+#list stack_walkPath create;
+#list stack_hereid create;
+#list stack_preid create;
+#list stack_istep create;
+#alias stack.put
+{
+	#list stack_torid add $torid;
+	#list stack_destEventHandler add $destEventHandler;
+	#list stack_walkPath add $inner_Route_list;
+	#list stack_preid add $preid;
+	#list stack_istep add $istep;
+};
+#alias stack.get
+{
+	#list stack_torid get {1} {torid};
+	#list stack_destEventHandler get {1} {destEventHandler};
+	#list stack_walkPath get {1}  {inner_Route_list};
+	#list stack_preid get {1} {preid};
+	#list stack_istep get {1} {istep};
+	
+	#list stack_torid delete {1} ;
+	#list stack_destEventHandler delete {1};
+	#list stack_walkPath delete {1} ;
+	#list stack_preid delete {1} ;
+	#list stack_istep delete {1} ;
+	
+	#if {$traversal_flag==2}
+	{
+		set_destEventHandler iwalk;
+		hgt $preid;		
+	}
+	{
+		set_destEventHandler $destEventHandler;
+		hgt $torid;
+	};
+};
+#alias get_Hgpass
+{
+	give qian 1 gold;
+	ask qian about 进宫;
+	#format hgpass_time %T;
+	#ticker t_showpass_cd
+	{
+		#format hgpass_now %T;
+		#math diff {580 - $hgpass_now + $hgpass_time};
+		#showme {passport cd left: $diff};
+		#if {$diff < -60}
+		{
+			#untick t_showpass_cd;
+		};
+	}{6};
+	#delay {2}
+	{
+		stack.get;
+	};	
+};
+#alias checkHgpass
+{
+	#nop check if has passport;
+	#if {"$hasSociability"=="yes"}
+	{	
+		#var haspass 1;
+	};
+	#act {%*Hgtongxing ling%*}
+	{		
+		#var haspass 1;
+	};
+	i;i;i;
+	#delay {2}
+	{
+		#unact {%*Hgtongxing ling%*};
+		#if {$haspass==1}
+		{
+			iwalk;
+		}
+		{
+			stack.put;
+			set_destEventHandler get_Hgpass;
+			hgt 66cbb0cd84cb1be459cbb2413a36f498;			
+		};
+	};
+};
+#alias hgt_pre
+{	
+	#showme {start to go};
+	#var torid %1;
+	#var pre %2;
+	#if {$pre==""}
+	{
+		#var pre 4;
+	};
+	#var hgtcount 0;
+	#delay {1}
+	{
+		a2c look;
+		#delay {2}
+		{
+			#nop #showme $lines;
+			#script {ret} {python ./tintin/myscripts/pkuxkx/gps/locatebylines2.py "$lines"};
+			#list pre2dest create;
+			#if {"$ret[1]"=="1"}
+			{				
+				#var hererid $ret[2];
+				#math hgtcount $hgtcount+1;
+				#script {ret1} {python ./tintin/myscripts/pkuxkx/gps/getPreNode.py "$hererid" "$torid" "$pre"};	
+				#if {"$ret1[1]"!="0"}
+				{
+					#var torid $ret1[1];
+					#list ret1 delete {1};					
+					#foreach {$ret1[%*]} {cmd} {#list pre2dest add {$cmd};};
+				};		
+				igt $hererid $torid;				
+			}
+			{
+				#if {"$ret[1]"=="0"}
+				{
+					#showme {here?};
+				}
+				{
+					#nop random walk;
+					#var elist @getExits{$lines};
+					#list elist size elist_size;
+					#math cidx {1d$elist_size};
+					#send {$elist[$cidx]};
+					#showme {here?};
+				};
+			};
+		};
+	};
+};
+
+
+#var direct_cname_map[down]  {下};
+#var direct_cname_map[east]  {东};
+#var direct_cname_map[north]  {北};
+#var direct_cname_map[northeast]  {东北};
+#var direct_cname_map[northwest]  {西北};
+#var direct_cname_map[south]  {南};
+#var direct_cname_map[southeast]  {东南};
+#var direct_cname_map[southwest]  {西南};
+#var direct_cname_map[up]  {上};
+#var direct_cname_map[west]  {西};
+#var direct_cname_map[northup] {北};
+#var direct_cname_map[southdown] {南};
+#var direct_cname_map[northdown] {北};
+#var direct_cname_map[southup] {南};
+#var direct_cname_map[westup] {西};
+#var direct_cname_map[eastdown] {东};
+#var direct_cname_map[westdown] {西};
+#var direct_cname_map[eastup] {东};
+
+#list destlist create {太子岩};
+#var destmap[taizy] $destlist;
+#list destlist create {紫霄宫};
+#var destmap[zixg] $destlist;
+#list destlist create {三公山};
+#var destmap[sangs] $destlist;
+#list destlist create {雷神洞};
+#var destmap[leisd] $destlist;
+#list destlist create {乌鸦岭}{南岩峰}{两仪殿}{后殿}{飞升岩};
+#var destmap[wuyl] $destlist;
+#var destmap[nanyf] $destlist;
+#list destlist create {潘神洞}{朝天宫};
+#var destmap[pansd] $destlist;
+#var destmap[chaotg] $destlist;
+#list destlist create {一天门}{天柱峰下};
+#var destmap[yitm] $destlist;
+#var destmap[tianzfx] $destlist;
+
+#alias messwalk
+{
+	#class c_kill kill;		
+	#class c_mwalk open;
+	#act {^%*%s - }
+	{		
+		#var hereloc %%1;			
+		#if {"$hereloc" != "乡野小路" && "$hereloc" != "石阶" }
+		{
+			#if {$mwalk_start==1}
+			{
+				#var mwalk_flag 1;
+				#class c_mwalk kill;
+				#delay {1}
+				{
+					stopt;
+					#showme {here?};
+				};
+			};
+		}
+		{
+			#var mwalk_start 1;
+		};
+	};
+	#act {^%s你可以看看(look):lupai}
+	{
+		#delay {1}
+		{	
+			a2c look lupai;
+			#delay {1}
+			{
+				#foreach {$direct_list[%*]} {mydirect}
+				{
+					#showme $mydirect;
+					#if {&direct_cname[$direct_cname_map[$mydirect]]}
+					{
+						#foreach {$destmap[$m_dest][%*]} {mydest}
+						{
+							#showme $direct_cname[$direct_cname_map[$mydirect]];
+							#showme $mydest;
+							#regexp {"$direct_cname[$direct_cname_map[$mydirect]]"} {"%*$mydest%*"} {#var m_act $mydirect;#showme {got direct:$mydirect};} {};
+						};
+					};				
+				};
+			};
+		};
+	};
+	#class c_mwalk close;
+	#var m_act %1;
+	#var m_dest %2;
+	#var mwalk_flag 0;
+	#var mwalk_start 0;
+	set brief 2;
+	m_walk $m_act;
+};
+
+#alias m_walk
+{
+	#var m_act %1;
+	#act {^%s这里%*的%*有 %*。}
+	{
+		#var preact $m_act;
+		#unact {^%s这里%*的%*有 %*。};
+		#var direct_str %%4;		
+		#script {direct_list} {python ./tintin/myscripts/pkuxkx/gps/mysplit.py "$direct_str" "、| 和 "};		
+		#var m_act $direct_list[1];
+		#foreach {$direct_list[%*]} {mydirect}
+		{
+			#if {"$mydirect"!="$movemap[$preact]"}
+			{
+				#var m_act $mydirect;
+				#break;
+			};
+		};	 
+	};
+	#if {$mwalk_flag==0}
+	{
+		$m_act;
+		#delay {0.5}
+		{
+			#list direct_list size dsize;
+			#if {$dsize>2}
+			{
+				look;
+				#delay {3}
+				{
+					m_walk $m_act;
+				};
+			}
+			{
+				m_walk $m_act;
+			};
+			
+		};
+	};
+};
+
+

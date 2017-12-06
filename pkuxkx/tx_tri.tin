@@ -1,0 +1,27 @@
+#list tx_desclist create {指风虎虎}
+			 {夜叉探海}
+			 {快如闪电}
+			 {掌穿闪指}
+			 {孤雁出群};
+			 
+#list tx_desclist size zssize;
+#var zs_count 1;
+#foreach {$tx_desclist[%*]} {zs}
+{
+	#act {$zs}
+	{
+		#unact {%0};
+		touxue $npcename;
+		#math zs_count {$zs_count+1};
+		#if {$zs_count>$zssize}
+		{
+			#5 halt;
+			#delay {2}
+			{
+				gtmrx;
+			};
+		};
+	};
+};
+
+

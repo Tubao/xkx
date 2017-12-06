@@ -1,0 +1,142 @@
+#alias pfzhen
+{
+	unwield all;jifa cuff taiji-quan;bei cuff;perform cuff.zhen;
+};
+#alias pfgr
+{
+	unwield all;jifa cuff taiji-quan;bei cuff;perform cuff.gangrou;
+};
+#alias pfzong
+{
+	perform dodge.zong;
+};
+#alias pfc
+{
+	enable sword taiji-jian;perform sword.chan;
+};
+#alias pfx
+{
+	enable sword hero-jianfa;perform sword.xiyang;
+};
+#alias pfl
+{
+	perform sword.lian;
+};
+#alias pfg
+{
+	unwield all;jifa cuff taiji-quan;jifa parry taiji-quan;bei cuff;jiali max;perform cuff.gangrou;
+};
+#alias erc
+{
+	exert recover;
+};
+#alias erh
+{
+	exert heal;
+};
+#alias eri
+{
+	exert inspire;
+};
+#alias err
+{
+	exert regenerate;
+};
+#alias pu
+{
+	exert powerup;
+};
+#alias kr
+{
+	kun robber;
+};
+#macro {\eOS} {erc};
+#macro {\e[15~} {erh};
+#macro {\e[17~} {eri};
+#macro {\e[18~} {err};
+#macro {\e[19~} {pfc};
+#macro {\e[20~} {pfx};
+#class c_kill open;
+#act {^看起来%*想杀死你！}
+{
+	yun qi;
+	#delay {1}
+	{
+		pfzong;
+	};
+	#delay {2}
+	{
+		yun taiji;		
+	};	
+	#ticker t_pf {pfc} {0.2};
+};
+#class c_kill close;
+#act {^经过一段时间后，你终于完全从紧张地战斗氛围中解脱出来。}
+{
+	#untick t_pf;	
+};
+#alias upf
+{
+	#untick t_pf;	
+};
+#act {阿诺(damage:%*气血:%*/%*)}
+{
+	exert recover;
+};
+#act {^( 只听见「啪」地一声，你手中的}
+{	
+	wield sword;
+	wield sword 2;
+	wield sword 3;
+};
+#alias start_wat
+{
+	#class c_wat open;
+	#act {^万安塔$}
+	{
+		pu;
+	}
+	#act {^万安塔%*层}
+	{	
+		killall wushi;		
+	};
+	#act {只能见招拆招，疲于应对，不觉已深陷太极剑意之中，无法出招。}
+	{		
+		#var pfl_count 0;
+		#delay {3}
+		{
+			#ticker t_pfl 
+			{
+				pfl;
+				#math pfl_count $pfl_count+1;
+				#if {$pfl_count>6}
+				{
+					#untick t_pfl;
+				};
+			} {0.5};
+		};
+	};
+	#alias pf
+	{
+		yun qi;
+		#delay {1}
+		{
+			pfzong;
+		};
+		#delay {2}
+		{
+			yun taiji;		
+		};	
+		#ticker t_pf {pfc} {0.2};
+	};
+	#alias askke
+	{
+		ask ke about 进塔;
+	};
+	#class c_wat close;
+};
+#alias stop_wat
+{
+	#class c_wat kill;
+};
+

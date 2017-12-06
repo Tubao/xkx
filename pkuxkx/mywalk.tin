@@ -1,0 +1,459 @@
+#nop ==行走命令==;
+#alias setVerySlowWalk {
+	#var xiaoyao.delay_long 3;
+	#var xiaoyao.delay_short 3;
+};
+#alias setSlowWalk {
+	#var xiaoyao.delay_long 0.5;
+	#var xiaoyao.delay_short 0.5;
+};
+#alias setSlowWalk2 {
+	#var xiaoyao.delay_long 0.8;
+	#var xiaoyao.delay_short 0.8;
+};
+#alias pauseWalk {
+	#var walk_paused 1;
+};
+#alias resumeWalk {
+	#var walk_paused 0;
+};
+#alias setNormalWalk
+{
+	#var xiaoyao.delay_long 0.5;
+	#var xiaoyao.delay_short 0.05;
+};
+#alias speed
+{
+	#var xiaoyao.delay_long 0.5;
+	#var xiaoyao.delay_short 0.05;
+};
+#alias {inner_walk} {
+	#var walk_paused 0;
+	#class c_mywalk open;
+	#act {^你定了定神，走了出来。}{iwalk};
+	#act {^王府卫士伸手拦住了你：“什么人？胆敢私带兵刃，擅闯王府！？”}{unwield all;};
+	#action {^大车停稳了下来，你可以下车(xia)了。}{xia;iwalk};
+	#action {^你朝船夫挥了挥手便跨上岸去。} {iwalk};
+	#action {^你把花盆搬回了原位。洞口被封住了。}{move pen};
+	#action {^小舟终于划到近岸，你从船上走了出来。} {iwalk};
+	#action {^不知过了多久，船终于靠岸了，你累得满头大汗。} {iwalk};
+	#action {^绿衣少女将小船系在树枝之上，你跨上岸去。} {iwalk};
+	#action {^你终于一步步的终于挨到了桥头} {iwalk};
+	#action {^你身在半空，双手乱挥，只盼能抓到什么东西，这么乱挥一阵，又下堕下百馀丈。} {iwalk};
+	#action {^你沿着踏板走了上去。} {iwalk};
+	#action {^{你小心翼翼往前挪动，遇到艰险难行处，只好放慢脚步。|你还在山中跋涉，一时半会恐怕走不出这藏边群山！|青海湖畔美不胜收，你不由停下脚步，欣赏起了风景。|你还在山中跋涉，一时半会恐怕走不出这西南地绵绵群山！|你还在山中跋涉，一时半会恐怕走不出这六盘山！|沙石地几乎没有路了，你走不了那么快。|荒路几乎没有路了，你走不了那么快。|你走着走着就陷进了一处沼泽当中，艰难地从沼泽中拔出来。}} {#math istep {$istep-2}};
+	#action {^你终于来到了对面，心里的石头终于落地。} {iwalk};
+	#action {^六名雪山弟子一齐转动机关，吊桥便又升了起来。} {iwalk};	
+	#action {正等着你呢，上来吧。} 
+	{
+		#class tmp kill;
+		#if {$tc_flag==1}
+		{
+			genter;
+		}
+		{
+			enter;
+		};
+	};
+	#action {艄公将一块踏脚板搭上堤岸，} 
+	{
+		#class tmp kill;
+		#if {$tc_flag==1}
+		{
+			genter;
+		}
+		{
+			enter;
+		};		
+	};
+	#action {^%*接过你递给的船资} {
+		#class tmp open;
+		#action {^只听得江面上隐隐传来：“别急嘛，这儿正忙着呐……”} {#class tmp kill;#delay {3} {yell boat}};
+		#class tmp close;
+	};
+	#action {^你吸了口气，一声“船家”，声音中正平和地远远传了出去。$} {
+		#class tmp open;
+		#action {^只听得江面上隐隐传来：“别急嘛，这儿正忙着呐……”} {#class tmp kill;#delay {3} {yell boat}};
+		#class tmp close;
+	};
+	#action {鼓足中气，长啸一声：“船家！”$} {
+		#class tmp open;
+		#action {^只听得江面上隐隐传来：“别急嘛，这儿正忙着呐……”} {#class tmp kill;#delay {3} {yell boat}};
+		#class tmp close;
+	};
+	#action {^你使出吃奶的力气喊了一声：“船家”$} {
+		#class tmp open;
+		#action {^只听得江面上隐隐传来：“别急嘛，这儿正忙着呐……”} {#class tmp kill;#delay {3} {yell boat}};
+		#class tmp close;
+	};
+	#var in_boat 0;
+	#action {^江心驶去。} {
+		#var in_boat 1;
+	};
+	#action {^艄公说“到啦，上岸吧”，随即把一块踏脚板搭上堤岸。} {
+		#if {${in_boat} == 1} {
+			#var in_boat 0;
+			#var istepaccu 1;
+			#if {$tc_flag==1}
+			{
+				gout;
+			}
+			{
+				out;
+			};
+			iwalk;            
+		};
+	};
+	#act {^艄公要继续做生意了，所有人被赶下了渡船。}
+	{
+		#if {${in_boat} == 1} {
+			#var in_boat 0;
+			#var istepaccu 1;
+			#if {$tc_flag==1}
+			{
+				gout;
+			}
+			{
+				out;
+			};
+			iwalk;            
+		};
+	};
+	#act {嘻嘻笑道：你说什么鸟语啊？}
+	{
+		#delay {2}
+		{ 
+			ask shao gong about huanghe;
+			ask shao gong about jiang;
+		};
+	};
+	#act {说道：你在说外国话吧？我不会，你最好带个翻译来。}
+	{
+		#delay {2}
+		{ 
+			ask shao gong about huanghe;
+			ask shao gong about jiang;
+		};
+	};
+	#act {说道：才阿八热古里古鲁。你看，我也能假装会说外国话。}
+	{
+		#delay {2}
+		{ 
+			ask shao gong about huanghe;
+			ask shao gong about jiang;
+		};
+	};
+	
+		
+	#alias iwalk {
+		#if {$walk_paused==1}
+		{
+			#math istep {$istep-1};
+		}
+		{
+			#if {$istep==$istepmax} {set brief 2};
+			#if {$istep<=$istepmax} {
+				#var icmd @item{inner_Route_list;$istep};
+				#if {"$icmd"=="stop"} {
+					#math istep {$istep+1};
+					#var istepaccu 1;
+				};
+				#else {
+					#if {"$icmd"=="busy2"} {
+						#math istep {$istep+1};
+						#var istepaccu 1;
+						#delay {2} {iwalk};
+					};
+					#else {
+						$icmd;
+						#math istepaccu {$istepaccu+1};
+						#math istep {$istep+1};
+						#if {$istepaccu>=${xiaoyao.accu}} {
+							#delay {${xiaoyao.delay_long}} {iwalk};
+							#var istepaccu 1;
+						};
+						#else {
+							#delay {${xiaoyao.delay_short}} {iwalk};
+						};
+					};
+				};
+			};
+			#else {			
+				#class c_mywalk kill;			
+				#showme {inner_walk done!}				
+			};
+		};
+	};
+
+	
+	
+	
+	
+	
+	#class c_mywalk close;
+
+	#var istep 1;
+	#var istepmax @numitems{inner_Route_list};
+	#var istepaccu 1;
+	set brief 1;
+	iwalk;
+};
+#alias gb_andao {say 天堂有路你不走呀;d;%1;};
+#alias sld_ask {ask chuan fu about 出海};
+#alias toyzw {tan qin;row yanziwu};
+#alias mr_mantuo {w;n;w;s;s;e;e;w};
+#alias mr_mantuob {e;s;n;w;n;n;e;s;e};
+#alias mr_askgirl {ask girl about 拜庄};
+#alias murongboat {enter boat};
+#alias bt_askzhang {ask zhang about 扬州};
+#alias bt_askqian {ask qian about 白驼山};
+#alias baituofufei {give qian 1 gold};
+#alias store4 {enter $mycharid;store tie;store tu;store pu;store guangling san;out};
+#alias meizhuang_gate {knock gate 4;knock gate 2;knock gate 5;knock gate 3};
+#alias px_asktou {ask tou about 自立为王};
+#alias ssb_askliang {ask liang about 拜山};
+#alias askdiao {ask diao about 独孤求败};
+#alias guojiang1 {ask shao gong about jiang};
+#alias guohe1 {ask shao gong about huanghe};
+#alias pyz_cure {ask ping about cure};
+#act {^平一指说道：「医药费一共需要四两黄金。」}
+{
+	give 4 gold to ping;
+};
+#act {^平一指说道：「医药费一共需要三两黄金。」}
+{
+	give 3 gold to ping;
+};
+#act {^平一指说道：「医药费一共需要二两黄金。」}
+{
+	give 2 gold to ping;
+};
+#act {^平一指说道：「医药费一共需要一两黄金。」}
+{
+	give 1 gold to ping;
+};
+#alias gtbwc
+{
+	pgt yangz biwc;
+};
+#alias ph
+{
+	set_destEventHandler pyz_cure;
+	pgt yangz yaop;
+};
+#alias gthome
+{
+	set_destEventHandler enter $mycharid;
+	pgt yangz shengczx;	
+};
+#alias gtxf
+{
+	hgt 661d3fe4eb38ec8a55d35890b2d156aa;
+};
+#alias gtpz
+{
+	hgt d1dc7d099c3faf508d147bb4bc80ce8c;
+};
+#alias gths
+{
+	hgt 16d2d91f8953aaf86d5e357800600078;
+};
+#alias gtqiu
+{
+	hgt dfb07f8dd9b08dbd0fda622a060b29a4;
+};	
+#alias gtcd
+{
+	hgt 3844ece1d9ced05d09bf864cb84341db;
+};
+#alias gtdl
+{
+	hgt 70aa1e98c6000f098105a254ee27a3ac;
+};
+#alias gtjz
+{
+	hgt 8439649696f8158347ceeab334e1aea6;
+};
+#alias gtyy
+{
+	hgt 8eee66dc2c86b36851db24598dda1d86;
+};
+#alias gtdangpu
+{
+	hgt 94cfd5ad28417048573437f2c11a2a23;
+};
+#alias gthsz
+{
+	pgt linaf dat;
+};
+#alias get4
+{
+	#class c_getout4 open;
+	#function {numitems} {#list %%1 size result};
+	#function {item} {#list %%1 get %%2 result};
+	#act {^%d%s《{广陵散|率意帖|溪山行旅图|呕血谱}》$} {#list sibao add {%%1}};
+	#act {^柜子里目前存放的物品有：$}
+	{
+		#list sibao create;
+		#delay 1
+		{
+			#if {@numitems{sibao}==4}
+			{
+				#loop 4 1 i {getout @item{sibao;$i}};		
+				#showme got 4!	;	
+			}
+			{
+				#showme 你的柜子里四宝不齐或有多余，无法前往梅庄。;			
+			};
+			#class c_getout4 kill;
+			out;
+		};
+	};
+	#class c_getout4 close;
+	enter $mycharid;
+	find;
+};
+#alias gtget4
+{
+	set_destEventHandler get4;
+	pgt yangz shengczx;	
+};
+#alias store4
+{
+	enter $mycharid;
+	store guangling san;
+	store tie;
+	store pu;
+	store tu;
+	out;
+};
+#alias gtstore4
+{
+	set_destEventHandler store4;
+	pgt yangz shengczx;	
+};
+#alias gethorse_handler
+{
+	ask alamuhan about 马;
+	#delay {1}
+	{
+		fight alamuhan;
+		#delay {5}
+		{
+			ride horse;
+			set_destEventHandler jump valley;
+			hgt 4c40ce601e14df826c98ed42e318daf1;
+		};
+	};
+};
+#alias gethorse
+{
+	set_destEventHandler gethorse_handler;
+	pgt xiaoz saimc;
+};
+#alias gttyhz
+{
+	set_destEventHandler s;
+	hgt 734c7f55a913a25528fb42c60864b8f3;
+}
+#alias hzout
+{
+	s;e;n;w;s;s;w;out;
+};
+#alias gtmhz
+{
+	set_destEventHandler sw;
+	hgt e7cceb430ae5efe2c76d600257e38670;
+};
+#alias mhzout
+{
+	s;e;n;w;
+};
+#alias havebath
+{
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		ask hao about 木桶;
+		#delay {2}
+		{
+			#act {^dest!}
+			{
+				#unact {^dest!};
+				buy gouqi;
+				#delay {2}
+				{
+					xiao gouqi;
+					#delay {2}
+					{
+						#act {^dest!}
+						{
+							#unact {^dest!};
+							zhai gancao;
+							#delay {2}
+							{
+								bo gancao;
+								#delay {2}
+								{
+									#act {^dest!}
+									{
+										#unact {^dest!};
+										buy im_13247;
+										#delay {2}
+										{
+											#act {^dest!}
+											{
+												#unact {^dest!};
+												buy pot;
+												#delay {2}
+												{
+													#act {^dest!}
+													{
+														#unact {^dest!};
+														guan;
+														#delay {2}
+														{
+															#act {^dest!}
+															{
+																#unact {^dest!};
+																enter $mycharid;
+																#delay {1}
+																{
+																	add zi;
+																	add pi;
+																	add gancao;
+																};																
+																#delay {4}
+																{
+																	do 3 add re shui;
+																};
+																#delay {6}
+																{
+																	bath;
+																};
+															};
+															pgt yangz shengczx;															
+														};
+													};
+													pgt xiny tangqc;
+												};
+											};
+											ngt 扬州杂货铺;
+										};
+									};
+									gtdangpu;	
+								};
+							};
+						};
+						pgt baits geb;
+						
+					};
+				};
+			};
+			ngt 灵州酒馆;
+		};
+	};	
+	pgt jiny yaop;			
+};
+
+

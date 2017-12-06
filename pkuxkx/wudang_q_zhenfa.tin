@@ -1,0 +1,67 @@
+#alias q_wd_zf 
+{e;zhenfa;
+#delay {destroy_zf}
+		{
+			wudang_q_zhenfa_fail;	
+		}{300};
+
+};
+#act {^房间中已经有人在演习阵法}
+{	
+	#delay {10}
+	{
+		#undelay destroy_zf;
+		q_wd_zf;
+	};
+};
+#act {大家一会儿按照我公布的方位走} 
+{
+#showme {start};
+#var locations {金木水火土};
+#var q_cnt 0;
+};
+#act {^清%*要求%*走向%*位} 
+{
+#showme {to %3};
+#math q_cnt {$q_cnt+1};
+#var loc %3;
+#replace {locations} {$loc} {};
+#if {$q_cnt==4} {
+#replace {locations} {金} {1};
+#replace {locations} {木} {2};
+#replace {locations} {水} {3};
+#replace {locations} {火} {4};
+#replace {locations} {土} {5};
+#var res {};
+#switch {$locations} {
+#case 1 {#var res j};
+#case 2 {#var res m};
+#case 3 {#var res s};
+#case 4 {#var res h};
+#case 5 {#var res t};
+#default {#var res error};
+};
+zw$res;
+};
+};
+#act {阵法教习挥%*喊道} {
+#showme {next round};
+#var locations {金木水火土};
+#var q_cnt 0;
+};
+#act {五行阵演练到此结束} {wudang_q_zhenfa_success;};
+#act {^你站错了方位} {wudang_q_zhenfa_fail;};
+#alias wudang_q_zhenfa_bootstrap {q_wd_zf;};
+#alias wudang_q_zhenfa_fail {#undelay destroy_zf;w;ask chongxu about cancel;#map goto 1;#var is_doing_task 0;};
+#alias wudang_q_zhenfa_success 
+{
+	#undelay destroy_zf;
+	w;ask chongxu about success;
+	#map goto 1;
+	#var is_doing_task 0;
+	
+};
+
+
+
+

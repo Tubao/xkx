@@ -1,0 +1,56 @@
+#list robbernpc create {tufei}{louluo}{Tufei}{Tu fei}{tufei tou}{Tufei tou};
+#alias ktufei
+{
+	killall tufei;
+	killall louluo;
+	killall Tufei;
+	killall Tu fei;	
+	killall robber;	
+	killall tufei tou;
+};
+#alias w2a_init
+{
+	#list moves create {e}{eu}{n}{nd}{w}{s}{se}{w};
+	#list moves size movesize;	
+	#var movestep 0;	
+};
+#alias w2a_finish
+{
+	#showme {end of move};	
+	give cui zhuozi;
+	#delay {3} 
+	{
+		#map goto 72;
+		#map run 1;
+		ask chongxu about success;
+		#var is_doing_task 0;
+		get all;
+	};	
+};
+#act {^ÄãÌÓÅÜÊ§°Ü}
+{
+	#math movestep {$movestep-1};
+};
+#function w2a_getAct
+{
+	#var hasnpc 0;
+	#foreach {$robbernpc[%*]} {mynpc}
+	{
+		#var tempv @has_dangerousNpc{$mynpc};
+		#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+	};
+	#if {$hasnpc==0}
+	{		
+		#math movestep {$movestep+1};
+		#if {$movestep>$movesize}
+		{
+			#return {-1};
+		}
+		{
+			#return $moves[$movestep];
+		};
+	}
+	{
+		#return {ktufei};
+	};
+};

@@ -1,0 +1,49 @@
+#alias mx_start
+{
+	#class {c_mingxiang} open;
+	#ticker {t_mx}
+	{
+		mingxiang;
+	} {2};	
+	#act {^很明显,你现在太累了,无法冥想佛家的真理}
+	{
+		tuna 100;
+	};
+	#act {^你现在精不足，无法修行精力}
+	{
+		north;		
+		yun regenerate;
+		eat gan liang;
+		drink hulu;	
+		save;
+	};
+	#act {^你略一凝神，精神看起来好多了}
+	{
+		enter hole;		
+	};
+	#act {^你的内力不够} 
+	{
+		dazuo max;
+	};
+	#act {^你现在精不够，无法控制内息的流动！}
+	{
+		#delay {10}
+		{
+			eat gan liang;
+			drink hulu;	
+			yun regenerate;
+			dazuo max;
+		};
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		yun regenerate;
+	};	
+	#class {c_mingxiang} close;	
+};
+#alias mx_stop
+{
+	#untick {t_mx};
+	#class {c_mingxiang} kill;
+};
+

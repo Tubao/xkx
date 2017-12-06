@@ -1,0 +1,45 @@
+#ALIAS gc {gan che to %1}
+#ALIAS ge {gan che to east}
+#ALIAS genter {gan che to enter}
+#ALIAS geu {gan che to eastup}
+#ALIAS gn {gan che to north}
+#ALIAS gne {gan che to northeast}
+#ALIAS gnu {gan che to northup}
+#ALIAS gnw {gan che to northwest}
+#ALIAS gout {gan che to out}
+#ALIAS gs {gan che to south}
+#ALIAS gse {gan che to southeast}
+#ALIAS gsu {gan che to southup}
+#ALIAS gsw {gan che to southwest}
+#ALIAS gw {gan che to west}
+#ALIAS gwu {gan che to westup}
+#ALIAS ged {gan che to eastdown}
+#ALIAS gnd {gan che to northdown}
+#ALIAS gwd {gan che to westdown}
+#ALIAS gsd {gan che to southdown}
+#ALIAS gdone {#SYSTEM python2 notify.py}
+
+#ALIAS bhz {e; e; ne; e; ne; se; se; sd; s; s; s; e; n; n; }
+#ALIAS bjx {out; out; n; ne; ne; s; se; se; se; sd; s; s; s; e; n; n; }
+#ALIAS bjz {s;s;s;su;se;s;s;s;s;s;s;s;se;s;se;n;se;se;se;sd;s;s;s;e;n;n;}
+#ALIAS bys {w;w;w;w;w;w;w;sw;sw;w;sw;nw;w;s;s;se;se;sd;s;s;s;e;n;n}
+#ALIAS bqz {ne;ne;ne;n;n;ne;ne;ne;e;e;e;e;n;n;}
+#ALIAS bzj {#4 e; se; se; s; sw; sw; s; se;#13 s; #DELAY {1} {se; se; sd; s; s; s; e; n; n; }}
+
+#ACTION {林震南递给你一封密信。} {s; s; s; xian xin}
+
+
+
+#ACTION {劫匪突然从暗处跳了出来，阴笑道：“红货和人命都留下来吧！。”} {hit robber; #TICKER {chan} {#IF {$recover == 0} {chan}} {1}}
+#ACTION {( 你气喘嘘嘘，看起来状况并不太好。 )} {#TICKER {reco} {#IF {$recover == 1} {yun recover};} {2};#MATH recover 1;}
+#ACTION {你深深吸了几口气，脸色看起来好多了。} {#math recover 0;#UNTICKER reco}
+#ACTION {你现在气力充沛。} {#MATH recover 0; #UNTICKER reco}
+#ACTION {劫匪个起纵遁入暗里不见了。} {#UNTICKER {chan}}
+#ACTION {你的太极神功运行完毕，将内力收回丹田。} {#TICKER {yp} {yun powerup;} {1}}
+#ACTION {你气沉丹田，运用太极神功来提升自己的战斗力。} {#UNTICKER {yp}}
+#ACTION {你要拿着 sword 类武器才能使出这种绝技。} {wield sword}
+#ACTION {林震南拍了拍饭团的头，说道：「好孩子，乖。」} {#DELAY {ask} {ask lin about 护镖} {10}}
+
+#ACTION {一个伙计挖着鼻屎走了出来，道：你找我啥事？} {look}
+
+#NOP vim: set ts=8 sw=8 tw=0 filetype=tt:

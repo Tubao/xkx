@@ -1,0 +1,22 @@
+#alias ywm_pd_start 
+{
+	pingdiao;
+	#var is_pingdiao 1;
+};
+#act {^你凭吊完毕,站起身来}
+{
+	eat gan liang;
+	drink hulu;
+	save;
+	#delay {1}
+	{
+		#if {$is_pingdiao==1}
+		{
+			pingdiao;
+		};
+	};
+};
+#alias ywm_pd_stop
+{
+	#var is_pingdiao 0;
+};

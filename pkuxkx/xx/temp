@@ -1,0 +1,486 @@
+wp_11629  |碧磷针(bilin zhen)            |一两白银            |一百四十一          
+
+阿紫想想对你说道：你去帮本派找来天山雪莲
+pgt xiaoz saimc
+ask alamuhan about 马
+fight alamuhan
+ride horse
+se;se;wu;wu;jump valley;get all
+jump valley;gtmz
+
+阿紫对你说道：烧饭僧正在比武，你去给我踢了烧饭僧的场子！
+hgt 07bc009bc77272b00d0b8a9315e9d8b6;
+fight seng
+阿紫回头对你说道：我现在正需要你去将甘文焜除掉！
+hgt 66e6e9cd4ba8150f2592c6d75b926619;
+killall wenkun;
+阿紫对你说道：正好正好，洪七公现在急需要玉竹杖，你赶紧送过去。
+gtdangpu;
+list yuzhu zhang;
+pgt gaib pomms;
+enter;kill jian;
+e;give yuzhu zhang to hong;
+阿紫对你说道：你马上去给王铁匠送烧红的铁锤去。
+hgt 40c01191609a2b83c92e372ec11f5fda;
+kill feng;
+get all from corpse;
+hgt 435dbf82adf00b030af3b211df86de64;
+give hot hammer to wang;
+阿紫对你点点头说道：听说道童需要拂尘，你给送去吧。
+gtdangpu;
+buy wp_14247;
+hgt 442935fe27610de616f35ed64ceaa51a;
+give fuchen to daotong;
+阿紫对你点点头说道：听说慧修尊者需要韦陀棍法，你给送去吧。
+
+阿紫对你说道：正好正好，书生现在急需要说文解字，你赶紧送过去。
+2 gold;
+pgt nanc yuelsy;
+buy shu;
+hgt 82973f84b423175effc2b342b1a79144;
+give shu to shu sheng;
+阿紫回头对你说道：我现在正需要你去将马宝除掉！
+阿紫对你点点头说道：听说裘万家需要竹叶青，你给送去吧。
+pgt yangz jiud;
+buy zhuye qing;
+hgt 8c68ea1da7beb46840ba9812949e6f4b;
+give zhuye qing to qiu
+阿紫对你一点头说道：这里尚缺些日月神剑
+pgt riysj zhengf;
+get la zhu;
+dc4055c45a43623a02c0564d15d17e49;
+drop la zhu;get la zhu;e;
+w;
+search;
+阿紫对你说道：金环蛇在武林中耀武扬威，你去跟金环蛇一比高下！
+hgt a458d60f9d054ed862f8d1935ecf0b2b; / hgt 49a153e52a17bb064dbfbc92e9fe1b09
+fight she;
+阿紫怒发冲冠，对你说道：武三通散布我派谣言，你去解决了武三通！
+hgt a7bce476dac8dbb19bad26c5eee4af9e
+kill wu;
+阿紫对你说道：岳阳统制弓手欺压我派中人，你去一趟了解了这事！
+hgt 0b5e68e8bc03fd27ac0894779611656f;
+killall gongshou;
+
+阿紫对你说道：去把将华山弟子杀掉！
+hgt f1b76be233b0024dc8a898a63380a8c8;
+kill dizi;
+阿紫想想对你说道：你去帮本派找来九转熊胆丸
+阿紫对你点点头说道：听说周伯通需要玉蜂浆，你给送去吧。
+阿紫对你说道：黑冠巨蟒欺压我派中人，你去一趟了解了这事！
+hgt 49a153e52a17bb064dbfbc92e9fe1b09;
+kill snake;
+阿紫对你说道：正好正好，打铁僧现在急需要烧红的铁锤，你赶紧送过去。
+hgt 40c01191609a2b83c92e372ec11f5fda;
+kill feng;
+get all from corpse;
+hgt 1221bdc3867a4baf9f5c79a03dc5a59d;
+give hot hammer to seng;
+阿紫回头对你说道：我现在正需要你去将明州知府除掉！
+hgt a331e7d93f51657f5fc117998f470b60;
+killall zhi fu;
+
+阿紫怒发冲冠，对你说道：朱国治散布我派谣言，你去解决了朱国治
+hgt 11e56305f5188ac5a7cbb20c832d32ad;
+killall guozhi;
+阿紫对你说道：正好正好，黄药师现在急需要洗髓经，你赶紧送过去。
+阿紫对你一点头说道：这里尚缺些红玫瑰
+pgt wuls gud;
+get all;
+give rose to a zi;
+阿紫对你说道：你马上去给陆大有送华山剑谱去。
+hgt 7af2db88f209043755f51c42f9323ac6;
+ask punk about 王小二;
+hgt ea42e0ba53297ee5b11512386adfd2f5;
+enter hole;ask wang about 鸡 ;
+bihua;
+pgt huas ket;
+give book to lu;
+
+阿紫对你说道：衙役在武林中耀武扬威，你去跟衙役一比高下！
+hgt 2a3ade3b98fd46773e14a378576ac364;
+fight ya yi;
+阿紫对你说道：听说游客需要野果，你去给游客送去。
+hgt 938a74e51d77de8c90d0aff695078e5c;
+get all;
+hgt b8cb48f3c4f7a3b373278ae987883a60;
+give guo to youke;
+阿紫对你说道：去把将孙思克杀掉！
+hgt 8d8b9b48d79ae1079b0f79ec99af790b;
+killall sike;
+阿紫想想对你说道：你去帮本派找来普渡杖法
+阿紫细想了一下对你说道：本派需要飞沙走石十三式，
+pgt yangz caizhy;
+ask tian about 淫贼;
+accept;
+阿紫对你说道：你马上去给梁发送华山剑谱去。
+hgt 7af2db88f209043755f51c42f9323ac6;
+ask punk about 王小二;
+hgt ea42e0ba53297ee5b11512386adfd2f5;
+enter hole;ask wang about 鸡 ;
+bihua;
+hgt 319a463801948b3c8f07c40b86db643c;
+give sword book to liang;
+阿紫回头对你说道：我现在正需要你去将衙役除掉！
+hgt 2a3ade3b98fd46773e14a378576ac364;
+kill ya yi;
+阿紫对你说道：家丁正在比武，你去给我踢了家丁的场子！
+hgt ddc6fbb97b3a1a46259f5ed9e77ff77e;
+fight jia ding;
+
+阿紫回头对你说道：我现在正需要你去将岳阳弓手除掉！
+阿紫对你说道：你马上去给李铁嘴送马屁宝典去。
+2 gold;
+pgt nanc yuelsy;
+buy mapi baodian;
+hgt 3c6c351f85bc528d43a6ea7e24e92c3c;
+give mapi baodian to teller;
+阿紫怒发冲冠，对你说道：昆明城门守将散布我派谣言，你去解决了昆明城门守将！
+hgt 10a1c787268dcf00d4e95303fc58e088;// hgt 69c7fa15fbddbd42beca0ac4cdabd55e;
+killall shou jiang;
+阿紫对你点点头说道：听说波斯商人需要圣火令，你给送去吧。
+hgt ec70b5410971ced6a295ea64675b0a97; 
+give ling to shangren;
+
+阿紫对你说道：去把将温峤杀掉！
+hgt 0b9d797f73f23fb8e7b94365128864c4;
+killall wen qiao;
+阿紫对你说道：庄仆在武林中耀武扬威，你去跟庄仆一比高下！
+hgt 202d19e74e0dd28b66e4074c710111b1
+fight zhuang pu;
+阿紫对你说道：小翠正在比武，你去给我踢了小翠的场子！
+hgt 89b5c01aed6754a96b9903488f276e71;
+jiali 0;
+hit cui;
+
+
+
+
+
+quest
+mz={}
+
+function mz.gt(node, gogogo)
+  DoAfterSpecial(1,"mz_to_node", 10)    ---自己加个mz_to_node这个别名，从接任务地点到最近的城际通节点的路径
+  DoAfterSpecial(3,"gt "..node, 10)
+  DoAfterSpecial(25, gogogo, 10)
+end
+
+function mz.back(toNode, after)
+  DoAfterSpecial(1, toNode, 10)
+  DoAfterSpecial(3, "gt xx",10)  -- xx改成你自己的门派城际通节点名
+  DoAfterSpecial(20, "node_to_mz;ask a zi about quest;"..after, 10)  -- node_to_mz是门派城际通节点到门忠任务npc路径，另外改下这句里面的a zi
+end
+
+function mz.find(t)
+  if (t=="道德经「第十三章」" or t=="旧竹片" or t=="长鞭" or t=="玉竹杖" or t=="军服" or t=="毒蛇胆") then
+    mz.gt("yz", "s;e;list "..t);
+  elseif (t=="短剑") then
+    mz.gt("yz", "s;s;e;buy duanjian;")
+  elseif (t=="托钵僧") then
+    mz.gt("yz", "s;s;fight tuobo seng;")
+  elseif (t=="药铺伙计") then
+    mz.gt("yz", "#2e;n;hit huo ji")
+  elseif (t=="家丁") then
+    mz.gt("yz", "w;w;n;n;fight jia ding")
+  elseif (t=="王铁匠") then
+    mz.gt("yz", "e;e;s;fight want tiejiang")
+  elseif (t=="好逑汤" or t=="熏田鸡") then
+    mz.gt("taohua", "n;n;nu;nu;nu;n;n;n;n;e;e;e;e;get all;")
+  elseif (t=="火折") then
+      mz.gt("tianshan", "nw;w;buy fire;")
+  elseif (t=="牢房钥匙") then
+      mz.gt("yz", "w;w;n;n;n;killall cui;")
+  elseif (t=="狗肉") then
+      mz.gt("yz", "w;w;n;killall dog;")
+  elseif (t=="衙役服" or t=="衙役") then
+    mz.gt("yz", "w;n;killall yayi;")
+  elseif (t=="雷震挡") then
+    mz.gt("ll", "give ding 10 silver;n;n;fight zhao;")
+  elseif (t=="华山弟子") then
+    mz.gt("hs", "e;e;n;n;n;fight dizi")
+  elseif (t=="成都城门官") then
+    mz.gt("cd", "n;n;fight guan")
+  elseif (t=="岳阳弓手") then
+    mz.gt("yy", "n;n;")
+  elseif (t=="手信" or t=="信纸") then
+    mz.gt("hs", "e;n;")
+  elseif (t=="明州捕快") then
+    mz.gt("mz", "fight bukuai")
+  elseif (t=="烧饭僧") then
+    mz.gt("sl", "s;s;sd;s;w;n;n;fight seng;")
+  elseif (t=="烧红的铁锤") then
+    mz.gt("xc", "e;s;fight feng")
+  elseif (t=="说文解字" or t=="马屁宝典") then
+    mz.gt("nc", "w;w;w;wu;wu;nu;enter;buy shu;out;sd;ed;ed;ed;3 e")
+  elseif (t=="七寸子蛇" or t=="眼镜蛇" or t=="竹青蛇") then
+    mz.gt("gy", "#4w;#3(nu);w;jiali 0")
+  elseif (t=="阿牧" or t=="庄仆") then
+    mz.gt("gy", "enter;")
+  elseif (t=="黄金") then
+    mz.gt("gy", "#6w;give gold to shang ren")
+  elseif (t=="知客道长") then
+    mz.gt("wd", "sd;hit zhike daozhang")
+  elseif (t=="净慈" or t=="巡山弟子" or t=="大金刚拳法") then
+    DoAfterSpecial(1, "ask a zi about cancelquest;ask a zi about quest;", 10)
+  else
+    Note(t.." 找不到")
+  end
+end
+
+function mz.done(t)
+  if t=="道德经「第十三章」" or t=="旧竹片" or t=="玉竹杖" or t=="军服" then
+    mz.back("w;n;", "")
+  elseif t=="裘万家" then
+    mz.back("u;out", "")
+  elseif t=="竹叶青" then
+    DoAfterSpecial(1,"s;w;n;n;n;enter shudong;give zhuyeqing to qiu",10)
+  elseif t=="好逑汤" or t=="熏田鸡" then
+    mz.back("#2w", "give ji to a zi;give tang to a zi;")
+  elseif t=="冯铁匠" then
+    DoAfterSpecial(1, "get all from corpse;n;w", 10)
+    DoAfterSpecial(3, "gt sl",10)
+    DOAfterSpecial(8, "n;e;e;n;e;open door;e;give hot hammer to seng",10)
+  elseif t=="打铁僧" then
+    mz.back("w;s;w;w;s", "")
+  elseif t=="马屁宝典" then
+    DoAfterSpecial(1, "out;sd;#2(ed);#3e", 10)
+    DoAfterSpecial(3, "gt xc",10)
+    DoAfterSpecial(12, "#6e;n;give mapi baodian to teller;",10)
+  elseif t=="李铁嘴" then
+    mz.back("s;#6w", "")
+  elseif t=="说文解字" then
+    DoAfterSpecial(1,"out;sd;#2(ed);#3e;",10)
+    DoAfterSpecial(3,"gt ts",10)
+    DoAfterSpecial(12,"#6(sd);(wd);#3(sd);#2s;give book to shu sheng",10)
+  elseif t=="书生" then
+    mz.back("#2n;#3(nu);(eu);#6(nu)", "")
+  elseif t=="赵一伤" then
+    Execute("get all from corpse")
+    mz.back("#3s", "give hammer to a zi")
+  elseif t=="知客道长" then
+    mz.back("nu", "")
+  elseif t=="托钵僧" then
+    mz.back("#2n", "")
+  elseif t=="药铺伙计" then
+    mz.back("s;w;w","")
+  elseif t=="家丁" then
+    mz.back("s;s;e;e", "")
+  elseif t=="王铁匠" then
+    mz.back("n;w;w","")
+  elseif t=="衙役" then
+    mz.back("get all from corpse;s;e;", "")
+  elseif t=="牧羊人" then
+    mz.back("#8s","")
+  end
+end
+
+
+一、寻物：
+1、道德经「第十三章」 武当复真观 
+2、短剑(Duanjian) e;e;s;buy Duanjian 
+3、好逑汤 taohua;n;n;#3 nu;#4 n;#4 e;get tang 
+4、火折 tianshan;nw;w;buy fire 
+5、旧竹片 少林达摩洞 
+6、牢房钥匙 w;w;n;n;n;killall cui;get all 
+7、狗皮 w;w;n;killall dog 
+8、六脉神剑剑谱 找天龙弟子帮忙 
+10、麻鞋(Gunny shoes)  
+11、少林英雄令 s;s; give 1 gold to seng 
+12、水壶(bottle)  
+13、水靠 泉州挂剑祠
+14、天山雪莲 星宿采药人 
+15、雷振挡 Lvliu;killall ding;n; 绿柳山庄赵一伤 
+16、熏田鸡 Taohua;n;n;#3 nu;#4 n;#4 e;get ji 
+17、衙役服(Yayi cloth) w;n扬州衙役 
+18、爪法入门(Claw book) luoyang;w;n;buy Claw book 
+19、手信 去华山书房拿信纸, 然后去李四那合成 
+20、粽子 jiaxing;e;se;s;buy zongzi 
+21、无量寿经 少林藏经阁一楼 
+22、大金刚拳法 少林藏经阁二楼 
+23、玄铁剑 嘉兴李莫愁处nd;ask chou diao about 独孤求败;nu;ask yu fu about 过河;se;catch fish;nw;give fish to yu fu;swim;pick sword 
+24、虎皮 归云庄树林;s乱走(pat tiger) 
+25、红玫瑰 无量山，climb yafeng.不过小心可能会死。 
+二、送物
+1、梁发/华山剑谱 Xiaocun;s;s;w;nw;ask punk about 王小二;se;e;n;n;nw;nw;ne;enter hole;ask wang about 鸡 
+2、陆大有/华山剑谱 同上 
+3、牧羊人/长鞭 牧羊人在gt xz;se;wu;/ changbian yz 当铺
+4、商人/黄金 归云 太湖街;give 1 gold to shang ren 
+5、书生/说文解字 e;n;buy shu;#wa 1000; 泰山路上;give shu to sheng 
+6、药铺伙计/毒蛇胆 e;e;n; give shedan to huoji/      jiaxing;nd;w;kill Snake 
+7、赵狗儿/肥鸭 gaibang;open door;enter;e/ Taohua;n;n;#3 nu;#4 n;#4 e;get ya 
+8、诚识/大般若什么经 少林/ 少林藏经阁一楼 
+9、啊善/甜点心 明都/归云庄 
+三、除掉、教训
+1、采花子(Caihua zi) 星宿石道采花子 
+2、崔员外(cui) w;w;n;n;n 
+3、打手(Da shou) xingxiu 黑店
+4、黑老板 xingxiu 黑店
+5、归云庄七寸子蛇(snake) guiyun黑风山脚
+6、归云庄眼镜蛇(snake) guiyun黑风山脚
+7、归云庄竹青蛇(snake) guiyun黑风山脚
+8、海公公(Hai) 泰山路上 大驿道 
+9、洪水旗众 mingjiao;n;killall Qi zhong 
+10、厚土旗众(Qi zhong) mingjiao;killall Qi zhong 
+11、花匠 白驼山花园小径花匠(Gardener) 
+12、霍都(Huo du) #3 n;#3 nw;w;nw;w;sw;sw;ask he about 霍都 
+13、金环蛇(Jin she) pingxi;#5 s;sw;nw;nu;killall jin she 
+14、巨木旗众(Qi zhong) mingjiao;w;killall Qi zhong 
+15、烈火旗众(Qi zhong) mingjiao;e;killall Qi zhong 
+16、流氓 扬州东大街流氓(Liu mang) 
+17、农妇(Woman) riyue;killall tong;n;#3 w;s日月卧房 
+18、日月教众(riyue jiaozhong) riyue 
+19、锐金旗众(Qi zhong) mingjiao;s;killall Qi zhong 
+20、蛇奴 白驼山蛇场蛇奴(She nu) 
+21、舞蛇人 白驼山西街舞蛇人(Snaker) 
+22、小喽罗(Xiao louluo) wudang;ed;e;e;ed 
+23、小土匪(Xiao tufei) wudang;ed;e;e;ed;sd;ed 
+24、星宿派号手(Haoshou) Xingxiu 
+25、药铺伙计 e;e;n
+26、小翠 gt ssb;jy
+27\李老三 cancel
+28信纸 gt hs;w;n;move desk;get all;
+29 净慈 gt fzl;u;n;fight shami
+
+
+牢房钥匙－－扬州崔员外（财主家中，杀掉后可得）
+送紫霞秘笈给庄挣－－秘笈陆大油身上有，庄挣在明教锐金旗（注意如果你拿着紫霞秘笈，劳德诺会追杀你，可以放入马中.当铺也经常有）
+杀死小流氓－－华山村
+教训（杀死）海公公－－泰山路上 大驿道 .海公公被揍了会到处走，多在附近转转。
+教训土匪－－武当山
+杀死庄丁－－绿柳山庄
+给挑夫手杖－－太湖桥，小贩处买手杖（walking stock）少林脚下也有卖的
+杀死（教训）流氓头－－ct;e
+杀死（教训）赵一？钱二？？三？？四？－－绿柳山庄.
+找铁震档，也在绿柳山庄
+比武巨蟒。太湖桥向北，蛇洞。注意梅超凤。不过巨蟒很抢手，不行就放弃。
+比武黑老板。嘉玉关黑店。功夫不能太低，否则容易死。
+比武霍都。#3 n;#3 nw;w;nw;w;sw;sw;ask he about 霍都.功夫最好有100级，exp 10w
+比武狮吼子。这个任务有点困难，主要是他老用叫杀的perform，很容易打死。可以fight  之后直接一个剑掌，拿把差点的剑。
+比武王五。这个任务以前很难完成，现在很好做。直接比就行，不用ask 鬼刀
+给媒婆送玉白露。无量谷底，现在好像苏州东门也有，媒婆在扬州西门
+蜜蜂---全真教树林里边吧
+小孩--满大街都是，华山村就有好几个
+烤鸡腿--不知道在哪里的，……无话可说了，扬州醉仙楼。
+旧竹片，简单的办法是在当铺买，或者少林达摩洞里面。
+铁背心，少林弟子，和尚院二部,e,open door,e,n,ask chanshi about 铁背心。
+清水葫芦，有些小贩可以买，或者有些门派饭厅里面。
+花雕酒袋，扬州醉仙楼二楼买。
+烤鸭，同上。
+麻辣豆腐，明教的饭堂，少林的有时候也有，不过我懒得拿。
+铁棍，扬州铁匠铺可以买，地保在华山村。
+麻鞋，少林脚下和归云路上的小贩都可以买。
+戒刀，少林弟子，和尚院二部,e,open door,e,n,ask chanshi about 戒刀。
+阿庆嫂，扬州 ct,s,s,w.
+手杖，少林脚下和归云路上的小贩都可以买。
+
+
+物品
+
+道德经「第十三章」	武当复真观	当铺没有我都懒的上武当，书类靠刷，不一定刷出什么
+短剑(duanjian)	扬州的铁匠铺	买吧，多买几个
+好逑汤(tang)	桃花岛的饭厅	随机刷的，一次一个，路过就拿着
+火折(fire)	天山，苏州等地的小贩，买	
+旧竹片(bamboo)	少林后山的达摩洞	这个是练轻功的，经常有人卖到当铺
+牢房钥匙(key)	扬州的崔员外	杀了拿，还是要有点功夫的大概60级+
+狗皮	扬州崔员外家的狗	
+六脉神剑剑谱	天龙寺的枯荣大师	天龙500+门忠，问才给。没人帮助就当铺看看
+麻鞋	苏州，归云庄的小贩	买吧
+少林英雄令	扬州南大街托钵僧	给僧人1Gold，他会给你的，上少林也要用到的，敲门用的
+水壶	扬州杂货铺	买
+水靠	嘉兴的谷底	到嘉兴谷底 ask diao about 独孤求败；北上有个钓鱼的，ask yu about 过河;se;catch fish;give yu fish
+天山雪莲	天山星宿s;w;	骑上马，越过山谷jump valley;一般有刷出，杀采药人，也可能有。没马不行，训吧train horse;
+雷震挡	明教山下绿柳山庄	杀了赵一伤，拿。门口的家丁可以杀，也可以给10silver
+熏田鸡	桃花岛饭厅	和好逑汤一样
+衙役服(yayi cloth)	扬州衙门	杀，打晕个衙役就拿，当铺一般也有
+爪法入门(claw book)	洛阳镖局门外	小厮，出售2G吧。当铺经常有
+手信	华山寝室	在寝室里 move desk 得到信纸(paper)，去华山脚下的玉泉院找李铁嘴 ask teller about 伪造
+粽子	归云庄，烟雨楼	小二卖，过去买吧，不想过河就看看当铺，多买几个
+无量寿经	少林藏经阁	看看武庙的box有没有，我懒的花1G上少林，还不一定有
+大金刚拳法	少林藏经阁	同上，一般少林的看武庙，武当的看当铺，没有放弃，有好人拿来放在武庙的，北侠有千万个善人
+玄铁剑	嘉兴谷底，过河	同上的水靠，拿了水靠，swim过河，pick sword，有可能给别人拿了，这个自己用用也不错，比北侠青峰剑强2倍以上，永不磨损哦
+虎皮	归云庄外树林	那个小迷宫，走进去就有老虎走过来，打虎。拿皮。有点功夫再打虎。别啥都不会就去
+玫瑰花	无量后山	天龙寺附近的无量山，climb stiff;然后climb yafeng;再走一两布就看见各种花了，常浇水water flower，干了，就失败了，随机刷各种花，玉白露，等
+华山剑谱	华山下的小村	有个地痞ask punk about 王小二;他说在庙后，到打谷场nw那边的庙enter hole;ask wang about 偷鸡;然后跟他bihua;就给了。登录一次就一次机会吧
+长鞭(changbian)	古墓小玲、天山阿拉木汗、绿柳山庄吴六破	杀了，拿。另外：阿拉木汗可以要到马，ask 赛马;然后fight赢了就行了
+说文解字	扬州书院朱熹	当铺也都有，2G
+毒蛇胆(shedan)	天龙的无量山，嘉兴谷底蛇窟，归云庄外蛇窟	杀蛇
+紫霞秘籍	在华山的陆大有，当铺很多	带着秘籍碰到陆大有会杀人哦，他会在华山范围内追杀。
+手杖	归云庄小贩，少林山脚下也有	
+烤鸡腿	扬州醉仙楼买，当铺也有	
+铁背心	少林和尚院二部	要是少林寺的弟子,e,open door,e,n,ask chanshi about 铁背心
+清水葫芦	饭厅	一般门派都有
+花雕酒袋	扬州醉仙楼，当铺有	
+烤鸭	扬州醉仙楼	
+麻辣豆腐	饭堂，一般门派刷	
+戒刀	少林弟子，和尚院二部	e,open door,e,n,ask chanshi about 戒刀。
+玉竹杖	路上捡的，去当铺碰碰运气	
+竹叶青	去扬州云台街	酒店，向沈千盅买 buy zhuye qing
+烧红的铁锤	华山村冯铁匠	kill and get
+找人
+
+多看看地图，npc一般都有标出的到了指定区域用localmaps看看，都找得到。
+
+梁法	华山，过了陆大有就看得到
+牧羊人	天山山路上
+商人	送钱，去归云庄外的太湖街give 1 gold to shang ren;
+书生	泰山大驿道，泰山山下
+赵狗儿	扬州丐帮，走丐帮地道，走竹林都行，简长老不让过，杀了过（120级以上安全，可以偷袭）。丐帮随便进
+药铺伙计	扬州药铺
+采花子	星宿海
+崔员外	扬州崔员外家
+七寸子蛇（这个不显示名字，黑色字）	归云庄蛇窟：眼睛蛇，竹青蛇，等蛇，无量山也有几样。
+花匠	在白驼山，别走白驼山的沙漠，看看北侠路径怎么走，扬州钱庄问问去
+海公公	泰山大驿道
+旗众	各种五行旗，旗众，当然明教
+流氓	各种流氓，在扬州广场附近
+农妇(woman)	有好几个，门忠的是在日月教的小村里，有点功夫才行,同样要过童XX守门
+日月教众	在日月教，门口就有
+蛇奴	白驼山后的蛇场
+舞蛇人	白驼山下的小村子里
+小喽罗	武当山下有个岔路su的地方，也是丐帮暗道去武当的出口处，要点功夫，有好几个敌人叫杀呢，推荐去襄阳西门出去雪峰南边的乡间小路杀
+小土匪	同上，武当山下，推荐去襄阳西门出去雪峰南边的乡间小路杀
+星宿号手	星宿门口有各种乐队，过去直接杀，别碰带名字的就没事
+庄丁	明教山下绿柳山庄
+挑夫	泰山
+巨蟒	归云庄蛇窟，天龙寺的无量山都有，比较不好杀相比其它，挺危险
+黑老板	70+以上再考虑，在天山附近有个六盘山，然后wd，有个黑店，叫杀，open men;eu;才能出
+霍都	霍都王子伪装成了何师我，在南阳城，ask he about 霍都;多问几次，他会叫杀你。100级功夫会安全些
+狮吼子	星宿的，如果是战胜的话，别打死了。
+王五	扬州醉仙楼
+媒婆	扬州红娘庄
+蜜蜂	全真教树林
+小孩	华山村，很多地方啦
+裘万家	在扬州丐帮的洞里
+游客	归云庄太湖街
+王铁匠	华山村，铁匠铺，扬州铁匠铺
+打铁僧	少林寺
+打手	长安西门出去上六盘山，新手小心2个打手1个黑老板见面就叫杀
+李老三	壮族山寨小酒馆里，壮族迷宫超级难走，时间不够的，放弃吧
+
+壮族山寨老林迷宫，到当铺买好司南带在身上，进入老林后；一直nu;nd;n 直到出现：在你筋疲力尽之际，终于找到了出路(out)。 回来的时候一直eu;ed;e
+
+
+你向英雄无敌打听有关『job』的消息。
+英雄无敌拍了拍伯特的头，说道：「好孩子，乖。」
+英雄无敌说道：「你去帮我弄根木杖过来吧。」
+英雄无敌(swnt npc)告诉你：这两样工具也许你会需要，一定要保管好。
+
+英雄无敌给你一把大斧头。
+英雄无敌给你一把碎金刀。
+
+
+英雄无敌道，我派弟子毒技是为基础，你去山林给我挖根白色三叶草来吧
+#map run 18
+wa
+你在地上找了半天，却什么也没发现
+你摘下树边的一根不知名小草。
+#config {convert meta} {on};
+look du cao
+#config {convert meta} {off};
+
+单叶
+###############:
+三叶：
+## ### ##     #     @#   #####
+

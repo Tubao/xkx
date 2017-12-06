@@ -1,0 +1,138 @@
+select t1.rid,t1.nextrid,t2.rname,t3.rname,t3.area from roomrel t1,roominfo t2,roominfo t3 where t1.rid=t2.rid and t1.nextrid=t3.rid and t2.area like 'gb%' and t3.area not like 'gb%' 
+
+
+> qu zhongyuan
+车资一两白银已经记在你的账上了。
+在出发前，你结清了车资共一两白银。
+马车缓缓开动，向着中原驶去。
+> 
+大车停稳了下来，你可以下车(xia)了。
+#3.32M,35965,4600,4600,4600,4600
+#9731,9731,9460,1722,1713,1713
+> 
+什么？
+> 
+什么？
+> xia
+                                               
+                                    
+                         中原马车总行            
+                             ｜     
+                           许昌城              
+中原马车总行
+    这里唯一的出口是 south。
+你起身走下了马车。
+达到了目的地中原，你从马车上走了下来。
+
+
+> gu
+
+                               马车   
+马车
+你登上了一辆马车。
+> qu 扬州
+车资一两白银三十文铜板已经记在你的账上了。
+在出发前，你结清了车资共一两白银三十文铜板。
+马车缓缓开动，向着扬州驶去。
+> 
+#3.32M,35965,4600,4600,4600,4600
+#9731,9731,9460,1722,1713,1713
+> 
+大车停稳了下来，你可以下车(xia)了。
+什么？
+> 
+什么？
+> xia
+                                               
+                                    
+                         中原马车行--春来茶馆  
+                                    
+                                               
+中原马车行
+    这里唯一的出口是 east。
+你起身走下了马车。
+达到了目的地扬州，你从马车上走了下来。
+
+
+select * from roominfo where rname like '%马车%'
+select * from roominfo t1,area_name_map t2 where t1.rname like '%马车%' and t1.area=t2.area
+百年老店，竭诚为新老顾客提供方便。
+
+    目的地    拼音名                距离                正常车资            
+ 1  成都      chengdu               二千四百余里        七两白银二十文铜板  
+ 2  大理城中  dalichengzhong        二千八百余里        八两白银四十文铜板  
+ 3  大轮寺    dalunsi               二千八百余里        八两白银四十文铜板  
+ 4  峨嵋      emei                  二千四百余里        七两白银二十文铜板  
+ 5  福州      fuzhou                八百余里            二两白银四十文铜板  
+ 6  归云庄    guiyunzhuang          四百余里            一两白银二十文铜板  
+ 7  临安府    hangzhou              四百余里            一两白银二十文铜板  
+ 8  江州      jiangzhou             一千六百余里        四两白银八十文铜板  
+ 9  建康府北城 jiankangfu            八百余里            二两白银四十文铜板  
+10  嘉兴      jiaxing               四百余里            一两白银二十文铜板  
+11  昆明      kunming               二千八百余里        八两白银四十文铜板  
+12  凌霄城    lingxiaocheng         二千八百余里        八两白银四十文铜板  
+13  南昌      nanchang              一千六百余里        四两白银八十文铜板  
+14  泉州      quanzhou              八百余里            二两白银四十文铜板  
+15  天龙寺    tianlongsi            二千八百余里        八两白银四十文铜板  
+16  牙山      yashan                四百余里            一两白银二十文铜板  
+17  岳阳      yueyang               一千六百余里        四两白银八十文铜板  
+18  镇江      zhenjiang             四百余里            一两白银二十文铜板  
+
+
+SELECT t1.*,t2.rname FROM roomrel t1,roominfo t2  where flag=1 and t1.nextrid=t2.rid	
+find maze:
+SELECT t1.*,t2.rname FROM roomrel t1,roominfo t2  where length(exit)>9 and t1.nextrid=t2.rid	
+update roomrel set flag=0 where flag=1 and rid='e48bde4974d709ee1a6b0ba20ed28115' and nextrid='734c7f55a913a25528fb42c60864b8f3'
+update roomrel set flag=0 where flag=1 and rid='734c7f55a913a25528fb42c60864b8f3' and nextrid='e48bde4974d709ee1a6b0ba20ed28115'
+
+select * from roominfo where rdesc like '%荡然%' and rdesc like '%这里%'
+
+
+select * from roomrel  where bak1 is not null
+//1cost = 0.1sec
+update roomrel  set cost=40 where bak1='busy'
+update roomrel  set cost=100 where bak1='kmove'
+update roomrel set cost=50   where bak2 like '%stop%'
+update roomrel set cost=20   where bak2 like '%busy2%'
+update roomrel set cost=20   where exit like '%busy2%'
+update roomrel set cost=200,flag=1   where exit like '%guojiang1%'
+
+select * from roomrel  where exit like '%guojiang1%'
+
+SELECT t1.*,t2.* FROM roominfo t1,room_npc t2 where t1.rid=t2.rid and t2.npc_cname='屠夫'
+insert into area_name_map(cname,area) values('古墓','gm')
+select * from roominfo where rname='后山小路'
+
+qiu:dfb07f8dd9b08dbd0fda622a060b29a4
+
+cd:3844ece1d9ced05d09bf864cb84341db
+
+dl:70aa1e98c6000f098105a254ee27a3ac
+
+jz:8439649696f8158347ceeab334e1aea6
+
+yy:8eee66dc2c86b36851db24598dda1d86
+
+select * from roominfo t1,roomrel t2 where t1.rid=t2.rid and t1.rname='金牛道'
+//set busy
+update roomrel set bak1='busy' where rid in (select t1.rid from roominfo t1 where t1.rname='藏边土路')
+update roomrel set bak1='busy' where nextrid in (select t1.rid from roominfo t1 where t1.rname='川西土路')
+
+SELECT t2.rid  FROM area_name_map t1,roominfo t2 where t1.area=t2.area and t1.cname='' and t2.rname=''
+
+n;e;ne;n;ne
+sw;s;sw;w;s
+
+
+你移动了一捆柴火，突然从柴火下面滚出一个人来。
+
+你的动作还没有完成，不能移动。
+
+
+hit yan
+
+{w} {w} {w} {n} {n} {w} {w} {w} {n} {n} {w} {w} 
+
+w;w;w;n;n;w;w;w;n;n;w;w
+
+

@@ -1,0 +1,138 @@
+#alias liandu_s1
+{
+	set_destEventHandler getCorpse;
+	hgt 3328f1951d2d3547a17fa22822872a5c;
+};
+#alias start_ld
+{	
+	#list task_stack insert {1} {liandu};	
+	#var task_status[liandu] {s1};
+	#var task_chkDelay[liandu] {420};
+	#var task_act[liandu][s1] {liandu_s1};
+		
+	#class c_xxld open;
+	#act {^星宿%*死了。}
+	{
+		#delay {2}
+		{
+			get corpse;
+			#delay {2}
+			{
+				set_destEventHandler startLiandu;
+				hgt 21b492db2d54673ff4b5ce4388c4332e;
+			};
+		};
+	};
+	#act {^钹手首领死了。}
+	{
+		#delay {2}
+		{
+			get corpse;
+			#delay {2}
+			{
+				set_destEventHandler startLiandu;
+				hgt 21b492db2d54673ff4b5ce4388c4332e;
+			};
+		};
+	};
+	#act {^飘然子说道：「好吧，你来试着练习(liandu)一下毒技吧。」}
+	{
+		#format heatbeat[liandu] %T;
+		#act {^你刚刚炼毒完成不久，频繁炼毒会有生命危险的！}
+		{
+			#unact {^你刚刚炼毒完成不久，频繁炼毒会有生命危险的！};
+			#delay {60}
+			{
+				set_destEventHandler getCorpse;
+				hgt 3328f1951d2d3547a17fa22822872a5c;
+			};
+		
+		};
+		liandu;
+		#delay {5}{liandu};
+	};
+	
+	#act {^你的经验增加了，你的杀气增加了。}
+	{
+		#format heatbeat[liandu] %T;
+		#delay {2}
+		{
+			dazuo max;
+			#delay {60}
+			{
+				halt;
+				yun recover;
+				dazuo max;
+				#delay {60}
+				{
+					halt;
+					yun recover;
+					dazuo max;					
+					#delay {90}
+					{
+						halt;
+						set_destEventHandler getCorpse;
+						hgt 3328f1951d2d3547a17fa22822872a5c;
+					};						
+					
+				};
+			};
+		};
+	};
+	#act {^飘然子说道：「石棺正在用呢，你等等吧。」}
+	{
+		drop corpse;
+		dazuo max;
+		#delay {120}
+		{
+			set_destEventHandler getCorpse;
+			hgt 3328f1951d2d3547a17fa22822872a5c;
+		};		
+	};
+	#class c_xxld close;
+	set_destEventHandler getCorpse;
+	hgt 3328f1951d2d3547a17fa22822872a5c;
+};
+#alias stop_ld
+{
+	#list task_stack delete {1};
+	#class c_xxld kill;
+};
+#alias getCorpse
+{
+	#list targetList create {gushou}{haoshou}{boshou};
+	#ticker {t_getCorpse}
+	{
+		a2c id here;
+		#delay {2}
+		{
+			#if {$success_a2c==1}
+			{
+				#var hasnpc 0;
+							
+				#foreach {$targetList[%*]} {mynpc}
+				{
+					#var tempv @has_id{$mynpc};
+					#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+				};
+				#if {$hasnpc==0}
+				{
+					#showme wait;	
+				}
+				{
+					#untick {t_getCorpse};						
+					kill $mynpc;									
+				};	
+			};
+		};
+	}{13};
+};
+#alias startLiandu
+{
+	ask zi about 炼毒;
+	#delay {2}
+	{
+		give corpse to zi;		
+	};
+};
+

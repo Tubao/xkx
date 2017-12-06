@@ -1,0 +1,16 @@
+#alias gtmz
+{
+	hgt 429260bfbdaf3e1570e0a9b7a42d9cea;
+};
+#alias askmz.job
+{
+	ask a zi about quest;
+};
+#alias askmz.fail
+{
+	ask a zi about fail;
+};
+#alias giveaz
+{
+	give %0 to a zi;
+};

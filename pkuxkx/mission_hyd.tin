@@ -1,0 +1,451 @@
+#alias gthyd
+{
+	hgt 3ed5550ea65808a6fcbf7b0703c27a2d;
+};
+#var Nickname {伯特子};
+#alias askfinder
+{	
+	#act {%*目前在【%*的%*】,快去摁死它吧!}
+	{		
+		#showme {finder get it!};
+		#var finded 1;
+		#var localdesc %%2%%3;	
+		#var area %%2;
+		#unact {%*目前在【%*的%*】,快去摁死它吧!};
+		stopt;
+		#delay {2}
+		{
+			xia;
+			#delay {3}
+			{
+				xia;
+			};
+			hu.t $localdesc 2;	
+		};	
+	};	
+	helpme find ...;
+	helpme find %0;
+};
+#alias start_hyd
+{	
+	#untick t_sk;			
+	#class hyd open;
+	unwield staff;
+	jiali max;	
+	#alias askhyd.job
+	{			
+		ask hu about job;		
+	};
+	#act {^请注意，忽略验证码中的红色文字。}
+	{
+		#if {$bxs_flag==1}
+		{
+			#var bxs_hyd_flag 1;
+		};
+		#untick t_pf;
+	};
+	#alias findsc
+	{
+		#var traversal_handler {stopTbyNpc_nofollow Sui cong};
+		ptraversal %%0 0;
+		#act {%*(Sui cong)}
+		{
+			#unact {%*(Sui cong)};
+			#delay {3}
+			{
+				asksc;
+			};
+		};
+	};
+	#alias asksc
+	{
+		ask sui cong about 藏宝图;
+	};
+	#alias kdbr
+	{
+		follow daobao ren;
+		kill daobao ren;
+	};
+	#alias gtdbr
+	{
+		#var traversal_handler {stopTbyNpc Daobao ren};
+		ptraversal %%0 0;		
+	};
+	#act {^盗宝人%*在%*的%*}
+	{
+		#var localdesc %%2%%3;		
+		#delay {2}
+		{
+			#var traversal_handler {stopTbyNpc Daobao ren};
+			#var tra {hu.t $localdesc 0};			    	
+		    	#echo {$tra};
+		    	$tra;	
+		};	
+	};
+	#act {^胡一刀说道：『我收到消息，听说%*有盗宝人%*(%*)找到了闯王宝藏的地图,你可否帮忙找回来！』}
+	{
+		#format start_t %T;
+		#var dbr_count 1;			
+		#var localdesc %%1;	
+		#var area %%1;		
+		#format targetNpc_ename %l {%%3};
+		#var targetNpc %%2;
+		#var hererid {3ed5550ea65808a6fcbf7b0703c27a2d};
+		#var finded 0;
+		#var traversal_handler {stopTbyNpc_cn $targetNpc};
+		#if {$bxs_flag==1}
+		{
+			#var bxs_hyd_flag 1;
+		};
+		#var pp_first 1;
+		ppdbr;		
+	};
+	#alias ppdbr
+	{
+		#format now_t %T;
+		#math diff $now_t - $start_t;
+		pp $targetNpc_ename;		
+	};	
+	#alias askf
+	{
+		askfinder $targetNpc_ename;
+	};	
+	#act {^未有对手或者你和对方未处于战斗中}
+	{		
+		stophu;		
+	};
+	#act {^这里%*战斗。}
+	{
+		ask $targetNpc_ename about fight;
+		#delay {1}
+		{
+			follow $targetNpc_ename;
+			follow daobao ren;
+		};
+	};
+	#alias fd
+	{
+		follow $targetNpc_ename;
+		follow daobao ren;
+	};
+	#act {^你掐指一算，感觉%*(%*)现在好象在%*一带活动。}
+	{		
+		#var finded 1;
+		#var pp_first 0;
+		#var localdesc $area%%3;
+		#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$localdesc"};
+		#list ret {size} {retsize};	
+		#if {"$retsize"=="0"}
+		{
+			#showme {can not pp!ask finder};
+			askf;				
+		}
+		{	
+			#var ref_rid ret[1];				
+			stopt;		
+			hu.t $localdesc 2;				
+		};
+		
+		#var pp_first 0;	
+	};
+	#alias seta
+	{
+		#var area %%0;
+		ppdbr;		
+	};
+	#act {^你决定开始跟随%*一起行动。}
+	{			
+		#unact {%*目前在【%*的%*】,快去摁死它吧!};
+		stopt;
+		yun qi;
+		kill $targetNpc_ename;
+		kill daobao ren;
+		#if {$dbr_count==5}
+		{
+			set ForcedAct 1;
+			pfcs $targetNpc_ename;
+			unset ForcedAct;
+		};
+		#ticker t_pf {pfcs} {0.2};
+	};
+	#act {说道：“你有种去%*找我兄弟%*(%*)，他会给我报仇的！”}
+	{
+		#format start_t %T;
+		#math dbr_count $dbr_count+1;	
+		#untick t_pf;	
+		jiali max;	
+		#var localdesc %%1;
+		#var area %%1;		
+		#format targetNpc_ename %l {%%3};
+		#var targetNpc %%2;	
+		#var finded 0;
+		#var traversal_handler {stopTbyNpc_cn $targetNpc};
+		#if {$bxs_flag==1 && $bmrxover_flag==1}
+		{
+			bmrx.askover;	
+			#var bxs_hyd_flag 1;
+		}
+		{
+			#var pp_first 1;
+			ppdbr;
+		};	
+	};
+	#act {长叹道：“人算不如天算，想不到我兄弟五人都栽在你的手中！”}
+	{
+		#untick t_pf;
+		combine;
+		#if {$bxs_flag==1 && $bmrxover_flag==1}
+		{
+			bmrx.askover;
+			#var bxs_hyd_flag 2;
+		}
+		{
+			#var destEventHandler {askhyd.over};
+			set_destEventHandler $destEventHandler;
+			gthyd;
+		};
+	};
+	#act {^你将手中的五块地图残片拼在一起，合成了一张藏宝图！}
+	{
+		#if {$bxs_flag==1}
+		{			
+			#var bxs_hyd_flag 2;
+		};		
+	};
+	#alias get5
+	{
+		#untick t_pf;
+		combine;
+		#if {$bxs_flag==1 && $bmrxover_flag==1}
+		{
+			bmrx.askover;
+			#var bxs_hyd_flag 2;
+		}
+		{
+			#var destEventHandler {askhyd.over};
+			set_destEventHandler $destEventHandler;
+			gthyd;
+		};
+		
+	};
+	#act {忙凝聚全身功力，却阻挡不住内力飞泄而出！}
+	{
+		#untick t_pf;
+		yun dianhuo;
+		#ticker t_pf {pfhq} {0.2};
+	};
+	#alias askhyd.over
+	{
+		give cangbao tu to hu;
+		#delay {2}
+		{
+			drop yun tie;
+			drop huo tong;
+			#if {$bxs_flag==1}
+			{
+				stop_hyd;
+				#var bxs_hyd_flag 3;
+				bxs.next;
+			}
+			{
+				chakan bao tu;
+			};
+		};
+	};
+	#alias xb
+	{
+		set_destEventHandler xunbao;
+		pgt %%0;
+	};
+	#act {^你找到了闯王宝藏的线索}
+	{	
+		set_destEventHandler dazuo max;	
+		gthyd;
+	};
+	#act {^你手上持有的武器并不能用来发动%*}
+	{
+		wield staff;
+		wield staff 2;
+		wield staff 3;
+	};	
+	#alias stophu
+	{
+		#untick t_pf;				
+	};	
+	
+	#class hyd close;
+};
+#alias stop_hyd
+{
+	#var traversal_handler {};
+	#class hyd kill;
+};
+#alias hu.t
+{
+	#act {^traversal_finished}
+	{
+		#unact {^traversal_finished};
+		#delay {2}
+		{
+			ppdbr;
+		};
+	};
+	#act {^这里没有 %*。}
+	{
+		#nop only allow to go one step back;
+		#unact {^这里没有 %*。};		
+		#math istep_bak {$istep_bak-1};
+		#var icmd @item{inner_Route_list;$istep_bak};
+		$movemap[$icmd];
+		#delay {1}
+		{
+			follow %%1;
+		};
+	};
+	#var r_traversal {traversal %1};		
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 0;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		hgt_pre $torid;	
+	
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#if {&traversal_table[$locdesc]}
+						{
+							#list ret create {$traversal_table[$locdesc]};
+						}
+						{
+							#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal_opt.py "$locdesc" "$depth"};
+						};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk2;};
+						#list pre2dest size pre2dest_size;
+						#if {$pre2dest_size>1}
+						{
+							#foreach {$pre2dest[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};		
+	};
+};
+#alias r.hu.t
+{
+	$traversal_handler;
+	traversal $localdesc %1;
+	#act {^这里没有 %*。}
+	{
+		#nop only allow to go one step back;
+		#unact {^这里没有 %*。};		
+		#math istep_bak {$istep_bak-1};
+		#var icmd @item{inner_Route_list;$istep_bak};
+		$movemap[$icmd];
+		#delay {1}
+		{
+			follow %%1;
+		};
+	};	
+};
+#alias hs
+{
+	htraversal 2;
+};
+#alias hu.t_byref
+{
+	#act {^traversal_finished}
+	{
+		#unact {^traversal_finished};
+		#delay {2}
+		{
+			ppdbr;
+		};
+	};
+	#act {^这里没有 %*。}
+	{
+		#nop only allow to go one step back;
+		#unact {^这里没有 %*。};		
+		#math istep_bak {$istep_bak-1};
+		#var icmd @item{inner_Route_list;$istep_bak};
+		$movemap[$icmd];
+		#delay {1}
+		{
+			follow %%1;
+		};
+	};
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 3;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByRName.py "$ref_rid" "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		hgt $torid;	
+	
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			#var traversal_flag 0;
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#showme {"$ref_rid" "$locdesc" "$depth"};
+						#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal_rid.py "$ref_rid" "$locdesc" "$depth"};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk2;};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};			
+	};
+};

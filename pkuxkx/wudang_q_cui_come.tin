@@ -1,0 +1,44 @@
+#list robbernpc create {tufei}{louluo}{Tufei}{Tu fei};
+#alias ktufei
+{
+	killall tufei;
+	killall louluo;
+	killall Tufei;
+	killall Tu fei;	
+	killall robber;	
+};
+#alias w2a_init
+{
+	#list moves create {se;w;ask cui about Âé·³}{e;enter;#map leave};
+	#list moves size movesize;	
+	#var movestep 0;	
+};
+#alias w2a_finish
+{
+	#untick {t_act};
+	#class c_w2a kill;
+	wait2act wudang_q_cui_maze_test2_c 5;
+};
+#function w2a_getAct
+{
+	#var hasnpc 0;
+	#foreach {$robbernpc[%*]} {mynpc}
+	{
+		#var tempv @has_dangerousNpc{$mynpc};
+		#if {"$tempv"=="1"} {#var hasnpc 1;#break;};
+	};
+	#if {$hasnpc==0}
+	{		
+		#math movestep {$movestep+1};
+		#if {$movestep>$movesize}
+		{
+			#return {-1};
+		}
+		{
+			#return $moves[$movestep];
+		};
+	}
+	{
+		#return {ktufei};
+	};
+};

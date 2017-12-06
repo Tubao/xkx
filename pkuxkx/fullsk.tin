@@ -1,0 +1,1030 @@
+#var default_maxlevel 321;
+#var master {zhang};
+#alias toz
+{
+#map run 北侧门;
+#map leave;
+w;sw;s;se;e;ne;n;nw;sw;s;e;open door;n;
+};
+#alias zback
+{
+	s;w;w;
+	#map goto 北侧门;
+};
+#alias fullsk_hbset
+{
+	#list task_stack insert {1} {fullsk};
+	#var task_status[fullsk] {normal};
+	#var task_act[fullsk][normal] {};	
+};
+#list {fullsk_skills} {create} 
+			{literate}
+			{taiji-shengong}
+			{force}			
+			{cuff}
+			{taiji-quan}		
+			{parry}
+			{sword}
+			{blade}
+			{dodge}				
+			{hero-jianfa}	
+			{taiji-jian}
+			{tiyunzong}
+			{xuanxu-dao}
+			{taoism};
+#var {fullsk_maxlevels} 
+		{
+			{literate}{300}
+			{taoism}{770}
+			{force}{0}
+			{parry}{0}
+			{sword}{0}
+			{blade}{0}
+			{dodge}{0}
+			{cuff}{0}
+			{taiji-shengong}{0}
+			{hero-jianfa}{100}
+			{taiji-quan}{0}
+			{taiji-jian}{0}
+			{tiyunzong}{0}
+			{xuanxu-dao}{0}
+		};
+	
+#var {fullsk_methods} 
+	{
+		{literate}{xx}
+		{taiji-shengong}{xx}
+		{force}{ll}
+		{taoism}{wudao}
+		{cuff}{ll}
+		{taiji-quan}{ll}		
+		{parry}{ll}
+		{sword}{ll}
+		{blade}{ll}
+		{dodge}{ll}				
+		{hero-jianfa}{readbook}		
+		{taiji-jian}{ll}
+		{tiyunzong}{ll}
+		{xuanxu-dao}{ll}
+	};
+#var {fullsk_skillmap} 
+	{		
+		{taiji-shengong}{force}
+		{hero-jianfa}{sword}
+		{taiji-quan}{cuff}
+		{taiji-jian}{sword}
+		{tiyunzong}{dodge}
+		{xuanxu-dao}{blade}
+	};
+#var {fullsk_skillenable_special} 
+	{		
+		{taiji-shengong}{force}
+		{hero-jianfa}{sword}
+		{taiji-quan}{cuff}
+		{taiji-jian}{sword}
+		{tiyunzong}{dodge}
+		{xuanxu-dao}{blade}
+	};
+#var {fullsk_skillenable_basic} 
+	{		
+		{force}{taiji-shengong}
+		{sword}{taiji-jian}
+		{parry}{taiji-jian}
+		{cuff}{taiji-quan}		
+		{dodge}{tiyunzong}
+		{blade}{xuanxu-dao}
+	};
+#list {fullsk_basicskills} create {force}{parry}{cuff}{sword}{dodge}{blade};	
+#list {fullsk_books} create ;
+#list {fullsk_books_ch} create ;
+#nop #list {fullsk_books} create {shediao}{tianlong}{hero book};
+#nop #list {fullsk_books_ch} create {射雕英雄传}{天龙八部}{英雄剑法秘籍};
+#list {fullsk_skills} size skills_size;	
+#alias {fullsk_startnext} 
+{
+	#format heatbeat[fullsk]  %T;
+	#if {$forcestop==1}
+	{
+		#format work_done_flag %T;
+	}
+	{
+		#ticker {t_fullsk}
+		{
+			#if {$stopping_task==0}
+			{		
+				#var curr_skill ${fullsk_skills}[$skill_ind];
+				#var maxlevel 0;
+				#if {${fullsk_maxlevels}[$curr_skill]==0}
+				{
+					#var maxlevel $default_maxlevel;
+				}
+				{
+					#var maxlevel ${fullsk_maxlevels}[$curr_skill];
+				};
+				#if {$myskill[$curr_skill]>=$maxlevel}
+				{
+					#math skill_ind $skill_ind+1;
+					#var stopping_task 1;
+					${fullsk_methods}[$curr_skill]_stop;				
+				};				
+			};		
+		}{60};	
+		#if {$skill_ind>$skills_size}
+		{
+			fullsk_stop;			
+		}
+		{	
+			#var curr_skill ${fullsk_skills}[$skill_ind];
+			#var stopping_task 0;
+
+			#nop judge if exceeds maxlevel
+			#var maxlevel 0;
+			#if {${fullsk_maxlevels}[$curr_skill]==0}
+			{
+				#var maxlevel $default_maxlevel;
+			}
+			{
+				#var maxlevel ${fullsk_maxlevels}[$curr_skill];
+			};
+			#if {$myskill[$curr_skill]>=$maxlevel}
+			{
+				#math skill_ind $skill_ind+1;
+				#if {$skill_ind>$skills_size}
+				{
+					fullsk_stop;			
+				}
+				{
+					fullsk_startnext;						
+				};	
+			}
+			{
+				${fullsk_methods}[$curr_skill]_start;
+			};
+		};
+	};
+};
+#alias {fullsk_start}
+{	
+	fullsk_hbset;		
+	#var forcestop 0;
+	#var skill_ind 1;	
+	#list worklist create 		
+		{fullsk_startnext}		
+		{dazuo_start 150}
+		{tuna_start 150}
+		{#list task_stack delete 1};		
+	worklist_start;	
+};
+#alias {fullsk_stop}
+{
+	#untick {t_fullsk};	
+	#format work_done_flag %T;
+};
+#alias {fullsk_forcestop}
+{
+	#var forcestop 1;
+	#var stopping_task 1;
+	#untick {t_fullsk};
+	${fullsk_methods}[$curr_skill]_stop;
+};
+#alias {fullsk_prepare}
+{
+	loadmap wd;
+	unwield all;
+	#delay {2}
+	{		
+		a2c i;
+		#delay {2}
+		{
+			#list inner_Route_list create;
+			#var blade_num @getItemNum{blade};
+			#var changjian_num @getItemNum{changjian};
+			#var gold_num @getItemNum{gold};
+			#var ganliang_num  @getItemNum{gan liang};
+			#var jiudai_num  @getItemNum{jiudai};
+			#var bktotall 0;
+			#foreach {${fullsk_books}[%*]} {bk}
+			{
+				#var bkn @getItemNum{$bk};
+				#math bktotall $bktotall+$bkn
+			};
+			#list fullsk_books size {bksize};
+			#if {$gold_num<3}
+			{
+				#var Route_list_short ${Route_yzct_qugold3};
+				#list inner_Route_list add $Route_list_short[%*];
+			};
+			#if {$bksize>0 && $bktotall<$bksize}
+			{
+				#var Route_list_short ${Route_yzct_xarnold};
+				#list inner_Route_list add $Route_list_short[%*];
+			};						
+			#if {$blade_num==0 || $changjian_num==0}
+			{
+				#var Route_list_short ${Route_yzct_buyweapon};
+				#list inner_Route_list add $Route_list_short[%*];
+			};
+			#if {$ganliang_num<100 || $jiudai_num<10}
+			{
+				#var Route_list_short ${Route_yzct_buyfood};
+				#list inner_Route_list add $Route_list_short[%*];
+			};	
+			#list inner_Route_list size {rsize};
+			#if {$rsize>0}
+			{
+				#list inner_Route_list insert 1 {stop};
+				#list inner_Route_list insert 1 {gtyz};
+				#list inner_Route_list add {gtwd};
+				#list inner_Route_list add {stop};
+				#list inner_Route_list add {#map goto 1;#format work_done_flag %T;};
+				
+				#map run 2;
+				ask song about 下山;
+				#delay {2} 
+				{
+				 	s;
+				 	#map leave;
+					#delay {1}
+					{
+				 		inner_walk;
+					};
+				 };				
+			}
+			{
+				#format work_done_flag %T;
+			};	
+		};
+	};
+	#class c_fp open;
+	#action {{\d+}{\s+}{.+}} {#list boxitem_inds add {%%1};#list boxitem_names add {%%3};};
+	#action {^柜子里目前存放的物品有：$} 
+	{
+		#list boxitem_inds create;
+		#list boxitem_names create;
+		#delay {2} 
+		{
+			#class c_fp kill;
+			#list sortlist create;
+			#foreach {${fullsk_books_ch}[%%*]} {bk}
+			{
+				#var bk_ind @ismember{$bk;boxitem_names};
+				#if {$bk_ind >0}
+				{
+					#list sortlist sort $bk_ind;					
+				};
+			};
+			#list sortlist size {sortsize};
+			#if {$sortsize>0}
+			{				
+				#loop $sortsize 1 cnt
+				{					
+					getout $boxitem_inds[$sortlist[$cnt]];
+				};
+			};
+
+			iwalk;
+		};
+	};	
+	#class c_fp close;	
+};
+
+#alias {fullsk_end}
+{
+	unwield all;
+	#delay {2}
+	{
+		a2c i;
+		#delay {2}
+		{
+			#list inner_Route_list create;
+			#var bktotall 0;
+			#foreach {${fullsk_books}[%*]} {bk}
+			{
+				#var bkn @getItemNum{$bk};
+				#math bktotall $bktotall+$bkn
+			};
+			#if {$bktotall>0}
+			{
+				#var Route_list_short ${Route_yzct_xarnold_in};
+				#foreach {$fullsk_books[%*]} {bk}
+				{
+					#list Route_list_short add {store $bk};
+					#list Route_list_short add {busy2};
+				};
+				#list Route_list_short add $Route_yzct_xarnold_out[%*];
+				#list inner_Route_list add $Route_list_short[%*];
+			};
+			#var Route_list_short ${Route_yzct_dangpu};
+			#foreach {$ilist[%*]} {item}
+			{
+				#if {"$item[ename]"!="gold" && "$item[ename]"!="silver" && "$item[ename]"!="jin nang" && "$item[ename]"!="coin"}
+				{
+					#if {"$item[ename]"=="gan liang"}
+					{
+						#list Route_list_short add {sell $item[ename] for $item[num]};
+						#list Route_list_short add {busy2};
+					}
+					{
+						#loop 1 {$item[num]} {cnt}
+						{
+							#list Route_list_short add {sell $item[ename]};
+							#list Route_list_short add {busy2};
+						};
+					};			
+				};
+			};
+			#list Route_list_short add $Route_dangpu_yzct[%*];		
+			#list inner_Route_list add $Route_list_short[%*];
+			#list inner_Route_list size {rsize};
+			#if {$rsize>0}
+			{
+				#list inner_Route_list insert 1 {stop};
+				#list inner_Route_list insert 1 {gtyz};
+				#list inner_Route_list add {gtwd};
+				#list inner_Route_list add {stop};
+				#list inner_Route_list add {#map goto 1;#format work_done_flag %T;};
+			
+				#map run 2;
+				ask song about 下山;
+				#delay {2} 
+				{
+				 	s;
+				 	#map leave;
+					#delay {1}
+					{
+				 		inner_walk;						
+					};
+				 };				
+			}
+			{
+				#format work_done_flag %T;
+			};	
+		};
+	};			
+};
+#alias gtsleep
+{
+	#nop 客房;
+	hgt 9220f9b0800bc465c9f73eb9af25a822;
+};
+#alias gtmaster
+{
+	hgt 4fb487195f823e02a8ef2292ad0d59e0;
+};
+#alias gtlw
+{
+	#nop 静修阁;
+	hgt c581a5939ea141659c267d97f50bb284;
+};
+#alias wudao_start
+{	
+	wudao_resume;
+	wudao;
+};
+#alias wudao_stop
+{
+	#class c_wudao kill;
+	#untick {t_wudao};
+	#delay {40}
+	{
+		#map run 6;
+		#delay {2}
+		{
+			fullsk_startnext;
+		};
+	};	
+};
+#alias wudao_resume
+{
+	#class c_wudao open;
+	#act {^你修行完毕，收心定神，满心释然的站了起来}
+	{
+		save;
+		wudao;		
+	};
+	#ticker {t_wudao}
+	{
+		wudao;
+	}{60};
+	#class c_wudao close;
+	#map run 静修阁二楼;
+};
+#alias wudao_pause
+{
+	#class c_wudao kill;	
+	#untick {t_wudao};
+	#delay {40}
+	{
+		#map run 6;
+	};
+};
+#alias xx_start
+{		
+	#delay {3}
+	{
+		gtmaster;
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#ticker {t_xx}
+			{		
+				xx;			
+			}{2};
+		};	
+	};
+	#class {c_lianwu_master} open;
+	#ALIAS xx {xue $master for $curr_skill 20};
+	#act {^你今天太累了，结果什么也没有学到。} 
+	{
+		yun regenerate;					
+	};		
+	#act {^你的内力不够} 
+	{		
+		save;
+		eat gan liang;
+		drink jiudai;
+		gtsleep;
+		#act {^start to go}
+		{
+			#unact {^start to go};
+			#untick {t_xx};
+		};
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			sleep;
+		};
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚}
+	{
+		dazuo max;		
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		#delay {1}
+		{
+			gtmaster;
+			#act {^dest!}
+			{
+				#unact {^dest!};
+				#ticker {t_xx}
+				{		
+					xx;			
+				}{2};
+			};			
+		};
+	};
+	#act {^你刚在三分钟内睡过一觉}
+	{
+		#delay {30}
+		{
+			sleep;
+		};
+	};	
+		
+	#class 	{c_lianwu_master} close;
+};
+#alias xx_stop
+{
+	#untick {t_xx};
+	#class 	{c_lianwu_master} kill;
+	halt;
+	#delay {40}
+	{
+		gtsleep;
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			fullsk_startnext;			
+		};
+	};		
+};
+#alias dazuo_start
+{	
+	#var dazuo_num %1;
+	#class {c_dazuo} open;
+	#var maxnl {5000};
+	#act {^你吐纳完毕，睁开双眼，站了起来}
+	{
+		dazuo $dazuo_num;
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		dazuo $dazuo_num;
+	};
+	#act {^你现在的气太少了，无法产生内息运行全身经脉}
+	{
+		save;
+		eat gan liang;
+		drink jiudai;
+		yun recover;
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚} 
+	{
+		tuna $dazuo_num;
+	};
+	#act {^你现在身体状况太差了}
+	{
+		yun recover;
+	};	
+	#ticker {t_dazuo_tuna}
+	{
+		#if {$mystatus[nl_2]<$maxnl}
+		{
+			dazuo $dazuo_num;
+		}
+		{
+			dazuo_stop;
+		};
+		
+	}{15};
+	#class {c_dazuo} close;
+	dazuo $dazuo_num;
+};
+#alias dazuo_stop
+{
+	#untick {t_dazuo_tuna};
+	#class {c_dazuo} kill;
+	#format work_done_flag %T;
+};
+#alias tuna_start
+{
+	#var tuna_num %1;
+	#class {c_tuna} open;	
+	#var maxjl {5000};
+	#act {^你吐纳完毕，睁开双眼，站了起来}
+	{
+		tuna $tuna_num;
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		tuna $tuna_num;
+	};
+	#act {^你现在精不足，无法修行精力}
+	{		
+		yun regenerate;	
+		eat gan liang;
+		drink jiudai;			
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚} 
+	{
+		dazuo 50;
+	};	
+	#act {^你的内力不够} 
+	{
+		save;
+		eat gan liang;
+		drink jiudai;
+		sleep;
+	};	
+	#ticker {t_dazuo_tuna}
+	{
+		#if {$mystatus[jl_2]<$maxjl}
+		{
+			tuna $tuna_num;
+		}
+		{
+			tuna_stop;
+		};		
+	}{10};
+	#class {c_tuna} close;
+	tuna $tuna_num;
+};
+#alias tuna_stop
+{
+	#untick {t_dazuo_tuna};
+	#class {c_tuna} kill;
+	#format work_done_flag %T;
+};
+#alias readbook_start
+{
+	#class {c_ds} open;	
+	#var skill_book {{force}{read shediao %1}{parry}{read shediao %1}{hero-jianfa}{du hero book for %1}{sword}{read tianlong %1}{blade}{read tianlong %1}};	
+	#alias ds {$skill_book[$curr_skill]};
+	#var rcnt 50;
+	#regexp {"$skill_book[$curr_skill]"} {"%*tianlong%*"} {#var rcnt 10;} {#nop};
+	#act {^你正专心阅读天龙八部}
+	{
+		ds 2;
+	};
+	#act {^你已经很累了，歇歇再读吧}
+	{
+		yun regenerate;	
+		#regexp {"$skill_book[$curr_skill]"} {"%*tianlong%*"} {ds 10;};	
+	};
+	#act {^你现在过于疲倦，无法专心下来研读新知}
+	{
+		yun regenerate;
+		#regexp {"$skill_book[$curr_skill]"} {"%*tianlong%*"} {ds 10;};	
+	};
+	#act {^你减缓真气运行，让自身恢复正常}
+	{
+		#untick {t_slowds};
+		yun regenerate;
+		#regexp {"$skill_book[$curr_skill]"} {"%*tianlong%*"} {ds 10;};	
+	};
+	#act {^你略一凝神，精神看起来好多了}
+	{
+		ds $rcnt;
+	};
+	#act {^你的内力不够} 
+	{
+		save;
+		eat gan liang;
+		drink jiudai;
+		sleep;		
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚}
+	{
+		dazuo max;		
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		#delay {1}
+		{
+			ds $rcnt;
+		};
+	};
+	#act {^你刚在三分钟内睡过一觉}
+	{
+		yun jing;
+		#ticker {t_slowds}
+		{
+			ds 2;
+		}{2};
+	};	
+	#ticker {t_ds}
+	{
+		ds $rcnt;					
+				
+	}{60};	
+	#class {c_ds} close;	
+	#map run 6;
+	ds $rcnt;
+};
+#alias readbook_stop
+{
+	#untick {t_ds};
+	#untick {t_slowds};
+	#class {c_ds} kill;
+	halt;
+	#delay {40}
+	{
+		fullsk_startnext;
+	};
+};
+#alias snow_start
+{
+	#class {c_snow} open;		
+	#act {^你突然发现在路旁的一片积雪上行走} {#send {walk snow}};
+	#act {^你一路走下来，看着脚印} 
+	{
+		eat gan liang;
+		drink jiudai;
+		save;
+		look snow;
+	};
+	#act {^突然间，你被积雪闪耀着}
+	{
+		#delay {20}
+		{
+		
+			look snow;
+		};
+	};
+	#ticker {t_snow}
+	{		
+		look snow;				
+	}{5};
+	#class {c_snow} close;
+	#map run 2;
+	ask song about 下山;
+	wield sword;
+	#delay {2} 
+	{
+	 	s;
+	 	#map leave;
+		#delay {1}
+		{
+			#list inner_Route_list create;
+			#list inner_Route_list add {gtxs};
+			#list inner_Route_list add {stop};
+			#list inner_Route_list add {busy2};
+			#list inner_Route_list add {sw};
+			inner_walk;
+		};
+	};
+};
+#alias snow_stop
+{
+	#untick {t_snow};
+	#class {c_snow} kill;	
+	#delay {60}
+	{
+		#var onloc 0;
+		wield sword;
+		kill wolf;
+		#delay {15}
+		{
+			ne;
+			#delay {1}
+			{
+				#list inner_Route_list create;
+				#list inner_Route_list add {gtwd};
+				#list inner_Route_list add {stop};
+				#list inner_Route_list add {#map goto 1;};
+				#list inner_Route_list add {busy2};
+				#list inner_Route_list add {fullsk_startnext;};
+				inner_walk;
+			};
+		};
+	};	
+};
+#alias lian_s1
+{	
+	gtlw;
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		#ticker {t_lx}
+		{	
+			#format heatbeat[lx] %T;
+			lx 5;				
+		}{1};
+	};
+};
+#alias lian_s2
+{
+	#format heatbeat[lx] %T;
+	save;
+	eat gan liang;
+	drink jiudai;
+	gtsleep;
+	#act {^start}
+	{
+		#unact {^start};
+		#untick {t_lx};
+	};
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		sleep;
+	};
+};
+#alias lian_start
+{
+	#list task_stack insert {1} {lx};	
+	#var task_act[lx][s1] {lian_s1};
+	#var task_act[lx][s2] {lian_s2};	
+	
+	#if {"$bskill"=="sword"}
+	{
+		wield sword;
+	};
+	#if {"$bskill"=="blade"}
+	{
+		wield blade;
+	};
+	#if {"$bskill"=="parry"}
+	{
+		wield sword;
+	};
+	#var task_status[lx] {s1};
+	lian_s1;
+
+	#class {c_lian} open;
+	
+	#alias lx {lian $bskill %1};	
+	#act {^你的体力}
+	{
+		yun recover;		
+	};
+	#act {^你现在气血虚浮}
+	{
+		yun recover;
+	};		
+	#act {^你的内力不够} 
+	{
+		#var task_status[lx] {s2};
+		lian_s2;
+	};
+	#act {^你现在内力不足} 
+	{
+		#var task_status[lx] {s2};
+		lian_s2;
+	};
+	#act {^你太累了，没有办法练习}
+	{
+		yun recover;		
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚}
+	{
+		#var task_status[lx] {s1};
+		lian_s1;	
+	};		
+			
+	#class {c_lian} close;	
+};
+#alias lian_stop
+{
+	#list task_stack delete {1};	
+	#untick {t_lx};	
+	#class {c_lian} kill;
+	unwield all;	
+};
+#alias lw_s1
+{	
+	#format heatbeat[lw] %T;
+	gtlw;
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		#ticker {t_lingwu}
+		{	
+			lw 25;	
+			lw 25;				
+		}{1};
+	};	
+};
+#alias lw_s2
+{
+	#format heatbeat[lw] %T;
+	save;
+	eat gan liang;
+	drink jiudai;
+	gtsleep;
+	#act {^start to go}
+	{
+		#unact {^start to go};
+		#untick {t_lingwu};
+	};
+	#act {^dest!}
+	{
+		#unact {^dest!};
+		sleep;
+	};	
+};
+#alias lingwu_start
+{
+	#list task_stack insert {1} {lw};	
+	#var task_act[lw][s1] {lw_s1};
+	#var task_act[lw][s2] {lw_s2};	
+	
+	
+	
+	#var task_status[lw] {s1};
+	lw_s1;
+	#class {c_lingwu} open;
+	#alias lw {lingwu $bskill %1};
+	
+	#act {^你现在过于疲倦,无法静下心来领悟}
+	{
+		#format heatbeat[lw] %T;
+		yun regenerate;		
+	};
+	#act {^你已经很累了}
+	{
+		#format heatbeat[lw] %T;
+		yun regenerate;
+	};	
+	#act {^你的内力不够} 
+	{
+		#var task_status[lw] {s2};
+		lw_s2;
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚}
+	{
+		dazuo max;		
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		#delay {1}
+		{
+			#var task_status[lw] {s1};
+			lw_s1;
+		};
+	};
+	#act {^你刚在三分钟内睡过一觉}
+	{
+		#delay {30}
+		{
+			sleep;
+		};
+	};	
+	
+		
+	#class {c_lingwu} close;
+};
+#alias lingwu_stop
+{
+	#list task_stack delete {1};	
+	#untick {t_lingwu};	
+	#untick {t_slowlw};
+	#class {c_lingwu} kill;	
+};
+#alias ll_start
+{
+	#list task_stack insert {1} {ll};
+	#var task_status[ll] {normal};
+	#var task_act[ll][normal] {};	
+	
+	#var is_basic @ismember{$curr_skill;{fullsk_basicskills}};
+	#var bskill $curr_skill;
+	#if {$is_basic==0}
+	{
+		#var bskill ${fullsk_skillmap}[$curr_skill];
+		#send {wbei none};
+		#send {enable ${fullsk_skillenable_special}[$curr_skill] $curr_skill};
+		#if {$myskill[$curr_skill]<$myskill[$bskill]}
+		{
+			#var ll_flag {lian};
+			lian_start;			
+		};
+		#if {$myskill[$curr_skill]>=$myskill[$bskill]}
+		{
+			#var ll_flag {lingwu};
+			lingwu_start;						
+		};
+	}
+	{
+		#send {wbei none};
+		#send {enable $curr_skill ${fullsk_skillenable_basic}[$curr_skill] };
+		#if {$myskill[$curr_skill]>$myskill[${fullsk_skillenable_basic}[$curr_skill]]}
+		{
+			#var ll_flag {lian};
+			lian_start;
+		};
+		#if {$myskill[$curr_skill]<=$myskill[${fullsk_skillenable_basic}[$curr_skill]]}
+		{
+			#var ll_flag {lingwu};
+			lingwu_start;
+		};
+	};
+
+	#ticker {t_ll}
+	{
+		#format heatbeat[ll] %T;			
+		#if {$is_basic==0}
+		{			
+			#if {$myskill[$curr_skill]<$myskill[$bskill] && "$ll_flag"=="lingwu"}
+			{
+				lingwu_stop;
+				#delay {10}
+				{
+					#var ll_flag {lian};
+					lian_start;	
+				};			
+			};
+			#if {$myskill[$curr_skill]>=$myskill[$bskill] && "$ll_flag"=="lian"}
+			{
+				lian_stop;
+				#delay {10}
+				{
+					#var ll_flag {lingwu};
+					lingwu_start;	
+				};			
+			};
+		}
+		{			
+			#if {$myskill[$curr_skill]>$myskill[${fullsk_skillenable_basic}[$curr_skill]] && "$ll_flag"=="lingwu"}
+			{
+				lingwu_stop;
+				#delay {10}
+				{
+					#var ll_flag {lian};
+					lian_start;
+				};
+			};
+			#if {$myskill[$curr_skill]<=$myskill[${fullsk_skillenable_basic}[$curr_skill]] && "$ll_flag"=="lian"}
+			{
+				lian_stop;
+				#delay {10}
+				{
+					#var ll_flag {lingwu};
+					lingwu_start;
+				};
+			};
+		};
+	}{30};
+		
+};
+#alias ll_stop
+{
+	#list task_stack delete {1};
+	
+	#untick {t_ll};
+	#if {"$ll_flag"=="lian"}
+	{
+		lian_stop;
+	};
+	#if {"$ll_flag"=="lingwu"}
+	{
+		lingwu_stop;
+	};
+	halt;
+	#delay {40}
+	{
+		fullsk_startnext;
+	};
+};
+

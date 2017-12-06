@@ -1,0 +1,191 @@
+#list hsz_mps create {星宿}{白驼}{天地会}{丐帮}{慕容}{灵鹫宫}{大轮寺}{日月神教}{天龙寺}{古墓}{全真}{少林}{华山}{武当};
+#var Nickname {伯特子};
+#var mydummy {xarnold};
+#var myhszid {xxkfk};
+#alias start_hsz
+{
+	#var mydummy {xarnold};
+	set hansz_new_mode 1;
+	#untick t_sk;	
+	#class c_kill kill;	
+	#class hsz open;	
+	#alias askhsz.job
+	{
+		#act {^韩世忠说道：「我听说有一群异族奸细在%*的%*附近出没，你%*}
+		{	
+			#unact {^韩世忠说道：「我听说有一群异族奸细在%*的%*附近出没，你%*};		
+			jiali max;
+			#if {"%%%1"!="西湖梅庄"}
+			{
+				give4toDummy;
+			};
+			#delay {2}
+			{
+				#var destEventHandler {dt};
+				set_destEventHandler $destEventHandler;
+				ngt %%%1%%%2;
+			};			
+		};
+		#act {^未有对手或者你和对方未处于战斗中}
+		{
+			#unact {^未有对手或者你和对方未处于战斗中};
+			stoph;		
+		};
+		ask han about job;		
+	};
+	#alias askhsz.over
+	{
+		ask han about finish;
+		tell $mydummy hszfinish;
+		#delay {2}
+		{
+			drop yun tie;
+			drop huo tong;
+		};
+		#if {$bxs_flag==1}
+		{
+			#delay {2}
+			{
+				stop_hsz;
+				#var bxs_hsz_flag 3;
+				bxs.next;
+			};
+		};
+	};
+	#act {^你手上持有的武器并不能用来发动%*}
+	{
+		wield staff;
+		wield staff 2;
+		wield staff 3;
+	};	
+	
+	#alias dt
+	{				
+		datan;
+		#delay {2}
+		{
+			n;			
+		};
+	};
+	#alias preh
+	{
+		yun qi;		
+		#send {%%0};
+		#list hsz_npc_cnames create;
+		#list hsz_npc_enames create;
+		#list hsz_npc_skills create;
+		#list hsz_npc_mps create;
+		#list hsz_npc_killorders create;
+		#delay {1}
+		{			
+			#foreach {1;2;3;4} {i} {kill jianxi $i;look jianxi $i};
+		};
+		#delay {3}
+		{
+			#list hsz_npc_mps size npcsize;			
+			#foreach {$hsz_mps[%*]} {mp}
+			{
+				#var tempi 1;				
+				#foreach {$hsz_npc_mps[%*]} {npcmp}
+				{								
+					#if {"$npcmp"=="$mp"}
+					{
+						#list hsz_npc_killorders add {$tempi};	
+						#showme $hsz_npc_killorders;					
+					};
+					#math tempi $tempi+1;					
+				};					
+			};
+			#showme $hsz_npc_cnames;
+			#showme $hsz_npc_enames;
+			#showme $hsz_npc_skills;
+			#showme $hsz_npc_mps;
+			#showme $hsz_npc_killorders;
+			#ticker t_pf 
+			{
+				#list hsz_npc_killorders size killsize;
+				#if {$killsize>0}
+				{
+					pfh $hsz_npc_enames[$hsz_npc_killorders[1]];
+				}
+				{
+					pfh;
+				};
+			} {0.2};
+		};
+	};
+	#alias hleave
+	{
+		leave;
+		#delay {1}
+		{
+			set_destEventHandler askhsz.over;
+			gthsz;
+		};
+	};
+	#alias stoph
+	{
+		#untick t_pf;
+		#foreach {1;2;3;4} {i} {get gem from corpse $i};
+		#delay {2}
+		{
+			#4 {pack gem};
+			hleave;
+		};		
+	};
+	#act {^异族奸细 %*(%*)}
+	{
+		#list hsz_npc_cnames add {%%1};
+		#format {tempv} {%l} {%%2};
+		#list hsz_npc_enames add {$tempv};
+	};
+	#act {^这是一位擅长%*的高手。}
+	{
+		#var npcskill %%1;
+		#list hsz_npc_skills add {$npcskill};
+		#var mymp {@getmp{$npcskill}};	
+		#showme $mymp;
+		#if {"$mymp"==""}
+		{
+			#var mymp {明教};
+		};			
+		#list hsz_npc_mps add {$mymp};		
+	};
+	#act {^%*死了}
+	{
+		#var killednpc %%1;
+		#list hsz_npc_enames size npcsize;
+		
+		#var dtempi 1;				
+		#while {$dtempi <= $npcsize}
+		{					
+			#if {"$hsz_npc_cnames[$dtempi]"=="$killednpc"}
+			{
+				#list hsz_npc_killorders find {$dtempi} {killedindex};
+				#list hsz_npc_killorders delete {$killedindex};	
+				#break;				
+			};
+			#math dtempi $dtempi+1;
+		};
+		#list hsz_npc_killorders size leftnpcsize;
+		#if {$leftnpcsize==0}
+		{
+			jiali 0;
+		};
+		#showme $hsz_npc_killorders;
+	};
+	#alias give4toDummy
+	{		
+		give guangling san to $mydummy;		
+	};	
+	#class hsz close;
+};
+#alias stop_hsz
+{
+	#var traversal_handler {};
+	#class hsz kill;
+};
+#act {^$Nickname%*hszfinish}
+{
+	give guangling san to $myhszid;	
+};	

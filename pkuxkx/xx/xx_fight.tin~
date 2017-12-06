@@ -1,0 +1,166 @@
+#alias pfh
+{
+	perform staff.huose %0;
+};
+#alias pfcs
+{
+	perform strike.chousui %0;
+};
+#alias pfhq
+{
+	yun dianhuo;	
+	perform strike.huoqiu %0;
+};
+#alias erc
+{
+	exert recover;
+};
+#alias erh
+{
+	exert heal;
+};
+#alias eri
+{
+	exert inspire;
+};
+#alias err
+{
+	exert regenerate;
+};
+#alias pu
+{
+	exert powerup;
+};
+
+#macro {\eOS} {erc};
+#macro {\e[15~} {erh};
+#macro {\e[17~} {eri};
+#macro {\e[18~} {err};
+#macro {\e[19~} {pfc};
+#macro {\e[20~} {pfx};
+#class c_kill open;
+#act {^看起来%*想杀死你！}
+{
+	yun qi;
+	#ticker t_pf {pfcs} {0.2};
+};
+#class c_kill close;
+#act {^经过一段时间后，你终于完全从紧张地战斗氛围中解脱出来。}
+{
+	#untick t_pf;	
+};
+#alias upf
+{
+	#untick t_pf;	
+};
+#act {伯特子(damage:%*气血:%*/%*)}
+{
+	exert recover;
+};
+#act {^( 只听见「啪」地一声，你手中的}
+{
+	wield staff;
+	wield staff 2;
+	wield staff 3;
+};
+#act {^你手上持有的武器并不能用来发动%*}
+{
+	wield staff;
+	wield staff 2;
+	wield staff 3;		
+};
+#alias start_wat
+{
+	#class c_wat open;	
+	#act {^万安塔%*层}
+	{			
+		killall wushi;			
+	};	
+	#act {^看起来%*想杀死你！}
+	{
+		yun qi;
+		#ticker t_pf {pfcs} {0.2};
+	};
+	#act {忙凝聚全身功力，却阻挡不住内力飞泄而出！}
+	{
+		#untick t_pf;
+		yun dianhuo;
+		#ticker t_pf {pfhq} {0.2};
+	};
+	#alias askke
+	{
+		unwield all;
+		ask ke about 进塔;
+	};
+	#class c_wat close;
+};
+#alias stop_wat
+{
+	#class c_wat kill;
+};
+#list skills create {临济十二庄}{雁行刀}{诸天化身法}{霹雳弹}{天罡指}{金顶绵掌}{回风拂柳剑}{截手九式}{大乘涅槃功};
+#var mpskills[峨眉] $skills;
+#list skills create {混天气功}{逍遥游}{蛇形刁手}{降龙十八掌}{六合刀}{打狗棒};
+#var mpskills[丐帮] $skills;
+#list skills create {紫霞功}{华山内功}{混元功}{华山剑法}{狂风快剑}{玉女十九剑}{独孤九剑}{反两仪刀}{养吾剑法}{希夷剑法}{混元掌}{劈石破玉拳}{华山身法};
+#var mpskills[华山] $skills;
+#list skills create {雪山内功}{雪山剑法}{金乌刀法}{凌霄拳法}{飘雪掌法}{雁翼身法};
+#var mpskills[凌霄] $skills;
+#list skills create {先天功}{金雁功}{全真剑法}{同归剑法}{养心拳}{空明拳}{一阳指}{三花聚顶掌}{天罡北斗阵};
+#var mpskills[全真] $skills;
+#list skills create {达摩剑}{混元一气功}{金刚不坏功}{大金刚拳}{拈花指}{少林身法}{修罗刀}{易筋神功}{大韦陀杵}{燃木刀法}{日月鞭法}{一指禅}{慈悲刀}{龙爪功}{如来千叶手}{伏魔剑}{罗汉拳}{韦陀棍}{修罗刀}{般若掌}{无常杖}{鹰爪功}{风云手}{少林醉棍}{普渡杖}{散花掌}{无影剑法};
+#var mpskills[少林] $skills;
+#list skills create {浩气苍冥功}{零丁飘洋}{五虎断门刀}{九龙鞭}{碧血丹心剑}{猴拳}{乾坤伏龙手}{云龙爪};
+#var mpskills[天地会] $skills;
+#list skills create {枯荣神功}{北冥神功}{凌波微步}{一阳指}{六脉神剑}{飞花逐月}{段家剑法}{天南步法};
+#var mpskills[天龙寺] $skills;
+#list skills create {太极神功}{梯云纵}{太极拳}{太极爪}{太极剑}{玄虚刀法};
+#var mpskills[武当] $skills;
+#list skills create {蛤蟆功}{灵蛇杖}{蛇形刁手}{神驼雪山掌}{蟾蜍步法};
+#var mpskills[白驼] $skills;
+#list skills create {龙象般若功}{御雪遁形}{血刀经}{火焰刀}{降伏轮}{无上大力杵}{大手印}{天王爪};
+#var mpskills[大轮寺] $skills;
+#list skills create {日月神功}{葵花神功}{吸星大法}{日月剑法}{日月刀法}{辟邪剑法}{日月闪电锤}{判官笔法}{鹰爪功}{开山掌}{飞天身法}{马屁神功}{大光明心法};
+#var mpskills[日月神教] $skills;
+#list skills create {神龙心法}{神龙鞭法}{毒龙匕法}{化骨绵掌}{意形步法};
+#var mpskills[神龙岛] $skills;
+#list skills create {化功大法}{摘星手}{星宿毒掌}{摘星功}{天山杖法}{冥天九式}{小无相功};
+#var mpskills[星宿] $skills;
+#list skills create {碧血心法}{龙凤双翔}{太祖长拳}{岳家散手}{破军刀法}{虎钤剑法}{格虎戟}{杨家梨花枪}{太祖盘龙棍}{三十六路猛虎鞭法};
+#var mpskills[朝廷] $skills;
+#list skills create {九阴神功}{玉女心法}{黯然销魂掌}{美女拳}{九阴白骨爪}{全真剑法}{玉女剑法}{玄铁剑法}{长恨鞭法}{千灭银针手}{纤云步法};
+#var mpskills[古墓] $skills;
+#list skills create {八荒六合唯我独尊功}{北冥神功}{天羽奇剑}{长恨剑法}{天山六阳掌}{天山折梅手}{月影舞步}{小无相功};
+#var mpskills[灵鹫宫] $skills;
+#list skills create {大腾挪步法}{光明圣火功}{寒冰绵掌}{九阳神功}{烈焰刀}{乾坤大挪移}{七伤拳}{圣火令法}{飞花摘叶手法}{鹰爪功};
+#var mpskills[明教] $skills;
+#list skills create {神元功}{斗转星移}{燕灵身法}{慕容剑法}{慕容刀法}{参合指}{星移掌}{百家刀法}{弹腿};
+#var mpskills[慕容] $skills;
+#list skills create {碧海神功}{落英身法}{玉箫剑法}{落英神剑掌}{弹指神功}{兰花拂穴手}{九阴白骨爪}{摧心掌};
+#var mpskills[桃花岛] $skills;
+#list mps create $mpskills[];
+#list mps size mps_size;
+#nop $mpskills[+1] is the first mpskills;
+#nop $mpskills[] is the all index,can #list mps create $mpskills[] to get all index as a list;
+#function {getmp}
+{
+	#var npcskill {%1};	
+	#var mymp {};
+	#foreach {$mps[%*]} {mp}
+	{
+		#foreach {$mpskills[$mp][%*]} {mp_skill}
+		{
+			#if {"$mp_skill"=="$npcskill"}
+			{
+				#var mymp $mp;
+				#break;
+			};
+		};
+		#if {"$mymp"!=""}
+		{
+			#break;
+		};
+	};	
+	#return $mymp;
+};
+

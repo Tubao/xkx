@@ -1,0 +1,38 @@
+  File "./tintin/myscripts/pkuxkx/mrtxMatcher.py", line 67, in <module>
+    main(sys.argv)
+  File "./tintin/myscripts/pkuxkx/mrtxMatcher.py", line 22, in main
+    zsobj = MyZs(sss)
+  File "/home/xdw/tintin/myscripts/pkuxkx/mrtxParser.py", line 10, in __init__
+    self.bigwords = bigWordsParse(words)        
+  File "/home/xdw/tintin/myscripts/pkuxkx/mrtxParser.py", line 35, in bigWordsParse
+    ss = s.group(1)
+IndexError: no such group
+zs not match.
+
+欧阳鼎劲剑柄反握，撞向你。！
+结果一击命中，你闷哼了一声显然吃了不小的亏！
+( 你气息粗重，动作开始散乱，看来所受的伤著实不轻。 )『伯特子(damage:+46 气血:93%/52%)』
+
+Traceback (most recent call last):
+  File "./tintin/myscripts/pkuxkx/mrtxMatcher.py", line 67, in <module>
+    main(sys.argv)
+  File "./tintin/myscripts/pkuxkx/mrtxMatcher.py", line 22, in main
+    zsobj = MyZs(sss)
+  File "/home/xdw/tintin/myscripts/pkuxkx/mrtxParser.py", line 10, in __init__
+    self.bigwords = bigWordsParse(words)        
+  File "/home/xdw/tintin/myscripts/pkuxkx/mrtxParser.py", line 35, in bigWordsParse
+    ss = s.group(1)
+IndexError: no such group
+zs not match.
+欧阳鼎劲双手一拱，笑著说道：「承让！」
+
+
+你双掌挟着一股腥臭之气拍向周芳红的左腿！
+结果「砰」地一声，周芳红退了两步！
+( 周芳红气喘嘘嘘，看起来状况并不太好。 )『周芳红(damage:+100 气血:65%/85%)』
+周芳红一中掌，身子一晃，看来已经中了毒！
+你在攻击中不断积蓄攻势。(气势：50%)
+
+你双掌挟着一股腥臭之气拍向周芳红的头部！
+
+

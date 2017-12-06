@@ -1,0 +1,40 @@
+#ACTION {^$targetNpc}
+{
+	#unevent {RECEIVED LINE};
+	#var lines {%0};
+	#var i_line 1;					
+	#event {RECEIVED LINE}
+	{
+		#if {$i_line>3}
+		{
+			#unevent {RECEIVED LINE};
+			#script {ret} {python ./tintin/myscripts/pkuxkx/mrtxMatcher.py "$targetNpc" "$lines"};
+			#if {"$ret[1]"=="1"}
+			{
+				#nop touxue $npcename;
+				#showme {touxue! $lines};
+			}
+			{
+				#showme {zs not match.};
+			};
+		}
+		{
+			#math i_line {$i_line+1};					
+			#var line {%%1}; 
+			#regex {line} {^{但是|结果|你}} 
+			{
+				#unevent {RECEIVED LINE};
+				#script {ret} {python ./tintin/myscripts/pkuxkx/mrtxMatcher.py "$targetNpc" "$lines"};
+				#if {"$ret[1]"=="1"}
+				{
+					#nop touxue $npcename;
+					#showme {touxue! $lines};
+				}
+				{
+					#showme {zs not match.};
+				};
+			} 
+			{#var lines {$lines$line};};				   	 
+		};
+	};	
+};

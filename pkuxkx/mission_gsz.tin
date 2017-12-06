@@ -1,0 +1,278 @@
+#nop 你细细回忆，走出山洞的步骤是：后右右右右前左前;
+#var mploc[峨眉] {pgt em shanmd};
+#var mploc[丐帮] {pgt gaib pomms};
+#var mploc[华山] {pgt huas huasjx};
+#var mploc[凌霄] {pgt lingxc qiaot};
+#var mploc[全真] {pgt quanz gongm};
+#var mploc[少林] {pgt shaols shaols};
+#var mploc[天龙寺] {pgt tianls ruihm};
+#var mploc[武当] {pgt wuds wudsm};
+#var mploc[白驼] {pgt baits dam};
+#var mploc[大轮寺] {pgt dals dianqgc};
+#var mploc[日月神教] {pgt riysj heimyx};
+#var mploc[神龙岛] {pgt shenld wultdm};
+#var mploc[星宿] {pgt xings juy};
+#var mploc[朝廷] {pgt linaf yuhm};
+#var mploc[古墓] {pgt gum duanls};
+#var mploc[灵鹫宫] {pgt lingj baizj};
+#var mploc[明教] {pgt mingj shanm};
+#var mploc[慕容] {pgt gusmr yanzwdm};
+#var mploc[桃花岛] {pgt taohd hait};
+
+#var mpname[峨眉] {峨眉派};
+#var mpname[丐帮] {丐帮};
+#var mpname[华山] {华山派};
+#var mpname[凌霄] {凌霄};
+#var mpname[全真] {全真派};
+#var mpname[少林] {少林派};
+#var mpname[天龙寺] {天龙寺};
+#var mpname[武当] {武当派};
+#var mpname[白驼] {白驼山};
+#var mpname[大轮寺] {大轮寺};
+#var mpname[日月神教] {日月神教};
+#var mpname[神龙岛] {神龙岛};
+#var mpname[星宿] {星宿派};
+#var mpname[朝廷] {朝廷};
+#var mpname[古墓] {古墓派};
+#var mpname[灵鹫宫] {灵鹫宫};
+#var mpname[明教] {明教};
+#var mpname[慕容] {慕容};
+#var mpname[桃花岛] {桃花岛};
+#alias entergsz
+{
+	northwest;
+	enter;enter;
+	#list inner_Route_list create {move hou}{move you}{move you}{move you}{move you}{move qian}{move zuo}{move qian}{setNormalWalk}{e}{n}{n}{n}{n}{n};
+	setVerySlowWalk;
+	inner_walk;	
+};
+#alias leavegsz
+{
+	s;s;s;s;s;w;
+	enter;
+	#list inner_Route_list create {move qian}{move zuo}{move qian}{move you}{move you}{move you}{move you}{move hou}{setNormalWalk}{out}{southeast};
+	setVerySlowWalk;
+	inner_walk;
+};
+#alias gtgsz
+{
+	#var destEventHandler {entergsz};
+	set_destEventHandler $destEventHandler;
+	hgt c88efd53e1b15644495b0c984d554ea0;	
+};
+#alias start_gsz
+{
+	#untick t_sk;
+	#class c_kill kill;		
+	#class gsz open;
+	#alias askgsz.job
+	{		
+		ask gongsun about job;
+	};
+	#alias askgsz.over
+	{		
+		ask gongsun about finish;
+	};
+	#act {^你手上持有的武器并不能用来发动%*}
+	{
+		wield staff;
+		wield staff 2;
+		wield staff 3;
+	};	
+	#alias gsz.1
+	{		
+		#var traversal_handler {stopTbyNpcTitle 绝情谷 弟子};
+		#var tra {gsz.t %%1};
+		#echo {$tra};
+		$tra;
+	};
+	
+	#act {^仔细查看(chakan)%*的伤势，也许能发现什么。}
+	{
+		chakan;
+		#showme using ss to set skill;
+	};
+	#alias ss
+	{
+		#var npcskill %%1;		
+		#var mymp {@getmp2{$npcskill}};
+		#showme $mymp;		
+		$mploc[$mymp];
+	};
+	#act {%*使者 %*(%* %*)}
+	{
+		ask %%4 about wound;
+	};
+	#act {%*说道：「我派叛徒已被逐出师门，听说他现在正在%*一带的%*活动。」}
+	{
+		#var traversal_handler {stopTbyNpcTitle $mpname[$mymp]逆徒};
+		#var tra {gsz.t2 %%2%%3};
+		#echo {$tra};
+		$tra;
+	};
+	#act {^完整完成公孙谷主的要求，你可以回去复命了！}
+	{
+		#untick t_pfh;
+		#delay {1}
+		{
+			get all from corpse;
+		};
+		#delay {3}
+		{			
+			gtgsz;			
+			
+		};
+	};
+	#act {^{这里不准战斗。|这里禁止战斗。}}
+	{
+		ask jiazei about fight;
+		yun qi;
+		#delay {2}
+		{			
+			killall jiazei;			
+		};
+	};
+	#act {^你大声道：“%*今天看你还往哪逃。”}
+	{
+		yun qi;
+		set ForcedAct 1;
+		#delay {3}
+		{
+			pfcs;
+			unset ForcedAct;
+		};
+		
+	};	
+	#class gsz close;
+};
+#alias stop_gsz
+{
+	#var traversal_handler {};
+	#class gsz kill;
+};
+#alias gsz.t
+{
+	#var r_traversal {traversal %1};	
+	#var hererid {c88efd53e1b15644495b0c984d554ea0};
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 0;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		igt $hererid $torid;	
+		
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#nop #script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal.py "$locdesc" "$depth"};
+						#if {&traversal_table[$locdesc]}
+						{
+							#list ret create {$traversal_table[$locdesc]};
+						}
+						{
+							#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal_opt.py "$locdesc" "$depth"};
+						};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk;};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};
+		#act {^traversal_finished}
+		{
+			#unact {^traversal_finished};
+			r.gsz.t 0;
+		};
+	};
+};
+#alias r.gsz.t
+{
+	$r_traversal %1;	
+};
+#alias gsz.t2
+{
+	#var r_traversal {traversal %1};	
+	
+	#var locdesc %1;
+	#var depth %2;
+	#if {$depth==""}
+	{
+		#var depth 0;
+	};
+	#var traversal_flag 0;
+	#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getRidsByName.py "$locdesc"};
+	#list ret {size} {retsize};	
+	#if {"$retsize"=="0"}
+	{
+		#showme {can not find dest location!};
+	}
+	{
+		#var torid $ret[1];
+		#math hgtcount 1;
+		hgt $torid;	
+		
+		#act {^dest!}
+		{
+			#unact {^dest!};
+			#showme {stopt to stop traversal.};
+			$traversal_handler;
+			#delay {1}
+			{
+				look;			
+				#delay {1}
+				{
+					#if {$traversal_flag == 0}
+					{	
+						#nop #script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal.py "$locdesc" "$depth"};
+						#if {&traversal_table[$locdesc]}
+						{
+							#list ret create {$traversal_table[$locdesc]};
+						}
+						{
+							#script {ret} {python ./tintin/myscripts/pkuxkx/gps/getcmds_traversal_opt.py "$locdesc" "$depth"};
+						};
+						#list inner_Route_list create;
+						#list inner_Route_list add {#showme {traversal_start};};
+						#list inner_Route_list add {setSlowWalk;};
+						#foreach {$ret[%*]} {cmd} {#list inner_Route_list add {$cmd};};	
+						#list inner_Route_list add {#showme {traversal_finished};#var traversal_flag 1;};
+						#list inner_Route_list add {setNormalWalk;};					
+						inner_walk;
+	
+					};
+				};
+			};
+		};
+		#act {^traversal_finished}
+		{
+			#unact {^traversal_finished};
+			r.gsz.t 0;
+		};
+	};
+};

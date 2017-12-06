@@ -1,0 +1,26 @@
+#alias rygtnf
+{
+	igt a4437744fdf7f0424661135d1ec16806 f2cfcf9527481ed03ffac37a7ce45c37;	
+};
+#act {^农夫死了。}
+{
+	get all from corpse;
+	#delay {2}
+	{
+		nfgtry;
+	};
+};
+#act {^    农夫(Nong fu)}
+{
+	#10 ask nong fu about 华山派;
+	#delay {2}
+	{
+		kill nong fu;
+	};
+};
+#alias nfgtry
+{
+	igt f2cfcf9527481ed03ffac37a7ce45c37 a4437744fdf7f0424661135d1ec16806;
+};
+
+

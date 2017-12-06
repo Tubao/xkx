@@ -1,0 +1,29 @@
+#ACTION {^$targetNpc%*}
+{
+	#var lines {%0};
+	#script {ret} {python ./tintin/myscripts/pkuxkx/mrtxMatcher.py "$targetNpc" "$lines"};
+	#if {"$ret[1]"=="1"}
+	{
+		touxue $npcename;		
+	};
+	#if {"$ret[1]"=="2"}
+	{
+		touxue $npcename;
+		#class c_txtri kill;
+		#delay {2}
+		{
+			#5 halt;
+			follow none;
+			bei strike;
+			#delay {2}
+			{
+				set_destEventHandler askmrtx.over;
+				gtmrx;
+			};
+		};		
+	};
+	#if {"$ret[1]"=="0"}
+	{
+		#showme {zs not match.max score: $ret[2]};
+	};
+};

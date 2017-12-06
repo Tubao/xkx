@@ -1,0 +1,24 @@
+#alias wudang_q_cui_bootstrap
+{	
+	#map run 2;
+	ask song about 下山;
+	#delay {2} {
+		#map run 69;		
+		wait2act wudang_q_cui_come 5;		
+	};
+
+};
+#act {^阿诺的土匪头死了}
+{
+	jiali 0;
+	get zhuozi from corpse;
+	#delay {5}
+	{
+		wudang_q_cui_success;
+	};
+};
+#alias wudang_q_cui_success
+{
+	#class {c_cui_leave} read {./tintin/myscripts/pkuxkx/wudang_q_cui_leave.tin};
+	cui_leave_init;	
+};

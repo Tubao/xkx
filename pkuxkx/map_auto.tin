@@ -1,0 +1,73 @@
+#var v_loadingmap 0;
+#alias loadmap 
+{
+	#map destroy;
+	#switch {"%1"}
+	{
+		#case {"wd"} {#map read {./tintin/myscripts/pkuxkx/wd_map.map};};
+		#default {#map read {./tintin/myscripts/pkuxkx/wd_map.map};};
+	};	
+	#map flag static on;
+	#showme {map loaded};
+	#var v_loadingmap 1; 
+	#delay {1}
+	{
+		#config {convert meta} {on};
+		l;
+	};
+}
+#alias map_edit_off
+{
+	#config {convert meta} {off};
+	#map flag static on;
+	#var flag_map_auto_name 0;
+}
+#alias map_auto_name_on 
+{	
+	#split 16 1;#map flag vtmap on;
+	#var flag_map_auto_name 1;
+	#var rarea %1;
+	#map flag static off;
+};
+#alias map_auto_name_off 
+{
+	#var flag_map_auto_name 0;#config {convert meta} {off};
+	#map flag static on;
+	#map write {./tintin/myscripts/pkuxkx/wd_map.map};
+};
+#event {MAP ENTER ROOM} {
+	#if {$flag_map_auto_name==1}
+	{
+		#var room_enter 1;
+		#showme {roomenter:$room_enter};
+		#config {convert meta} {on};
+	}
+};
+#act {~\e[1;32m%*\e[2;37;0m} 
+{
+	#if {$room_enter==1 && $flag_map_auto_name==1}
+	 {
+		#showme {rename to %1};
+		#var curr_roomname %1;
+		#map name %1;
+		#map set roomarea {$rarea};		
+		#config {convert meta} {off};
+		#var room_enter 0;
+	};
+	#if {$v_loadingmap==1}
+	{
+		#config {convert meta} {off};
+		#nop {goto location};
+		#map goto %1;
+		#var v_loadingmap 0;
+	};
+};
+#act {^哎哟，你一头撞在墙上}{#map undo;};
+#function f_is_in_map
+{
+	#list loclist create {};
+	#map list {variable} {loclist} {roomname} {%1};
+	#list loclist size loclistsize;
+	#if {$loclistsize==0} {#return 0} {#return 1};	
+};
+

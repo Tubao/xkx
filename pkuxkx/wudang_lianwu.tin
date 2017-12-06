@@ -1,0 +1,384 @@
+#alias auto_lianwu
+{
+	#list worklist create 
+		{dazuo_start 100}
+		{tuna_start 100}
+		{readbook_start}
+		{lian_start};
+	worklist_start;
+};
+#act {^葫芦已经被喝得一滴也}
+{
+	drop hulu;
+};
+#act {^也许是上天垂青于你的勤奋和努力吧}
+{
+	dazuo 15;
+	#delay {3}
+	{
+		tuna 15;
+	};
+};
+#alias wudao_start
+{
+	#map run 静修阁二楼;
+	wudao;
+	#act {^你修行完毕，收心定神，满心释然的站了起来}
+	{
+		save;
+		eat gan liang;
+		#math r 1d10;
+		#if {$r==1}
+		{
+			#map run 龟泉;
+			drink;
+			#delay {1}
+			{
+				#map run 静修阁二楼;
+				wudao;
+			};
+		}
+		{
+			wudao;
+		};
+	};
+	#ticker {t_wudao}
+	{
+		wudao;
+	}{60};
+};
+#alias wudao_stop
+{
+	#unact {^你修行完毕，收心定神，满心释然的站了起来};
+	#untick {t_wudao};
+	#format work_done_flag %T;
+};
+#alias xx_start
+{	
+	#class {c_lianwu_master} open;
+	#class {c_xx_q_lianwu} kill;
+	loadmap xx_new;
+	#list {xx_skills} {create} {taiji-shengong};
+	#list {xx_skills} size xx_size;
+	#var maxlevel {{taiji-shengong}{101}};
+	#var skill_ind 1;
+	#act {^你今天太累了，结果什么也没有学到。} 
+	{
+		yun regenerate;					
+	};		
+	#act {^你的内力不够} 
+	{		
+		save;
+		eat gan liang;
+		drink hulu;
+		s;s;e;e;sleep;
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚}
+	{
+		w;w;n;n;
+	};
+	#act {^你刚在三分钟内睡过一觉}
+	{
+		#delay {30}
+		{
+			w;w;n;n;
+		};
+	};	
+	#ticker {t_xx}
+	{
+		#var curr_skill $xx_skills[$skill_ind];
+		#if {$myskill[$curr_skill]>=$maxlevel[$curr_skill]}
+		{
+			#math skill_ind $skill_ind+1;
+			#if {$skill_ind>$xx_size}
+			{
+				xx_stop;
+			};	
+		};
+		#ALIAS xx {xue yu for $xx_skills[$skill_ind] 20};
+		xx;			
+	}{2};	
+	#class 	{c_lianwu_master} close;
+};
+#alias xx_stop
+{
+	#untick {t_xx};
+	#class 	{c_lianwu_master} kill;
+	#format work_done_flag %T;
+};
+#alias dazuo_start
+{	
+	#var dazuo_num %1;
+	#class {c_dazuo} open;
+	#var maxnl {1480};
+	#act {^你吐纳完毕，睁开双眼，站了起来}
+	{
+		dazuo $dazuo_num;
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		dazuo $dazuo_num;
+	};
+	#act {^你现在的气太少了，无法产生内息运行全身经脉}
+	{
+		save;
+		eat gan liang;
+		drink hulu;
+		sleep;
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚} 
+	{
+		tuna $dazuo_num;
+	};
+	#act {^你现在身体状况太差了}
+	{
+		sleep;
+	};	
+	#ticker {t_dazuo_tuna}
+	{
+		#if {$mystatus[nl_2]<$maxnl}
+		{
+			dazuo $dazuo_num;
+		}
+		{
+			dazuo_stop;
+		};
+		
+	}{15};
+	#class {c_dazuo} close;
+	dazuo $dazuo_num;
+};
+#alias dazuo_stop
+{
+	#untick {t_dazuo_tuna};
+	#class {c_dazuo} kill;
+	#format work_done_flag %T;
+};
+#alias tuna_start
+{
+	#var tuna_num %1;
+	#class {c_tuna} open;	
+	#var maxjl {1480};
+	#act {^你吐纳完毕，睁开双眼，站了起来}
+	{
+		tuna $tuna_num;
+	};
+	#act {^你运功完毕，深深吸了口气}
+	{
+		tuna $tuna_num;
+	};
+	#act {^你现在精不足，无法修行精力}
+	{		
+		yun regenerate;	
+		eat gan liang;
+		drink hulu;			
+	};
+	#act {^你一觉醒来，精神抖擞地活动了几下手脚} 
+	{
+		dazuo 50;
+	};	
+	#act {^你的内力不够} 
+	{
+		save;
+		eat gan liang;
+		drink hulu;
+		sleep;
+	};	
+	#ticker {t_dazuo_tuna}
+	{
+		#if {$mystatus[jl_2]<$maxjl}
+		{
+			tuna $tuna_num;
+		}
+		{
+			tuna_stop;
+		};		
+	}{10};
+	#class {c_tuna} close;
+	tuna $tuna_num;
+};
+#alias tuna_stop
+{
+	#untick {t_dazuo_tuna};
+	#class {c_tuna} kill;
+	#format work_done_flag %T;
+};
+#alias readbook_start
+{
+	#class {c_ds} open;
+	#list {rb_skills} {create} {force}{parry}{hero-jianfa}{sword}{blade};
+	#list {rb_skills} size rb_size;
+	#var maxlevel {{force}{101}{parry}{101}{hero-jianfa}{101}{sword}{101}{blade}{101}};	
+	#var skill_book {{force}{read shediao %1}{parry}{read shediao %1}{hero-jianfa}{du hero book for %1}{sword}{du sword book for %1}{blade}{du blade book for %1}};	
+	#alias ds {read shediao %1};
+	#var skill_ind 1;	
+	#act {^你已经很累了，歇歇再读吧}
+	{
+		yun regenerate;
+	};
+	#act {^你现在过于疲倦，无法专心下来研读新知}
+	{
+		yun regenerate;
+	};
+	#act {^你减缓真气运行，让自身恢复正常}
+	{
+		#untick {t_slowds};
+		yun regenerate;
+	};
+	#act {^你略一凝神，精神看起来好多了}
+	{
+		ds 100;
+	};
+	#act {^你的内力不够} 
+	{
+		save;
+		eat gan liang;
+		drink hulu;
+		yun jing;
+		#ticker {t_slowds}
+		{
+			ds 2;
+		}{2};
+	};	
+	#ticker {t_ds}
+	{
+		ds 100;
+		#var curr_skill $rb_skills[$skill_ind];
+		#if {$myskill[$curr_skill]>=$maxlevel[$curr_skill]}
+		{
+			#math skill_ind $skill_ind+1;
+			#if {$skill_ind>$rb_size}
+			{
+				readbook_stop;
+			}
+			{
+				#alias ds {$skill_book[$rb_skills[$skill_ind]]};
+			};	
+		};				
+				
+	}{60};	
+	#class {c_ds} close;	
+};
+#alias readbook_stop
+{
+	#untick {t_ds};
+	#untick {t_slowds};
+	#class {c_ds} kill;
+	#format work_done_flag %T;
+};
+#alias snow_start
+{
+	#class {c_snow} open;
+	#var maxlevel {101};
+	#act {^你突然发现在路旁的一片积雪上行走} {walk snow};
+	#act {^你一路走下来，看着脚印} 
+	{
+		eat gan liang;
+		drink hulu;
+		save;
+		look snow;
+	};
+	#act {^突然间，你被积雪闪耀着}
+	{
+		#delay {20}
+		{
+		
+			look snow;
+		};
+	};
+	#ticker {t_snow}
+	{
+		#if {$myskill[dodge]<$maxlevel}
+		{
+			look snow;
+		}
+		{
+			snow_stop;
+		};		
+	}{5};
+	#class {c_snow} close;
+};
+#alias snow_stop
+{
+	#untick {t_snow};
+	#class {c_snow} kill;
+	#showme {one task complete};
+};
+#alias lian_start
+{
+	#class {c_lx} open;
+	#list {special_skill} {create} {taiji-quan} {taiji-jian} {tiyunzong} {xuanxu-dao};
+	#list {basic_skill} {create} {cuff} {sword} {dodge} {blade};
+	#list {basic_skill} {size} {skill_size};
+	#var maxlevel {{taiji-quan}{84}{taiji-jian}{84}{tiyunzong}{101}{xuanxu-dao}{84}};
+	#var s_index 1;
+	#alias lx {lian cuff %1};	
+	#act {^你的体力不够}
+	{
+		yun recover;
+		lx 1;
+	};
+	#act {^你现在气血虚浮}
+	{
+		yun recover;
+		lx 1;
+	};		
+	#act {^你试着练习}
+	{
+		lx 1;
+	};
+	#act {^你的内力不够} 
+	{
+		save;
+		eat gan liang;
+		drink hulu;
+		sleep;
+	};
+	#act {^你现在内力不足} 
+	{
+		save;
+		eat gan liang;
+		drink hulu;
+		sleep;
+	};
+	#act {^你太累了，没有办法练习}
+	{
+		yun recover;
+		lx 1;
+	};		
+	#ticker {t_lx}
+	{	
+		#while {$s_index<=$skill_size}
+		{
+			#if {$myskill[$special_skill[$s_index]]>=$maxlevel[$special_skill[$s_index]]}
+			{
+				#math s_index {$s_index+1};
+				#alias lx {lian $basic_skill[$s_index] %1};
+				unwield all;
+				#if {"$basic_skill[$s_index]"=="sword"}
+				{
+					wield sword;
+				};
+				#if {"$basic_skill[$s_index]"=="blade"}
+				{
+					wield blade;
+				};
+			}
+			{
+				lx 1;
+				#break;
+			};
+		};
+		#if {$s_index>$skill_size}
+		{
+			lian_stop;			
+		};				
+	}{15};		
+	#class {c_lx} close;	
+};
+#alias lian_stop
+{	
+	#untick {t_lx};	
+	#class {c_lx} kill;
+	#format work_done_flag %T;
+};

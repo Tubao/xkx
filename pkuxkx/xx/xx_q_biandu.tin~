@@ -1,0 +1,93 @@
+#alias q_xx_biandu
+{
+	#map run 18;
+	#list worklist create 
+		{zhaiguo}
+		{findducao};
+	worklist_start;
+};
+#alias findducao
+{
+	#map goto 18;	
+	wa;	
+};
+#act {^你大叫一声：哇徕，好酷哦}
+{
+	#delay {1}
+	{
+		wa;
+	};
+};
+#act {^你在地上找了半天，却什么也没发现}
+{
+	#delay {1}
+	{
+		wa;
+	};
+};
+#act {^你摘下树边的一根不知名小草}
+{
+	#delay {2}
+	{
+		look du cao;
+	};
+};
+#act {%s###############:%s}
+{
+	#if {$biandu_type==1}
+	{
+		#map run 1;
+		find_swnt2biandu;
+	}
+	{
+		#delay {1}
+		{
+			wa;
+		};
+	};
+};
+#act {%s## ### ##     #     @#   #####%s}
+{
+	#if {$biandu_type==3}
+	{
+		#map run 1;
+		find_swnt2biandu;
+	}
+	{
+		#delay {1}
+		{
+			wa;
+		};
+	};
+};
+#act {^英雄无敌冷冷地看着你，一言不发}
+{
+	#delay {3}
+	{
+		w;n;n;s;out;
+		#map goto 1;
+		#map run 18;
+		#delay {2}
+		{
+			findducao;
+		};		
+	};
+};
+#act {^英雄无敌指点了你一些基本毒技的心得}
+{
+	#delay {3}
+	{
+		w;n;n;s;out;
+		#map goto 1;		
+		#format work_done_flag %T;
+		#var is_doing_task 0;		
+	};
+};
+#alias find_swnt2biandu
+{	
+	enter;give du cao to swnt npc;
+	n;give du cao to swnt npc;
+	s;s;give du cao to swnt npc;
+	n;e;give du cao to swnt npc;		
+};
+

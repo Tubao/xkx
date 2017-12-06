@@ -1,0 +1,57 @@
+你目前所学过的技能：（共五项技能，你的技能等级最多能达到八十二级）
+
+┌──三项基本知识─────┬─────────────┬────┬──┬───┐
+│  读书写字                │literate                  │初窥门径│  52│1474  │
+│  医    术                │medical-skill             │初窥门径│  64│1000  │
+│  道家养生术              │taoism                    │初窥门径│  97│7695  │
+├──一项基本功夫─────┼─────────────┼────┼──┼───┤
+│  基本内功                │force                     │不堪一击│  16│147   │
+├──一项特殊功夫─────┼─────────────┼────┼──┼───┤
+│□太极神功                │taiji-shengong            │第一重楼│  30│0     │
+└─────────────┴─────────────┴─◎ 北大侠客行 ◎──┘
+
+
+#act {^【 精神 】 %*/ %*[%*]  【 精力 】 %*/ %*(%*)}
+{
+	#var mystatus[js_1] %1;
+	#var mystatus[js_2] %2;
+	#var mystatus[js_3] %3;
+	#var mystatus[jl_1] %4;
+	#var mystatus[jl_2] %5;
+	#var mystatus[jl_3] %6;
+};
+#act {^【 气血 】 %*/ %*[%*]  【 内力 】 %*/ %*(%*)}
+{
+	#var mystatus[qx_1] %1;
+	#var mystatus[qx_2] %2;
+	#var mystatus[qx_3] %3;
+	#var mystatus[nl_1] %4;
+	#var mystatus[nl_2] %5;
+	#var mystatus[nl_3] %6;
+};
+#act {^【 食物 】 %*/ %*[%*]  【 潜能 】 %*}
+{
+	#var mystatus[sw_1] %1;
+	#var mystatus[sw_2] %2;
+	#var mystatus[sw_3] %3;
+	#var mystatus[qn] %4;
+};
+#act {^【 饮水 】 %*/ %*[%*]  【 经验 】 %*}
+{
+	#var mystatus[ys_1] %1;
+	#var mystatus[ys_2] %2;
+	#var mystatus[ys_3] %3;
+	#var mystatus[jy] %4;
+};
+#act {^【 状态 】 %*}
+{
+	#var mystatus[zt] %1;
+};
+#function get_status
+{
+	hp;
+	#delay {2}
+	{
+		#return mystatus;
+	};
+};

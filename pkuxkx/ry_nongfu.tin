@@ -1,0 +1,34 @@
+#alias get_nftu
+{	
+	#10 ask nong fu about 华山派;
+	#delay {2}
+	{
+		kill nong fu;
+	};	
+};
+#alias start_nf
+{
+	#ticker t_getnftu
+	{
+		get_nftu;
+	}{60};
+};
+#alias stop_nf
+{
+	#untick t_getnftu;
+};
+#alias gtnf
+{
+	hgt f2cfcf9527481ed03ffac37a7ce45c37;	
+};
+#alias gtry
+{
+	hgt a4437744fdf7f0424661135d1ec16806;
+};
+#act {^农夫死了。}
+{
+	get tu from corpse;	
+};
+
+
+
