@@ -1,0 +1,131 @@
+if len(line) == 0 or len(line.strip()) == 0:
+        if trigger_flags["look_roomInfo"] in [2,3]:
+            trigger_flags["look_roomInfo"] = 4
+            return
+        if trigger_flags["look_roomInfo"] == 4:
+            trigger_flags["look_roomInfo"] = 5
+            return
+    if trigger_flags["look_roomInfo"] == 0:
+        p = re.compile(r'^(\S+) -\s+$')
+        m = p.match(line)
+        if m is not None:
+            current_room.cname = m.group(1)
+            trigger_flags["look_roomInfo"] = 1
+            return
+    if trigger_flags["look_roomInfo"] == 1:
+        p = re.compile(r'^(      \s+\S+.*)')
+        m = p.match(line)
+        if m is not None:
+            current_room.minMap = current_room.minMap + line + "\n"            
+            return
+        p = re.compile(r'^(    \S+.*)')
+        m = p.match(line)
+        if m is not None:
+            current_room.desc = m.group(0)
+            trigger_flags["look_roomInfo"] = 2         
+            return
+    if trigger_flags["look_roomInfo"] in [2,3]:        
+        p = re.compile(r'^(\S+.*)')
+        m = p.match(line)
+        if m is not None:
+            current_room.desc = current_room.desc + m.group(0)                  
+            return
+        p = re.compile(r'^\s+这里.*?的.*?有 .*'.decode("utf8"))
+        m = p.match(line)
+        if m is not None:
+            current_room.direction_desc = line
+            if re.search(r'。$'.decode("utf8"),line):
+                trigger_flags["look_roomInfo"] = 5
+                p = re.compile(r'^\s+这里.*?的.*?有 (.*?)。'.decode("utf8"))
+                m = p.match(line)
+                dstr = m.group(1)
+                p = re.compile(r'、| 和 '.decode("utf8"))
+                current_room.directions.extend(p.split(dstr))
+            else:                
+                trigger_flags["look_roomInfo"] = 4                 
+            return
+        p = re.compile(r'^\s+(「.*?」:.*)'.decode("utf8"))
+        m = p.match(line)
+        if m is not None:
+            current_room.weather_desc = m.group(0) 
+            trigger_flags["look_roomInfo"] = 3                
+            return
+        p = re.compile(r'^(    \S+.*)')
+        m = p.match(line)
+        if m is not None:
+            current_room.desc = current_room.desc + "\n" + m.group(0)                 
+            return
+    if trigger_flags["look_roomInfo"] == 4:  
+        current_room.direction_desc = current_room.direction_desc + line      
+        p = re.compile(r'。$'.decode("utf8"))
+        m = p.match(line)
+        if m is not None:
+            trigger_flags["look_roomInfo"] = 5
+            p = re.compile(r'^\s+这里.*?的.*?有 (.*?)。'.decode("utf8"))
+            m = p.match(current_room.direction_desc)
+            dstr = m.group(1)
+            p = re.compile(r'、| 和 '.decode("utf8"))
+            current_room.directions = p.split(dstr)   
+    if trigger_flags["look_roomInfo"] == 5:
+        p = re.compile(r'^>')
+        m = p.match(line)
+        if m is not None:
+            trigger_flags["look_roomInfo"] == 9                
+            return          
+        else:
+            p = re.compile(r'^\s*((一|二|三|四|五|六|七|八|九|十)(块|个|枚|位|只))?(.*?)\((.*?)\)( <(.*?)>)?$'.decode("utf8"))
+            s = p.match(line)
+            if m is not None:                
+                num = 1
+                if s.group(2) is not None:
+                    num = to_numbers(s.group(2))
+                ps = re.compile(r" |「|」")
+                mylist = ps.split(s.group(4).strip(" "))
+                itype = "npc"
+                title1=""
+                title2=""
+                title3=""
+                cname=""
+                ts = []
+                for t in mylist:
+                    if t=="":
+                        continue
+                    ts.append(t)
+                if len(ts) == 4:
+                    title1 = ts[0]
+                    title2 = ts[1]
+                    title3 = ts[2]
+                    cname = ts[3]
+                if len(ts) == 3:
+                    title1 = ts[0]
+                    title2 = ts[1]                
+                    cname = ts[2]
+                if len(ts) == 2:
+                    title1 = ts[0]                             
+                    cname = ts[1]
+                if len(ts) == 1:                           
+                    cname = ts[0]
+                    itype = "item"
+                
+                ename = s.group(5)
+                status = s.group(7)
+                if status is None:
+                    status = "normal"
+                if itype == "item":
+                    muditem = MudItem()
+                    muditem.ename = ename
+                    muditem.cname = cname
+                    muditem.type = "item"
+                    muditem.amount = num
+                    current_room.items.append(muditem)
+                else:
+                    mudnpc = MudNpc()
+                    mudnpc.ename = ename
+                    mudnpc.cname = cname
+                    mudnpc.type = "item"
+                    mudnpc.amount = num
+                    mudnpc.title1 = title1
+                    mudnpc.title2 = title2
+                    mudnpc.title3 = title3
+                    mudnpc.status = status
+                    current_room.npcs.append(mudnpc)

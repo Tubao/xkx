@@ -1,0 +1,9 @@
+[{
+    "filename":"config.json",
+    "func":"loadConfig"
+},
+{
+    "filename":"items.json",
+    "func":"loadItems"
+}
+]

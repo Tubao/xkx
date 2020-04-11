@@ -22,7 +22,7 @@
 		special + sociability;
 	};
 };
-#ticker t_hbcheck
+#nop #ticker t_hbcheck
 {
 	#format tnow %T;
 	#var curr_task $task_stack[1];
@@ -31,7 +31,7 @@
 	{
 		#var maxdiff $task_chkDelay[$curr_task];
 	};
-	#math diff $tnow - $heatbeat[$curr_task];
+	#math diff $tnow - *heatbeat[$curr_task];
 	#showme {task stack: $task_stack};
 	#showme {task status: $task_status[$curr_task]};
 	#showme {hbdiff is $diff};
@@ -124,7 +124,7 @@
 };
 #split;
 #prompt {xf:%* status 精神: %*/%* ; 气血: %*/%* ;内力:%*; 食物: %* ; 饮水: %* ; 状态: %*} {xf:$xf_type status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水: $mystatus[ys_1] ; 状态: $mystatus[zt]};
-#ticker {t_hp} 
+#nop #ticker {t_hp} 
 {
 	hp;
 	#format heatbeat[connected]  %T;
@@ -134,7 +134,7 @@
 		#showme {xf:$xf_type status 精神: $mystatus[js_1]/$mystatus[js_2] ; 气血: $mystatus[qx_1]/$mystatus[qx_2] ;内力:$mystatus[nl_1]; 食物: $mystatus[sw_1] ; 饮水:  $mystatus[ys_1] ; 状态: $mystatus[zt]};		
 	};	
 }{$showstatus_time};
-#ticker {t_hpbrief} 
+#nop #ticker {t_hpbrief} 
 {	
 	a2c hpbrief;
 	#delay {2}
@@ -207,7 +207,7 @@
 {
 	#var myskill[hero-jianfa] %3;
 };
-#ticker {t_sk} 
+#nop #ticker {t_sk} 
 {
 	sk;	
 }{30};
@@ -235,7 +235,7 @@
    #var capture_till {%0}; 
    #var line { }; 
    #var lines {};   
-   #class multiline_capture read ./tintin/myscripts/pkuxkx/multiline_capture.tin;
+   #class multiline_capture read ./git/xkx/pkuxkx/multiline_capture.tin;
 };
 #ALIAS {look2capture} 
 { 
@@ -279,18 +279,18 @@
 #alias {init_mydelay}
 {
 	#class c_mydelay kill;
-	#class c_mydelay read ./tintin/myscripts/pkuxkx/mydelay.tin;
+	#class c_mydelay read ./git/xkx/pkuxkx/mydelay.tin;
 };
 #function {getExits}
 {
 	#var tmp %1;
-	#script {ret} {python ./tintin/myscripts/pkuxkx/getExits.py "$tmp"};
+	#script {ret} {python ./git/xkx/pkuxkx/getExits.py "$tmp"};
 	#return $ret;
 };
 #function {getRoomName}
 {
 	#var tmp %1;
-	#script {ret} {python ./tintin/myscripts/pkuxkx/getRoomName.py "$tmp"};
+	#script {ret} {python ./git/xkx/pkuxkx/getRoomName.py "$tmp"};
 	#return $ret;
 };
 #function {getNpcs}
@@ -298,7 +298,7 @@
 	#var tmp %1;
 	#var ret_tab {};
 	#list ret_list create;
-	#script {ret} {python ./tintin/myscripts/pkuxkx/getNpcs.py "$tmp"};
+	#script {ret} {python ./git/xkx/pkuxkx/getNpcs.py "$tmp"};
 	#list ret size {retsize};
 	#var tmp_cnt {1}; 
 	#var t_cnt {1}; 
@@ -329,7 +329,7 @@
 	#var tmp %1;
 	#var ret_tab {};
 	#list ret_list create;
-	#script {ret} {python ./tintin/myscripts/pkuxkx/getIs.py "$tmp"};
+	#script {ret} {python ./git/xkx/pkuxkx/getIs.py "$tmp"};
 	#list ret size {retsize};
 	#var tmp_cnt {1}; 
 	#var t_cnt {1}; 
@@ -352,7 +352,7 @@
 	#var tmp %1;
 	#var ret_tab {};
 	#list ret_list create;
-	#script {ret} {python ./tintin/myscripts/pkuxkx/getIds.py "$tmp"};
+	#script {ret} {python ./git/xkx/pkuxkx/getIds.py "$tmp"};
 	#list ret size {retsize};
 	#var tmp_cnt {1}; 
 	#var t_cnt {1}; 
@@ -422,7 +422,7 @@
 	#var fpath {%1.tin};
 	#var p %2;
 	#if {"$p"==""} {#var p 5};#elseif {$p<3} {#var p 3};#else {#nop};
-	#class c_w2a read {./tintin/myscripts/pkuxkx/$fpath};
+	#class c_w2a read {./git/xkx/pkuxkx/$fpath};
 	w2a_init;	
 	#ticker {t_act}
 	{
@@ -486,10 +486,10 @@ enter;up;
 	#var fid %1;
 	#if {$mb_flag==1}
 	{
-		#script {ret} {python ./tintin/myscripts/pkuxkx/getFullme_mb.py "$fid"};
+		#script {ret} {python ./git/xkx/pkuxkx/getFullme_mb.py "$fid"};
 	}
 	{
-		#script {ret} {python ./tintin/myscripts/pkuxkx/getFullme.py "$fid"};
+		#script {ret} {python ./git/xkx/pkuxkx/getFullme.py "$fid"};
 	};
 };
 #alias start_fm
@@ -497,7 +497,7 @@ enter;up;
 	#var fullme_flag 0;
 	#tick t_fullmecheck
 	{
-		#script {ret} {python ./tintin/myscripts/pkuxkx/checkFullme.py};
+		#script {ret} {python ./git/xkx/pkuxkx/checkFullme.py};
 		#if {"$ret[1]"=="" && "$fullme_flag"=="0"}
 		{
 			#send {fullme};
@@ -549,4 +549,13 @@ enter;up;
 		};
 	};
 };
-
+#alias {start_capture_all}
+{
+    #var capture_till {%0}; 
+    #var line { }; 
+    #class capture_all read ./git/xkx/pkuxkx/capture_all.tin;
+};
+#alias {stop_capture_all}
+{
+    #unevent {RECEIVED LINE};
+};

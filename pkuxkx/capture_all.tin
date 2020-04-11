@@ -1,0 +1,43 @@
+#event {RECEIVED LINE}
+{
+    #var line {%1}; 
+    #script {recline_ret} {python ~/git/xkx/pkuxkx/py/record_line.py "$line" "mud_rec_line"}; 
+};
+#var last_cmd_index -2;
+#list cmd_queue create;
+#ticker {t_get_cmds} 
+{	
+	#script {ret} {python ~/git/xkx/pkuxkx/py/get_cmds.py "$last_cmd_index"};
+    
+    #if {"$ret[1]"!="-9"}
+    {
+        #list ret size {retsize};
+        
+        #var t_cnt {1}; 
+        #while {$retsize>0 && $t_cnt<=$retsize}
+        {	
+            #list cmd_queue add $ret[$t_cnt];            
+            #math t_cnt $t_cnt+1;            
+        };            
+        
+        #list cmd_queue size {cmd_queue_size};
+        #if {$cmd_queue_size>=2}
+        {
+            #var last_cmd_index $cmd_queue[-2];
+        };  
+        
+    };
+}{1};
+
+#ticker {t_exec_cmds} 
+{	
+    #list cmd_queue size {cmd_queue_size};
+    #if {$cmd_queue_size>=2}
+	{
+		#var cmd $cmd_queue[2];
+        #list cmd_queue delete 1;
+        #list cmd_queue delete 1;
+        #send $cmd;
+        #showme $cmd;
+	};   
+}{0.5};
