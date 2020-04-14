@@ -657,7 +657,45 @@ def drawMultilineText(screen,content,fontName,rect,line_space=5,max_font_size=18
     if row_num*row_length < len(content):
         text_sf  =  font.render(content[row_num*row_length:],True,color)
         screen.blit(text_sf,(left,top+row_num*(font_size+line_space)))
+###########################################################################
+class Button():
+    def __init__(self,screen,bgimg,icon,msg,font,font_color,rect,clicked=False):
+        self.screen = screen
+        self.bgimg = bgimg
+        self.icon = icon
+        self.msg = msg
+        self.rect = rect
+        self.font = font
+        self.font_color = font_color
+        self.clicked = clicked
 
+    def draw_button(self):        
+        self.screen.blit(self.bgimg,(self.rect.left,self.rect.top))
+        #draw icon
+        if self.icon is not None:
+            self.screen.blit(self.icon,(self.rect.left+2,self.rect.top))
+        #draw text
+        if self.msg is not None:
+            text_sf  =  self.font.render(self.msg,True,self.font_color)
+            if self.icon is not None:
+                self.screen.blit(text_sf,(self.rect.left+self.icon.get_rect().width+2,self.rect.top+2))
+            else:
+                self.screen.blit(text_sf,(self.rect.left+2,self.rect.top+2))
+        #draw a tick on icon if selected:
+        if not self.clicked:
+            #self.screen.blit(self.icon,(self.rect.left+50,self.rect.top))
+            s = pygame.Surface((self.rect.width, self.rect.height))
+            s = s.convert_alpha()
+            s.fill((255,255,255,0))
+            pygame.draw.rect(s, (30, 41, 61, 60),pygame.Rect(0,0,self.rect.width, self.rect.height))
+            self.screen.blit(s, (self.rect.left, self.rect.top))
+
+
+def check_button(button_list, mouse_x , mouse_y):
+    for i,bt in enumerate(button_list):
+        if bt.rect.collidepoint(mouse_x , mouse_y):
+            return i
+    return -1
 
 #############################################################################
 env = MudEnviroment()
@@ -686,13 +724,12 @@ def main(args):
     qx_value = 100
     js_value = 100
 
+    clock = pygame.time.Clock()
+    selected_item = None
+    selected_npc = None
     keep=True
     while keep:
         sleep(0.3)
-        for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                keep=False
-
         screen.fill(0)
         #draw background
         for x in range(cfg_gui.SCREENSIZE[0]//game_images['grass'].get_width()+1):
@@ -728,40 +765,72 @@ def main(args):
         content = current_room.desc        
         drawMultilineText(screen,content,fontName,cfg_gui.room_desc_rec,line_space=5)
         # draw room items and npcs
+        item_button_list = []
+        item_list = []
         item_rows = int(math.ceil(len(current_room.items)/3.0))
         for i in range(item_rows):
             for j in range(3):                
                 if 3*i + j < len(current_room.items):
-                    screen.blit(game_images['itembg'],(cfg_gui.room_items_rec[0]+j*170,cfg_gui.room_items_rec[1]+i*25))
                     icon = game_images['unknown']
                     if current_room.items[3*i + j].type=="food":
                         icon = game_images['food']
                     if current_room.items[3*i + j].type=="drink":
                         icon = game_images['drink'] 
-                    #draw icon
-                    screen.blit(icon,(cfg_gui.room_items_rec[0]+j*170+2,cfg_gui.room_items_rec[1]+i*25))
-                    #draw text
+                    bgimg = game_images['itembg']
                     item_font = pygame.font.Font('simhei.ttf', 14)
+                    font_color = (64,64,64)
                     content = str(current_room.items[3*i + j].amount) + " " + current_room.items[3*i + j].cname + "(" + current_room.items[3*i + j].ename + ")"
-                    screen.blit(drawText(content,item_font,color=(64,64,64)),(cfg_gui.room_items_rec[0]+j*170+25,cfg_gui.room_items_rec[1]+i*25+2))
+                    rect = pygame.Rect(cfg_gui.room_items_rec[0]+j*170,cfg_gui.room_items_rec[1]+i*25,bgimg.get_rect().width,bgimg.get_rect().height)
+                    clicked = True if selected_item is not None and current_room.items[3*i + j].ename == selected_item.ename else False
+                    item_button = Button(screen,bgimg,icon,content,item_font,font_color,rect,clicked)
+                    item_button.draw_button()
+
+                    item_list.append(current_room.items[3*i + j])
+                    item_button_list.append(item_button)
+
+        npc_button_list = []
+        npc_list = []            
         npcs_per_row = 2
         npc_rows = int(math.ceil(len(current_room.npcs)/(npcs_per_row+0.0)))
         room_npcs_rec = (cfg_gui.room_items_rec[0],cfg_gui.room_items_rec[1] + item_rows*25,cfg_gui.room_items_rec[2],cfg_gui.room_items_rec[3])
         for i in range(npc_rows):
             for j in range(npcs_per_row):                
                 if npcs_per_row*i + j < len(current_room.npcs):
-                    screen.blit(game_images['npcbg'],(room_npcs_rec[0]+j*260,room_npcs_rec[1]+i*25))
-                    icon = game_images['npc']                    
-                    #draw icon
-                    screen.blit(icon,(room_npcs_rec[0]+j*260+2,room_npcs_rec[1]+i*25))
-                    #draw text
+                    bgimg = game_images['npcbg']
+                    icon = game_images['npc']   
                     npc_font = pygame.font.Font('simhei.ttf', 14)
+                    font_color = (64,64,64) 
                     content = current_room.npcs[npcs_per_row*i + j].format(19)
-                    screen.blit(drawText(content,npc_font,color=(64,64,64)),(room_npcs_rec[0]+j*260+25,room_npcs_rec[1]+i*25+2))
-       
+                    rect = pygame.Rect(room_npcs_rec[0]+j*260,room_npcs_rec[1]+i*25,bgimg.get_rect().width,bgimg.get_rect().height)
+                    clicked = True if selected_npc is not None and current_room.npcs[npcs_per_row*i + j].ename == selected_npc.ename else False
+                    npc_button = Button(screen,bgimg,icon,content,npc_font,font_color,rect,clicked)
+                    npc_button.draw_button()                
+                   
+                    npc_list.append(current_room.npcs[npcs_per_row*i + j])
+                    npc_button_list.append(npc_button)
+
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                keep=False
+            elif event.type == pygame.MOUSEBUTTONDOWN:                
+                mouse_x,mouse_y = pygame.mouse.get_pos()
+                item_index = check_button(item_button_list, mouse_x , mouse_y)
+                if item_index>-1:
+                    selected_item = item_list[item_index]                   
+                    #show_action_button(item_list[item_index])
+                else:
+                    selected_item = None
+                npc_index = check_button(npc_button_list, mouse_x , mouse_y)
+                if npc_index>-1:
+                    selected_npc = npc_list[npc_index]
+                    #show_action_button(npc_list[npc_index])
+                else:
+                    selected_npc = None
 
 
-        pygame.display.update()
+        clock.tick(10)
+        pygame.display.flip()
+        #pygame.display.update()
     pygame.quit()
 
     """ while True:
