@@ -11,6 +11,10 @@
         {
             "name":"trigger_update_roomInfo",
             "func":"func_trigger_update_roomInfo"
+        },
+        {
+            "name":"trigger_score",
+            "func":"func_trigger_score"
         }
     ],
     "ticker":[
@@ -39,7 +43,7 @@
         {
             "name":"c_test",
             "enabled":true,
-            "trigger":["trigger_hpbrief","trigger_fillhulu","trigger_update_roomInfo"],
+            "trigger":["trigger_hpbrief","trigger_fillhulu","trigger_update_roomInfo","trigger_score"],
             "ticker":["t_hpbrief","t_skills"]
         }    
     ]

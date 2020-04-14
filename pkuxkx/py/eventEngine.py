@@ -12,6 +12,9 @@ from collections import defaultdict
 import traceback
 import pdb
 import sys
+import pygame
+import cfg_gui
+import math
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -44,8 +47,16 @@ class MudNpc(object):
         self.title3=""
         self.status="normal"
     def __str__(self):
-        return self.type + ": " + str(self.amount) + " " +self.title1 + " " + self.title2 + " " + self.title3 + " " \
-            + self.cname + " (" + self.ename + ") <" + self.status + ">"
+        return self.format()
+    def format(self,limit=100):
+        s1 = "" if self.amount <= 1 else str(self.amount) + " "        
+        s2 = "" if self.title1 == "" else self.title1 + " "
+        s3 = "" if self.title2 == "" else self.title2 + " "
+        s4 = "" if self.title3 == "" else self.title3 + " "
+        st = "" if self.status == "normal" else "<" + self.status + ">"
+        ret = s1+s2+s3+s4+self.cname + "(" + self.ename + ")" + st
+        
+        return ret[:min(limit,len(ret))]
 
 class Room(object):
     def __init__(self,env):
@@ -86,12 +97,12 @@ class MudEnviroment(object):
         self.weapon_dict = {}
         
     def is_food(self,item):
-        if item in self.food_dict.keys():
+        if item.lower() in self.food_dict.keys():
             return True
         else:
             return False
     def is_drink(self,item):
-        if item in self.drink_dict.keys():
+        if item.lower() in self.drink_dict.keys():
             return True
         else:
             return False     
@@ -115,6 +126,15 @@ class RoleStatus(object):
         self.zy = 0
         self.sw = 0
         self.ys = 0
+        #######score info#############
+        self.title1 = ""
+        self.title2 = ""
+        self.title3 = ""
+        self.remark = ""
+        self.cname = ""
+        self.ename = ""
+        self.name_desc = ""
+        self.age = ""
         #######items on body###########
         self.items = defaultdict(list)
 
@@ -299,7 +319,7 @@ def func_hpbrief_update(line):
     p = re.compile(r'^#(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)')
     m = p.match(line)
     if m is not None:
-        status = (m.group(1),m.group(2),m.group(3),m.group(4),m.group(5),m.group(6))
+        status = (int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),int(m.group(6)))
         mystatus.update_hpbrief(status)
 
 def func_trigger_fillhulu(line):
@@ -308,6 +328,66 @@ def func_trigger_fillhulu(line):
     if m is not None:
         sendCmd("fill hu lu")
 
+def func_trigger_score(line):
+    global trigger_flags
+    global record_lines
+    if len(line)>8 and line[:8] == "##cmd:::":
+        return
+    p = re.compile(r'^≡━━━━◎人物详情◎━━━━━━━━━━━━━━━━━━━━━━━━━━≡'.decode("utf8"))
+    m = p.match(line)
+    if m is not None:  
+        record_lines["score"] = []
+        trigger_flags["score"] = 1
+        return
+    if trigger_flags["score"] == 1:
+        p = re.compile(r'^>'.decode("utf8"))
+        m = p.match(line)
+        if m is None:
+            record_lines["score"].append(line)
+            return
+        else:
+            trigger_flags["score"] = 2
+            p = re.compile(r'^ 【(.+?)】(.*?)\((.*?)\)'.decode("utf8"))
+            s = p.match(record_lines["score"][0])
+            if s is not None:
+                mystatus.name_desc = s.group(0)
+                ps = re.compile(r" |「|」".decode("utf8"))
+                mylist = ps.split(s.group(2).strip(" "))                
+                title1=""
+                title2=""
+                title3=""
+                cname=""
+                ts = []
+                for t in mylist:
+                    if t=="":
+                        continue
+                    ts.append(t)
+                if len(ts) == 4:
+                    title1 = ts[0]
+                    title2 = ts[1]
+                    title3 = ts[2]
+                    cname = ts[3]
+                if len(ts) == 3:
+                    title1 = ts[0]
+                    title2 = ts[1]                
+                    cname = ts[2]
+                if len(ts) == 2:
+                    title1 = ts[0]                             
+                    cname = ts[1]
+                if len(ts) == 1:                           
+                    cname = ts[0]
+
+                remark = s.group(1)
+                ename = s.group(3)
+                (mystatus.title1,mystatus.title2,mystatus.title3,mystatus.remark,mystatus.cname,mystatus.ename) = \
+                    (title1,title2,title3,remark,cname,ename)                
+                for myline in record_lines["score"]:
+                    p = re.compile(r'^\s*你是一位(.+?岁)的.*'.decode("utf8"))
+                    s = p.match(myline)
+                    if s is not None:
+                        mystatus.age = s.group(1)                        
+                        break
+    
 def func_trigger_update_roomInfo(line):
     global trigger_flags
     global record_lines
@@ -334,7 +414,9 @@ def func_trigger_update_roomInfo(line):
         if m is None:
             p = re.compile(r'^(\S+.*)')
             m = p.match(line)
-            if m is not None:            
+            if m is not None:    
+                if len(record_lines["look_roomInfo"]) == 0:
+                    return        
                 record_lines["look_roomInfo"][-1] = record_lines["look_roomInfo"][-1] + line
                 return
         else:
@@ -457,20 +539,25 @@ def func_trigger_update_roomInfo(line):
                             muditem = MudItem()
                             muditem.ename = ename
                             muditem.cname = cname
-                            muditem.type = "item"
+                            if env.is_drink(ename):
+                                muditem.type = "drink"
+                            if env.is_food(ename):
+                                muditem.type = "food"
                             muditem.amount = num
                             current_room.items.append(muditem)
                         else:
                             mudnpc = MudNpc()
                             mudnpc.ename = ename
                             mudnpc.cname = cname
-                            mudnpc.type = "item"
+                            mudnpc.type = "npc"
                             mudnpc.amount = num
                             mudnpc.title1 = title1
                             mudnpc.title2 = title2
                             mudnpc.title3 = title3
                             mudnpc.status = status
                             current_room.npcs.append(mudnpc)
+
+
 ########################################################################
 #ticker functions######################
 def func_t_hpbrief():
@@ -528,11 +615,56 @@ def simpleoutput_handler(event):
 
 
 ###########################################################################
+
+def initGame():
+	# 初始化pygame, 设置展示窗口
+	pygame.init()
+	pygame.mixer.init()
+	screen = pygame.display.set_mode(cfg_gui.SCREENSIZE)
+	pygame.display.set_caption('pkuxkx')
+	# 加载必要的游戏素材
+	game_images = {}
+	for key, value in cfg_gui.IMAGE_PATHS.items():
+		game_images[key] = pygame.image.load(value)
+	game_sounds = {}
+	for key, value in cfg_gui.SOUNDS_PATHS.items():
+		if key != 'moonlight':
+			game_sounds[key] = pygame.mixer.Sound(value)
+	return screen, game_images, game_sounds
+
+def drawText(content,font,color=(255,255,255)):
+    text_sf  =  font.render(content,True,color)
+    return  text_sf 
+
+def drawMultilineText(screen,content,fontName,rect,line_space=5,max_font_size=18,color=(255,255,255)):
+    (left,top,width,height) = rect
+    if content is None or len(content) == 0:
+        return 
+    content = content.replace("\n","")
+    if width<10 or height<10:
+        return     
+    font_size = int((math.sqrt(line_space*line_space + 4*(width-10)*(height-10)/len(content))-line_space)/2)
+    if font_size<1:
+        font_size = 1
+    font_size = min(font_size,max_font_size)
+    pygame.font.init()
+    font  =  pygame.font.Font(fontName, font_size)
+    row_length = (width-10)//font_size
+    row_num = len(content)/row_length
+    for i in range(row_num):
+        text_sf  =  font.render(content[i*row_length:(i+1)*row_length],True,color)
+        screen.blit(text_sf,(left,top+i*(font_size+line_space)))
+    if row_num*row_length < len(content):
+        text_sf  =  font.render(content[row_num*row_length:],True,color)
+        screen.blit(text_sf,(left,top+row_num*(font_size+line_space)))
+
+
+#############################################################################
 env = MudEnviroment()
 mystatus =  RoleStatus()
 current_room = Room(env)
 rmq= RedisMQ()
-    
+  
 def main(args):    
     clear_cmdfiles()
     rmq.register("line_event",simpleoutput_handler)
@@ -540,13 +672,104 @@ def main(args):
     timer_check_config_change(settingFileName="setting_files.json",interval=1)
     rmq.register("line_event",trigger_handler)
     print("redis message queue has started.")    
-    
-    while True:
+
+    ####pygame code here######################
+
+    # 初始化
+    screen, game_images, game_sounds = initGame()
+    # 播放背景音乐
+    pygame.mixer.music.load(cfg_gui.SOUNDS_PATHS['moonlight'])
+    pygame.mixer.music.play(-1, 0.0)
+    pygame.font.init()
+    simhei_font  =  pygame.font.Font('simhei.ttf', 12)
+    #use for qx/js bar
+    qx_value = 100
+    js_value = 100
+
+    keep=True
+    while keep:
+        sleep(0.3)
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                keep=False
+
+        screen.fill(0)
+        #draw background
+        for x in range(cfg_gui.SCREENSIZE[0]//game_images['grass'].get_width()+1):
+			for y in range(cfg_gui.SCREENSIZE[1]//game_images['grass'].get_height()+1):
+				screen.blit(game_images['grass'], (x*100, y*100))
+        #draw qx and js status bar
+        screen.blit(drawText(u'气血:',simhei_font),(5,5))
+        screen.blit(game_images.get('healthbar'), (40, 5))
+        screen.blit(drawText(str(mystatus.qx) + "/" + str(mystatus.max_qx),simhei_font),(145,5))
+        if mystatus.max_qx>0:
+            for i in range(int(qx_value*mystatus.qx/mystatus.max_qx)):
+                screen.blit(game_images.get('health'), (i+43, 8))
+        screen.blit(drawText(u'精神:',simhei_font),(5,20))
+        screen.blit(game_images.get('healthbar'), (40, 20))
+        screen.blit(drawText(str(mystatus.js) + "/" + str(mystatus.max_js),simhei_font),(145,20))
+        if mystatus.max_js>0:
+            for i in range(int(js_value*mystatus.js/mystatus.max_js)):
+                screen.blit(game_images.get('health'), (i+43, 23))
+        # draw role name
+        screen.blit(drawText(mystatus.age + " " + mystatus.name_desc,pygame.font.Font('simhei.ttf', 16),color=(64,64,64)),(200,10))
+        #draw horizotal split 
+        for x in range(cfg_gui.SCREENSIZE[0]//game_images['split1'].get_width()+1):
+			screen.blit(game_images['split1'], (x*27, 40))
+        #draw vertical split 
+        for x in range((cfg_gui.SCREENSIZE[1]-cfg_gui.gps_rec[1])//game_images['split2'].get_height()+1):
+			screen.blit(game_images['split2'], (cfg_gui.gps_rec[0], cfg_gui.gps_rec[1]+x*27))
+        
+        # draw room name
+        room_name_font = pygame.font.Font('simhei.ttf', 20)
+        screen.blit(drawText(current_room.cname,room_name_font),(cfg_gui.room_desc_rec[0] + cfg_gui.room_desc_rec[2]/2 - 50 ,cfg_gui.room_desc_rec[1] - 30))
+        # draw room desc
+        fontName = 'simhei.ttf'
+        content = current_room.desc        
+        drawMultilineText(screen,content,fontName,cfg_gui.room_desc_rec,line_space=5)
+        # draw room items and npcs
+        item_rows = int(math.ceil(len(current_room.items)/3.0))
+        for i in range(item_rows):
+            for j in range(3):                
+                if 3*i + j < len(current_room.items):
+                    screen.blit(game_images['itembg'],(cfg_gui.room_items_rec[0]+j*170,cfg_gui.room_items_rec[1]+i*25))
+                    icon = game_images['unknown']
+                    if current_room.items[3*i + j].type=="food":
+                        icon = game_images['food']
+                    if current_room.items[3*i + j].type=="drink":
+                        icon = game_images['drink'] 
+                    #draw icon
+                    screen.blit(icon,(cfg_gui.room_items_rec[0]+j*170+2,cfg_gui.room_items_rec[1]+i*25))
+                    #draw text
+                    item_font = pygame.font.Font('simhei.ttf', 14)
+                    content = str(current_room.items[3*i + j].amount) + " " + current_room.items[3*i + j].cname + "(" + current_room.items[3*i + j].ename + ")"
+                    screen.blit(drawText(content,item_font,color=(64,64,64)),(cfg_gui.room_items_rec[0]+j*170+25,cfg_gui.room_items_rec[1]+i*25+2))
+        npcs_per_row = 2
+        npc_rows = int(math.ceil(len(current_room.npcs)/(npcs_per_row+0.0)))
+        room_npcs_rec = (cfg_gui.room_items_rec[0],cfg_gui.room_items_rec[1] + item_rows*25,cfg_gui.room_items_rec[2],cfg_gui.room_items_rec[3])
+        for i in range(npc_rows):
+            for j in range(npcs_per_row):                
+                if npcs_per_row*i + j < len(current_room.npcs):
+                    screen.blit(game_images['npcbg'],(room_npcs_rec[0]+j*260,room_npcs_rec[1]+i*25))
+                    icon = game_images['npc']                    
+                    #draw icon
+                    screen.blit(icon,(room_npcs_rec[0]+j*260+2,room_npcs_rec[1]+i*25))
+                    #draw text
+                    npc_font = pygame.font.Font('simhei.ttf', 14)
+                    content = current_room.npcs[npcs_per_row*i + j].format(19)
+                    screen.blit(drawText(content,npc_font,color=(64,64,64)),(room_npcs_rec[0]+j*260+25,room_npcs_rec[1]+i*25+2))
+       
+
+
+        pygame.display.update()
+    pygame.quit()
+
+    """ while True:
         sleep(30)        
         #repeatly print some info 
         print mystatus
         print myConfig
-        print current_room
+        print current_room """
         
     #rmq.stop()
 
