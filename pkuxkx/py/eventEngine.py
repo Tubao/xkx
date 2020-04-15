@@ -15,6 +15,9 @@ import sys
 import pygame
 import cfg_gui
 import math
+import copy
+from gui_tools import TextBox
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -32,7 +35,7 @@ class MudItem(object):
     def __init__(self):
         self.ename = ""
         self.cname = ""
-        self.type = ""
+        self.type = "other"
         self.amount = 0
     def __str__(self):
         return self.type + ": " + str(self.amount) + " " + self.cname + " (" + self.ename + ")"
@@ -40,7 +43,7 @@ class MudNpc(object):
     def __init__(self):
         self.ename = ""
         self.cname = ""
-        self.type = ""
+        self.type = "npc"
         self.amount = 0
         self.title1=""
         self.title2=""
@@ -69,6 +72,7 @@ class Room(object):
         self.directions=[]
         self.items = []
         self.npcs = []
+        self.isUpdating = True
     def __str__(self):
         ret = ""
         ret = ret + "room name: " + self.cname + "\n"
@@ -87,6 +91,7 @@ class Room(object):
         for d in self.npcs:
             ret = ret + str(d) + "\n"
         return ret
+    
 
 
 class MudEnviroment(object):
@@ -315,12 +320,22 @@ def sendCmd(cmd):
 
 ###################################################################
 #trigger functions###########
+#record cmd response put it into cmd channel
+def func_trigger_cmd_response_record(line):
+    pass
+
 def func_hpbrief_update(line):    
     p = re.compile(r'^#(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)')
     m = p.match(line)
     if m is not None:
         status = (int(m.group(1)),int(m.group(2)),int(m.group(3)),int(m.group(4)),int(m.group(5)),int(m.group(6)))
         mystatus.update_hpbrief(status)
+
+    p = re.compile(r'^>'.decode("utf8"))
+    m = p.match(line)
+    if m is not None:
+        mystatus._count_hpbrief=1
+
 
 def func_trigger_fillhulu(line):
     p = re.compile(r"^葫芦已经被喝得一滴也不剩了。".decode("utf8"))
@@ -556,6 +571,7 @@ def func_trigger_update_roomInfo(line):
                             mudnpc.title3 = title3
                             mudnpc.status = status
                             current_room.npcs.append(mudnpc)
+            current_room.isUpdating = False
 
 
 ########################################################################
@@ -606,7 +622,11 @@ def look_get_food_handler(event):
             sendCmd("get " + item)
             sendCmd("drink " + item)
 
-   
+def cmd_pack(action,item):
+    ret = action + " " + item.ename.lower()
+    if action.lower()=="get all":
+        ret = action
+    return ret
                         
 
 #line print out handler
@@ -678,7 +698,7 @@ class Button():
         if self.msg is not None:
             text_sf  =  self.font.render(self.msg,True,self.font_color)
             if self.icon is not None:
-                self.screen.blit(text_sf,(self.rect.left+self.icon.get_rect().width+2,self.rect.top+2))
+                self.screen.blit(text_sf,(self.rect.left+self.icon.get_rect().width+2,self.rect.top+1))
             else:
                 self.screen.blit(text_sf,(self.rect.left+2,self.rect.top+2))
         #draw a tick on icon if selected:
@@ -697,6 +717,9 @@ def check_button(button_list, mouse_x , mouse_y):
             return i
     return -1
 
+def sendCmdCallback(cmd):    
+    if len(cmd.strip())>0:
+        sendCmd(cmd.strip())
 #############################################################################
 env = MudEnviroment()
 mystatus =  RoleStatus()
@@ -725,11 +748,19 @@ def main(args):
     js_value = 100
 
     clock = pygame.time.Clock()
+    
     selected_item = None
     selected_npc = None
-    keep=True
+    selected_action = None
+    drawing_room = copy.deepcopy(current_room)
+    cmdline_input_rect = pygame.Rect(cfg_gui.command_line_rec[0]+25,cfg_gui.command_line_rec[1]+1,cfg_gui.command_line_rec[2]-40,cfg_gui.command_line_rec[3])
+    cmd_font = pygame.font.Font('simhei.ttf', 16)
+    cmdline_box = TextBox(cmdline_input_rect,font=cmd_font, callback=sendCmdCallback)
+
+
+    keep=True    
     while keep:
-        sleep(0.3)
+        sleep(0.1)
         screen.fill(0)
         #draw background
         for x in range(cfg_gui.SCREENSIZE[0]//game_images['grass'].get_width()+1):
@@ -756,76 +787,166 @@ def main(args):
         #draw vertical split 
         for x in range((cfg_gui.SCREENSIZE[1]-cfg_gui.gps_rec[1])//game_images['split2'].get_height()+1):
 			screen.blit(game_images['split2'], (cfg_gui.gps_rec[0], cfg_gui.gps_rec[1]+x*27))
-        
+
+        #deep copy current_room into drawing_room avoiding reading inconsistance
+        if not current_room.isUpdating:
+            drawing_room = copy.deepcopy(current_room)
         # draw room name
         room_name_font = pygame.font.Font('simhei.ttf', 20)
-        screen.blit(drawText(current_room.cname,room_name_font),(cfg_gui.room_desc_rec[0] + cfg_gui.room_desc_rec[2]/2 - 50 ,cfg_gui.room_desc_rec[1] - 30))
+        screen.blit(drawText(drawing_room.cname,room_name_font),(cfg_gui.room_desc_rec[0] + cfg_gui.room_desc_rec[2]/2 - 50 ,cfg_gui.room_desc_rec[1] - 30))
         # draw room desc
         fontName = 'simhei.ttf'
-        content = current_room.desc        
+        content = drawing_room.desc        
         drawMultilineText(screen,content,fontName,cfg_gui.room_desc_rec,line_space=5)
         # draw room items and npcs
         item_button_list = []
         item_list = []
-        item_rows = int(math.ceil(len(current_room.items)/3.0))
+        item_rows = int(math.ceil(len(drawing_room.items)/3.0))
         for i in range(item_rows):
             for j in range(3):                
-                if 3*i + j < len(current_room.items):
+                if 3*i + j < len(drawing_room.items):
                     icon = game_images['unknown']
-                    if current_room.items[3*i + j].type=="food":
+                    if drawing_room.items[3*i + j].type=="food":
                         icon = game_images['food']
-                    if current_room.items[3*i + j].type=="drink":
+                    if drawing_room.items[3*i + j].type=="drink":
                         icon = game_images['drink'] 
                     bgimg = game_images['itembg']
                     item_font = pygame.font.Font('simhei.ttf', 14)
                     font_color = (64,64,64)
-                    content = str(current_room.items[3*i + j].amount) + " " + current_room.items[3*i + j].cname + "(" + current_room.items[3*i + j].ename + ")"
+                    content = str(drawing_room.items[3*i + j].amount) + " " + drawing_room.items[3*i + j].cname + "(" + drawing_room.items[3*i + j].ename + ")"
                     rect = pygame.Rect(cfg_gui.room_items_rec[0]+j*170,cfg_gui.room_items_rec[1]+i*25,bgimg.get_rect().width,bgimg.get_rect().height)
-                    clicked = True if selected_item is not None and current_room.items[3*i + j].ename == selected_item.ename else False
+                    clicked = True if selected_item is not None and drawing_room.items[3*i + j].ename == selected_item.ename else False
                     item_button = Button(screen,bgimg,icon,content,item_font,font_color,rect,clicked)
                     item_button.draw_button()
 
-                    item_list.append(current_room.items[3*i + j])
+                    item_list.append(drawing_room.items[3*i + j])
                     item_button_list.append(item_button)
 
         npc_button_list = []
         npc_list = []            
         npcs_per_row = 2
-        npc_rows = int(math.ceil(len(current_room.npcs)/(npcs_per_row+0.0)))
+        npc_rows = int(math.ceil(len(drawing_room.npcs)/(npcs_per_row+0.0)))
         room_npcs_rec = (cfg_gui.room_items_rec[0],cfg_gui.room_items_rec[1] + item_rows*25,cfg_gui.room_items_rec[2],cfg_gui.room_items_rec[3])
         for i in range(npc_rows):
             for j in range(npcs_per_row):                
-                if npcs_per_row*i + j < len(current_room.npcs):
+                if npcs_per_row*i + j < len(drawing_room.npcs):
                     bgimg = game_images['npcbg']
                     icon = game_images['npc']   
                     npc_font = pygame.font.Font('simhei.ttf', 14)
                     font_color = (64,64,64) 
-                    content = current_room.npcs[npcs_per_row*i + j].format(19)
+                    content = drawing_room.npcs[npcs_per_row*i + j].format(19)
                     rect = pygame.Rect(room_npcs_rec[0]+j*260,room_npcs_rec[1]+i*25,bgimg.get_rect().width,bgimg.get_rect().height)
-                    clicked = True if selected_npc is not None and current_room.npcs[npcs_per_row*i + j].ename == selected_npc.ename else False
+                    clicked = True if selected_npc is not None and drawing_room.npcs[npcs_per_row*i + j].ename == selected_npc.ename else False
                     npc_button = Button(screen,bgimg,icon,content,npc_font,font_color,rect,clicked)
                     npc_button.draw_button()                
                    
-                    npc_list.append(current_room.npcs[npcs_per_row*i + j])
+                    npc_list.append(drawing_room.npcs[npcs_per_row*i + j])
                     npc_button_list.append(npc_button)
 
+        #draw action buttons
+        action_button_list = []
+        action_list = []           
+        if selected_item is not None or selected_npc is not None:            
+            item = selected_item if selected_item is not None else selected_npc
+            #check if selected item or npc is still in room:
+            flag = False
+            for i in item_list:
+                if i.ename == item.ename:
+                    flag = True
+                    break
+            for i in npc_list:
+                if i.ename == item.ename:
+                    flag = True
+                    break
+            if flag:#still in room
+                content = u"对 "+item.cname + "(" + item.ename+ ")" + u" 做什么？"
+                font = pygame.font.Font('simhei.ttf', 16)    
+                screen.blit(drawText(content,font,color=(255,255,255)),(cfg_gui.action_area_rec[0],cfg_gui.action_area_rec[1]))
+                msgs = cfg_gui.itemInRoom_buttonMsg_dict[item.type]
+                mylength = len(msgs)   
+                per_row = 5
+                rows = int(math.ceil(mylength/(per_row+0.0)))
+                for i in range(rows):
+                    for j in range(per_row):  
+                        index = per_row*i + j              
+                        if index < mylength:
+                            msg = msgs[index]
+                            bgimg = game_images['action_button_bg1'] 
+                            if msg in ['kill','hit']:
+                                bgimg = game_images['action_button_bg2'] 
+                            icon = None   
+                            msg_font = pygame.font.Font('simhei.ttf', 16)
+                            font_color = (255,255,255)             
+                            rect = pygame.Rect(cfg_gui.action_area_rec[0]+j*100,20+cfg_gui.action_area_rec[1]+i*25,bgimg.get_rect().width,bgimg.get_rect().height)
+                            clicked = True if selected_action is not None and msg == selected_action else False
+                            action_button = Button(screen,bgimg,icon," " + msg,msg_font,font_color,rect,clicked)
+                            action_button.draw_button() 
+
+                            action_list.append(msg)
+                            action_button_list.append(action_button)
+            else:#not in room,maybe left or room changed
+                selected_item = None 
+                selected_npc = None 
+                cmdline_box.text = ""
+
+        #draw command line
+        cmdline_bgimg = game_images['cmdline']
+        icon = game_images['cmdline_icon']   
+        font_color = (255,255,255) 
+        content = None
+        rect = pygame.Rect(cfg_gui.command_line_rec[0],cfg_gui.command_line_rec[1],cmdline_bgimg.get_rect().width,cmdline_bgimg.get_rect().height)
+        clicked = True 
+        cmdline_bg = Button(screen,cmdline_bgimg,icon,content,pygame.font.Font('simhei.ttf', 16),font_color,rect,clicked)
+        cmdline_bg.draw_button()                
+
+        #draw cmdline text box
+        cmdline_box.draw(screen)
+
+        #draw cmdline send button
+        bgimg = game_images['cmdline_bt']
+        rect = pygame.Rect(cfg_gui.command_line_rec[0]+cmdline_bgimg.get_rect().width+10,cfg_gui.command_line_rec[1],bgimg.get_rect().width,bgimg.get_rect().height)        
+        cmdline_bt = Button(screen,bgimg,None,None,pygame.font.Font('simhei.ttf', 16),font_color,rect,True)
+        cmdline_bt.draw_button() 
+
+
+        #event handle:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 keep=False
+            elif event.type == pygame.KEYDOWN:
+                cmdline_box.key_down(event)
             elif event.type == pygame.MOUSEBUTTONDOWN:                
                 mouse_x,mouse_y = pygame.mouse.get_pos()
                 item_index = check_button(item_button_list, mouse_x , mouse_y)
-                if item_index>-1:
-                    selected_item = item_list[item_index]                   
-                    #show_action_button(item_list[item_index])
-                else:
-                    selected_item = None
                 npc_index = check_button(npc_button_list, mouse_x , mouse_y)
-                if npc_index>-1:
-                    selected_npc = npc_list[npc_index]
-                    #show_action_button(npc_list[npc_index])
+                if item_index>-1 or npc_index>-1:
+                    if item_index>-1:
+                        selected_item = item_list[item_index]             
+                    else:
+                        selected_item = None                    
+                    if npc_index>-1:
+                        selected_npc = npc_list[npc_index]
+                    else:
+                        selected_npc = None
+                action_button_index = check_button(action_button_list,mouse_x , mouse_y)
+                if action_button_index>-1:
+                    selected_action = action_list[action_button_index]  
+                    if selected_item is not None or selected_npc is not None: 
+                        item = selected_item if selected_item is not None else selected_npc
+                        cmd = cmd_pack(selected_action,item)
+                        cmdline_box.text = cmd            
                 else:
-                    selected_npc = None
+                    selected_action = None
+
+                if cmdline_bg.rect.collidepoint(mouse_x , mouse_y):
+                    cmdline_box.focused = True
+                else:
+                    cmdline_box.focused = False
+
+                #cmd line bt clicked:send command
+                if cmdline_bt.rect.collidepoint(mouse_x , mouse_y) and len(cmdline_box.text)>0:
+                    sendCmd(cmdline_box.text.strip())
+                
 
 
         clock.tick(10)

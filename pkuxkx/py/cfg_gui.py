@@ -12,6 +12,10 @@ SCREENSIZE = (800, 700)
 room_desc_rec = (10,90,500,200)
 # room items rec
 room_items_rec = (10,300,500,100)
+# action buttons rec
+action_area_rec = (10,500,500,100)
+# command_line rec
+command_line_rec = (10,580,300,50)
 # gps rec
 gps_rec = (520,55,280,300)
 
@@ -33,7 +37,14 @@ IMAGE_PATHS = {
                 'food': os.path.join(os.path.dirname(__file__), 'resources/images/food_edited.png'),
                 'drink': os.path.join(os.path.dirname(__file__), 'resources/images/drink_edited.png'),
                 'npc': os.path.join(os.path.dirname(__file__), 'resources/images/npc_edited.png'),
-                'unknown': os.path.join(os.path.dirname(__file__), 'resources/images/unknown_edited.png')
+                'unknown': os.path.join(os.path.dirname(__file__), 'resources/images/unknown_edited.png'),
+                'action_button_bg1': os.path.join(os.path.dirname(__file__), 'resources/images/action_button_bg1.png'),
+                'action_button_bg2': os.path.join(os.path.dirname(__file__), 'resources/images/action_button_bg2.png'),
+                'cmdline_icon': os.path.join(os.path.dirname(__file__), 'resources/images/cmdline_icon.png'),
+                'cmdline': os.path.join(os.path.dirname(__file__), 'resources/images/cmdline.png'),
+                'cmdline_bt': os.path.join(os.path.dirname(__file__), 'resources/images/cmdline_bt.png'),
+                'cmd_flash': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_flash.gif')
+                
             }
 # 游戏声音路径
 SOUNDS_PATHS = {
@@ -42,3 +53,12 @@ SOUNDS_PATHS = {
                 'shoot': os.path.join(os.path.dirname(__file__), 'resources/audio/shoot.wav'),
                 'moonlight': os.path.join(os.path.dirname(__file__), 'resources/audio/moonlight.wav')
             }
+
+itemInRoom_buttonMsg_dict = {
+    'food':['get','get all','look','eat'],
+    'drink':['get','get all','look','drink'],
+    'other':['get','get all','look','fight','hit','kill'],
+    'npc':['look','fight','hit','kill']
+}
+
+
