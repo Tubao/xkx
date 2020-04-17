@@ -41,3 +41,8 @@
         #showme $cmd;
 	};   
 }{0.5};
+
+#alias clearcmd
+{
+    #var last_cmd_index -2;
+}

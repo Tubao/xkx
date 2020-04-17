@@ -16,6 +16,7 @@ import pygame
 import cfg_gui
 import math
 import copy
+from Queue import Queue
 from gui_tools import TextBox
 
 reload(sys)
@@ -24,6 +25,10 @@ sys.setdefaultencoding('utf8')
 myConfig = {"ticker":[],"current_tickers":[]}
 lock = Lock()
 global_cmdIndex = 0
+cmd_queue = Queue(maxsize=10)
+cache_resp = defaultdict(list)
+CACHE_SIZE = 200
+
 file_mtime_dict = defaultdict(float)
 trigger_flags = defaultdict(int)
 record_lines = defaultdict(list)
@@ -267,6 +272,12 @@ def clear_cmdfiles():
     if f.exists():
         for file in f.glob('*'):
             file.unlink()
+        #generate a cmd88888888 file to inform tt 
+        f = f/"cmd88888888"  
+        cmd = "hi"
+        with f.open('w',encoding = 'utf8') as file_handle:   # .txt可以不自己新建,代码会自动新建
+            file_handle.write(cmd.decode("utf8"))     # 写入
+
 
 
 #handle triggers
@@ -313,16 +324,14 @@ def sendCmd(cmd):
         ofile.unlink()    
     filename = "cmd" + str(global_cmdIndex)
     global_cmdIndex = global_cmdIndex + 1  
+    
     lock.release()
     f = f/filename  
     with f.open('w',encoding = 'utf8') as file_handle:   # .txt可以不自己新建,代码会自动新建
         file_handle.write(cmd.decode("utf8"))     # 写入
-
+        
 ###################################################################
 #trigger functions###########
-#record cmd response put it into cmd channel
-def func_trigger_cmd_response_record(line):
-    pass
 
 def func_hpbrief_update(line):    
     p = re.compile(r'^#(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)')
@@ -632,8 +641,73 @@ def cmd_pack(action,item):
 #line print out handler
 def simpleoutput_handler(event):
     print(u'处理事件：{}:{}'.format(event.type_,event.dict_['data'] ))        
+#classify msg into:cmd response msg(cmd),channel msg(channel)
+def msg_classify_handler(event):
+    global cmd_queue
+    global record_lines
+    global cache_resp
+    
+    line = event.dict_['data']
+    if len(line.strip()) == 0: 
+        return
+    p = re.compile(r'^##cmd:::(.*)'.decode("utf8"))
+    m = p.match(line)
+    if m is not None:
+        cmd_queue.put(m.group(1))        
 
-
+    p = re.compile(r'^【(.+?)】.*'.decode("utf8"))
+    m = p.match(line)
+    if m is not None:
+        mytype = m.group(1)
+        channel_info = {"type":mytype,"resp":line}
+        cache_resp["channel"].append(channel_info)
+        if len(cache_resp["channel"]) > CACHE_SIZE:
+            cache_resp["channel"] = cache_resp["channel"][len(cache_resp["channel"]) - CACHE_SIZE:]
+        #debug:
+        print(u'{}:{}'.format(channel_info["type"],channel_info["resp"] ))        
+        return
+    else:
+        p = re.compile(r'^>'.decode("utf8"))
+        m = p.match(line)
+        if m is None:
+            if cmd_queue.empty():
+                cache_resp["other"].append(line)
+                if len(cache_resp["other"]) > CACHE_SIZE:
+                    cache_resp["other"] = cache_resp["other"][len(cache_resp["other"]) - CACHE_SIZE:]
+                #debug
+                print(u'{}:{}'.format("other resp",line))    
+            else:           
+                record_lines["cmd"].append(line)
+            return
+        else:
+            command_str = ""
+            if not cmd_queue.empty():
+                command_str=cmd_queue.get()
+            mylines = copy.copy(record_lines["cmd"])
+            resp = mylines
+            other_resp = []            
+            for i,l in enumerate(mylines):
+                if l.startswith("##cmd:::"):
+                    resp = mylines[i+1:]
+                    other_resp = mylines[:i]            
+            cmd_info = {"command":command_str,"resp":resp}
+            record_lines["cmd"] = []
+            cache_resp["cmd"].append(cmd_info)
+            if len(cache_resp["cmd"]) > CACHE_SIZE:
+                cache_resp["cmd"] = cache_resp["cmd"][len(cache_resp["cmd"]) - CACHE_SIZE:]
+            #other resp:
+            for l in other_resp:
+                if l.startswith("##cmd:::"):
+                    continue
+                cache_resp["other"].append(l)
+                if len(cache_resp["other"]) > CACHE_SIZE:
+                    cache_resp["other"] = cache_resp["other"][len(cache_resp["other"]) - CACHE_SIZE:]
+            #debug:
+            print(u'{}:{}'.format(cmd_info["command"],"/n".join(cmd_info["resp"] )))     
+            print(u'{}:{}'.format("other resp","/n".join(other_resp) ))       
+            return
+    
+    
 ###########################################################################
 
 def initGame():
@@ -701,25 +775,125 @@ class Button():
                 self.screen.blit(text_sf,(self.rect.left+self.icon.get_rect().width+2,self.rect.top+1))
             else:
                 self.screen.blit(text_sf,(self.rect.left+2,self.rect.top+2))
-        #draw a tick on icon if selected:
+        #draw a opatical surface on it if not selected:
         if not self.clicked:
-            #self.screen.blit(self.icon,(self.rect.left+50,self.rect.top))
             s = pygame.Surface((self.rect.width, self.rect.height))
             s = s.convert_alpha()
             s.fill((255,255,255,0))
             pygame.draw.rect(s, (30, 41, 61, 60),pygame.Rect(0,0,self.rect.width, self.rect.height))
             self.screen.blit(s, (self.rect.left, self.rect.top))
 
-
+class CheckButton():
+    def __init__(self,screen,bgimg,msg,font,font_color,rect,checked=False):
+        self.screen = screen
+        self.bgimg = bgimg        
+        self.msg = msg
+        self.rect = rect
+        self.font = font
+        self.font_color = font_color
+        self.checked = checked
+    def draw_button(self):        
+        self.screen.blit(self.bgimg,(self.rect.left,self.rect.top))
+        #draw icon        
+        icon = pygame.image.load(cfg_gui.IMAGE_PATHS['checked'])            
+        if not self.checked:
+            icon = pygame.image.load(cfg_gui.IMAGE_PATHS['unchecked'])
+        self.screen.blit(icon,(self.rect.left+2,self.rect.top))
+        #draw text
+        if self.msg is not None:
+            text_sf  =  self.font.render(self.msg,True,self.font_color)
+            self.screen.blit(text_sf,(self.rect.left+icon.get_rect().width+4,self.rect.top+1))
+            
 def check_button(button_list, mouse_x , mouse_y):
     for i,bt in enumerate(button_list):
         if bt.rect.collidepoint(mouse_x , mouse_y):
             return i
     return -1
+def drawTwindow(screen,filter_checked_dict,content_top,content_bottom):
+    s_terminal = pygame.Surface((cfg_gui.twindows_rec[2],cfg_gui.twindows_rec[3]))
+    s_terminal = s_terminal.convert_alpha()
+    s_terminal.fill((255,255,255,0))
+    pygame.draw.rect(s_terminal, (0,0,0,200), pygame.Rect(0,0,cfg_gui.twindows_rec[2],cfg_gui.twindows_rec[3]))
 
-def sendCmdCallback(cmd):    
+    #draw content_top,content_top is a line list:
+    font_size = 16
+    color=(255,255,255,200)
+    font  =  pygame.font.Font('wqy-zenhei.ttc', font_size)
+    row_length = (cfg_gui.twindows_rec1[2])//font_size
+    max_row_num = (cfg_gui.twindows_rec1[3])//(font_size+1)
+    counter_row = 0
+    text_sf_list = []
+    for line in content_top[::-1]:        
+        row_num = len(line)/row_length
+        counter_row = counter_row + row_num
+        if counter_row+1>max_row_num:
+            break
+        line_row_list = []
+        for i in range(row_num):
+            text_sf  =  font.render(line[i*row_length:(i+1)*row_length],True,color)
+            line_row_list.append(text_sf)
+        if row_num*row_length < len(line):            
+            text_sf  =  font.render(line[row_num*row_length:],True,color) 
+            line_row_list.append(text_sf)
+            counter_row = counter_row + 1
+        text_sf_list.extend(line_row_list[::-1])
+    text_sf_list.reverse()
+   
+    for i,t in enumerate(text_sf_list):
+        s_terminal.blit(t,(0,i*(font_size+1)))
+    #draw content_bottom,content_top is a line list:
+    
+    max_row_num = (cfg_gui.twindows_rec2[3])//(font_size+1)
+    counter_row = 0
+    text_sf_list = []
+    for line in content_bottom[::-1]:        
+        row_num = len(line)/row_length
+        counter_row = counter_row + row_num
+        if counter_row+1>max_row_num:
+            break
+        line_row_list = []
+        for i in range(row_num):
+            text_sf  =  font.render(line[i*row_length:(i+1)*row_length],True,color)
+            line_row_list.append(text_sf)
+        if row_num*row_length < len(line):            
+            text_sf  =  font.render(line[row_num*row_length:],True,color) 
+            line_row_list.append(text_sf)
+            counter_row = counter_row + 1
+        text_sf_list.extend(line_row_list[::-1])
+    text_sf_list.reverse()
+   
+    for i,t in enumerate(text_sf_list):
+        s_terminal.blit(t,(0,cfg_gui.twindows_rec1[3]+30+i*(font_size+1)))
+
+
+    #draw split 
+    pygame.draw.line(s_terminal,(255,255,255,200),(0,cfg_gui.twindows_rec1[3]),\
+        (cfg_gui.twindows_rec1[2],cfg_gui.twindows_rec1[3]))
+    pygame.draw.line(s_terminal,(255,255,255,200),(0,cfg_gui.twindows_rec1[3]+30),\
+        (cfg_gui.twindows_rec2[2],cfg_gui.twindows_rec1[3]+30))
+    #draw filter text:
+    filter_font = pygame.font.Font('wqy-zenhei.ttc', 15)
+    filter_words = u"不显示这些："
+    s_terminal.blit(drawText(filter_words,filter_font,color=(255,255,255,255)),(2,cfg_gui.twindows_rec1[3]+4))
+    check_bt_list = []
+    for i,cmd in enumerate(["hpbrief","score","skills","look"]):
+        bgimg = pygame.Surface((80,20))
+        pygame.draw.rect(bgimg, (0,0,0,0), pygame.Rect(0,0,80,20))
+        msg = cmd
+        font_color = (255,255,255)
+        rect = pygame.Rect(80+i*100,cfg_gui.twindows_rec1[3]+4,80,20)
+        check_bt = CheckButton(s_terminal,bgimg,msg,filter_font,font_color,rect,filter_checked_dict[cmd])
+        check_bt.draw_button()
+        check_bt_list.append(check_bt)
+    screen.blit(s_terminal,(cfg_gui.twindows_rec[0],cfg_gui.twindows_rec[1]))
+    return check_bt_list
+
+    
+def sendCmdCallback(textbox):   
+    cmd = textbox.text 
     if len(cmd.strip())>0:
         sendCmd(cmd.strip())
+    
 #############################################################################
 env = MudEnviroment()
 mystatus =  RoleStatus()
@@ -728,11 +902,13 @@ rmq= RedisMQ()
   
 def main(args):    
     clear_cmdfiles()
-    rmq.register("line_event",simpleoutput_handler)
-    rmq.start()
-    timer_check_config_change(settingFileName="setting_files.json",interval=1)
+    #rmq.register("line_event",simpleoutput_handler)
+    rmq.register("line_event",msg_classify_handler)
+    rmq.start() 
+    print("redis message queue has started.")   
     rmq.register("line_event",trigger_handler)
-    print("redis message queue has started.")    
+    timer_check_config_change(settingFileName="setting_files.json",interval=1)
+    
 
     ####pygame code here######################
 
@@ -752,10 +928,21 @@ def main(args):
     selected_item = None
     selected_npc = None
     selected_action = None
+
+    filter_checked_dict = defaultdict(bool)
+    cmd_window_showed = False
+    filter_checked_dict={
+        'hpbrief':True,
+        "look":True,
+        "score":True,
+        "skills":True
+    }
+    check_bt_list = []
+
     drawing_room = copy.deepcopy(current_room)
     cmdline_input_rect = pygame.Rect(cfg_gui.command_line_rec[0]+25,cfg_gui.command_line_rec[1]+1,cfg_gui.command_line_rec[2]-40,cfg_gui.command_line_rec[3])
     cmd_font = pygame.font.Font('simhei.ttf', 16)
-    cmdline_box = TextBox(cmdline_input_rect,font=cmd_font, callback=sendCmdCallback)
+    cmdline_box = TextBox(screen,cmdline_input_rect,font=cmd_font, callback=sendCmdCallback)
 
 
     keep=True    
@@ -900,14 +1087,32 @@ def main(args):
         cmdline_bg.draw_button()                
 
         #draw cmdline text box
-        cmdline_box.draw(screen)
+        cmdline_box.draw()
 
         #draw cmdline send button
-        bgimg = game_images['cmdline_bt']
-        rect = pygame.Rect(cfg_gui.command_line_rec[0]+cmdline_bgimg.get_rect().width+10,cfg_gui.command_line_rec[1],bgimg.get_rect().width,bgimg.get_rect().height)        
-        cmdline_bt = Button(screen,bgimg,None,None,pygame.font.Font('simhei.ttf', 16),font_color,rect,True)
+        sendimg = game_images['cmdline_bt']
+        rect = pygame.Rect(cfg_gui.command_line_rec[0]+cmdline_bgimg.get_rect().width+10,cfg_gui.command_line_rec[1],sendimg.get_rect().width,sendimg.get_rect().height)        
+        cmdline_bt = Button(screen,sendimg,None,None,pygame.font.Font('simhei.ttf', 16),font_color,rect,True)
         cmdline_bt.draw_button() 
 
+        #draw button to pop out terminal-like window
+        cmd_window_img = game_images['cmd_window']
+        rect = pygame.Rect(cfg_gui.command_line_rec[0]+cmdline_bgimg.get_rect().width+sendimg.get_rect().width+20,cfg_gui.command_line_rec[1],cmd_window_img.get_rect().width,cmd_window_img.get_rect().height)        
+        cmd_window_bt = Button(screen,cmd_window_img,None,None,pygame.font.Font('simhei.ttf', 16),font_color,rect,True)
+        cmd_window_bt.draw_button() 
+        
+        if cmd_window_showed: 
+            content_top = []
+            content_bottom = []        
+            for resp in cache_resp['cmd']:
+                if filter_checked_dict.has_key(resp["command"]) and filter_checked_dict[resp["command"]]:
+                    continue
+                if len(resp["command"])>0:
+                    content_top.append(resp["command"])
+                content_top.extend(resp["resp"])
+            for resp in cache_resp['other']:
+                content_bottom.append(resp)
+            check_bt_list = drawTwindow(screen,filter_checked_dict,content_top,content_bottom)
 
         #event handle:
         for event in pygame.event.get():
@@ -915,28 +1120,31 @@ def main(args):
                 keep=False
             elif event.type == pygame.KEYDOWN:
                 cmdline_box.key_down(event)
+                if cmdline_box.focused and event.key==301:
+                    cmdline_box.text = ""
             elif event.type == pygame.MOUSEBUTTONDOWN:                
                 mouse_x,mouse_y = pygame.mouse.get_pos()
-                item_index = check_button(item_button_list, mouse_x , mouse_y)
-                npc_index = check_button(npc_button_list, mouse_x , mouse_y)
-                if item_index>-1 or npc_index>-1:
-                    if item_index>-1:
-                        selected_item = item_list[item_index]             
+                if not cmd_window_showed:
+                    item_index = check_button(item_button_list, mouse_x , mouse_y)
+                    npc_index = check_button(npc_button_list, mouse_x , mouse_y)
+                    if item_index>-1 or npc_index>-1:
+                        if item_index>-1:
+                            selected_item = item_list[item_index]             
+                        else:
+                            selected_item = None                    
+                        if npc_index>-1:
+                            selected_npc = npc_list[npc_index]
+                        else:
+                            selected_npc = None
+                    action_button_index = check_button(action_button_list,mouse_x , mouse_y)
+                    if action_button_index>-1:
+                        selected_action = action_list[action_button_index]  
+                        if selected_item is not None or selected_npc is not None: 
+                            item = selected_item if selected_item is not None else selected_npc
+                            cmd = cmd_pack(selected_action,item)
+                            cmdline_box.text = cmd            
                     else:
-                        selected_item = None                    
-                    if npc_index>-1:
-                        selected_npc = npc_list[npc_index]
-                    else:
-                        selected_npc = None
-                action_button_index = check_button(action_button_list,mouse_x , mouse_y)
-                if action_button_index>-1:
-                    selected_action = action_list[action_button_index]  
-                    if selected_item is not None or selected_npc is not None: 
-                        item = selected_item if selected_item is not None else selected_npc
-                        cmd = cmd_pack(selected_action,item)
-                        cmdline_box.text = cmd            
-                else:
-                    selected_action = None
+                        selected_action = None
 
                 if cmdline_bg.rect.collidepoint(mouse_x , mouse_y):
                     cmdline_box.focused = True
@@ -946,7 +1154,20 @@ def main(args):
                 #cmd line bt clicked:send command
                 if cmdline_bt.rect.collidepoint(mouse_x , mouse_y) and len(cmdline_box.text)>0:
                     sendCmd(cmdline_box.text.strip())
-                
+                    cmd_window_showed = True
+                    cmdline_box.text = ""
+
+                #cmd_window bt clicked:pop out terminal-like window
+                if cmd_window_bt.rect.collidepoint(mouse_x , mouse_y):
+                    cmd_window_showed = not cmd_window_showed    
+
+                #check filter button 
+                for bt in check_bt_list:
+                    rect = pygame.Rect(bt.rect.left+cfg_gui.twindows_rec[0],bt.rect.top+cfg_gui.twindows_rec[1],bt.rect.width,bt.rect.height)
+                    if rect.collidepoint(mouse_x , mouse_y):
+                        filter_checked_dict[bt.msg] = not filter_checked_dict[bt.msg]
+                                        
+                       
 
 
         clock.tick(10)

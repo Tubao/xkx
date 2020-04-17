@@ -16,6 +16,11 @@ room_items_rec = (10,300,500,100)
 action_area_rec = (10,500,500,100)
 # command_line rec
 command_line_rec = (10,580,300,50)
+# terminal-like rec
+twindows_rec = (10,50,500,520)
+twindows_rec1 = (10,50,500,300)
+twindows_rec2 = (10,380,500,190)
+twindows_rec3 = (512,50,500,520)
 # gps rec
 gps_rec = (520,55,280,300)
 
@@ -43,7 +48,10 @@ IMAGE_PATHS = {
                 'cmdline_icon': os.path.join(os.path.dirname(__file__), 'resources/images/cmdline_icon.png'),
                 'cmdline': os.path.join(os.path.dirname(__file__), 'resources/images/cmdline.png'),
                 'cmdline_bt': os.path.join(os.path.dirname(__file__), 'resources/images/cmdline_bt.png'),
-                'cmd_flash': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_flash.gif')
+                'cmd_flash': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_flash.gif'),
+                'checked': os.path.join(os.path.dirname(__file__), 'resources/images/checked.png'),
+                'unchecked': os.path.join(os.path.dirname(__file__), 'resources/images/unchecked.png'),
+                'cmd_window': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_window_edited.jpeg')                 
                 
             }
 # 游戏声音路径
@@ -55,9 +63,9 @@ SOUNDS_PATHS = {
             }
 
 itemInRoom_buttonMsg_dict = {
-    'food':['get','get all','look','eat'],
-    'drink':['get','get all','look','drink'],
-    'other':['get','get all','look','fight','hit','kill'],
+    'food':['get','get all','look','eat','drop'],
+    'drink':['get','get all','look','drink','drop'],
+    'other':['get','get all','drop','look','fight','hit','kill'],
     'npc':['look','fight','hit','kill']
 }
 

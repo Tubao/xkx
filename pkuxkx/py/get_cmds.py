@@ -16,8 +16,17 @@ def main(args):
         print "hi"
         return
     ret = []
+    #check if event engine has reset index
+    index_reset = False
+    for file in p.glob('*'):
+        if file.name[3:]=="88888888":
+            index_reset = True
+            file.unlink()
+            last_cmd_index = -1
+            break
+
     for file in p.glob('*'):        
-        if int(file.name[3:])<=last_cmd_index:
+        if not index_reset and int(file.name[3:])<=last_cmd_index:
             continue
         cmd_index = int(file.name[3:])        
         cmd = ""
