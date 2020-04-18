@@ -2,6 +2,7 @@
 
 '''config file'''
 import os
+import pygame
 
 
 # FPS
@@ -21,10 +22,35 @@ twindows_rec = (10,50,500,520)
 twindows_rec1 = (10,50,500,300)
 twindows_rec2 = (10,380,500,190)
 twindows_rec3 = (512,50,500,520)
-# gps rec
+# gps area rec
 gps_rec = (520,55,280,300)
+# direction area rec
+direction_rec = (540,300,240,240)
 
-# 游戏图片路径
+#direction rec dict
+direction_rec_dict = {
+    "northwest":pygame.Rect(0,0,72,72),
+    "northeast":pygame.Rect(168,0,72,72),
+    "southwest":pygame.Rect(0,168,72,72),
+    "southeast":pygame.Rect(168,168,72,72),
+    "up":pygame.Rect(84,84,72,30),
+    "down":pygame.Rect(84,124,72,30),
+    "northup":pygame.Rect(84,0,72,22),
+    "north":pygame.Rect(84,24,72,22),
+    "northdown":pygame.Rect(84,50,72,22),
+    "southdown":pygame.Rect(84,168,72,22),
+    "south":pygame.Rect(84,192,72,22),
+    "southup":pygame.Rect(84,216,72,22),
+    "westup":pygame.Rect(0,84,22,72),
+    "west":pygame.Rect(24,84,22,72),
+    "westdown":pygame.Rect(50,84,22,72),
+    "eastdown":pygame.Rect(168,84,22,72),
+    "east":pygame.Rect(192,84,22,72),
+    "eastup":pygame.Rect(216,84,22,72)
+}
+
+
+# 图片路径
 IMAGE_PATHS = {
                 'rabbit': os.path.join(os.path.dirname(__file__), 'resources/images/dude.png'),
                 'grass': os.path.join(os.path.dirname(__file__), 'resources/images/grass.png'),
@@ -51,7 +77,8 @@ IMAGE_PATHS = {
                 'cmd_flash': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_flash.gif'),
                 'checked': os.path.join(os.path.dirname(__file__), 'resources/images/checked.png'),
                 'unchecked': os.path.join(os.path.dirname(__file__), 'resources/images/unchecked.png'),
-                'cmd_window': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_window_edited.jpeg')                 
+                'cmd_window': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_window_edited.jpeg'),
+                'direction_bg': os.path.join(os.path.dirname(__file__), 'resources/images/direction.png')                 
                 
             }
 # 游戏声音路径

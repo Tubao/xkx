@@ -581,6 +581,7 @@ def func_trigger_update_roomInfo(line):
                             mudnpc.status = status
                             current_room.npcs.append(mudnpc)
             current_room.isUpdating = False
+            #print current_room.directions
 
 
 ########################################################################
@@ -841,7 +842,7 @@ def drawTwindow(screen,filter_checked_dict,content_top,content_bottom):
    
     for i,t in enumerate(text_sf_list):
         s_terminal.blit(t,(0,i*(font_size+1)))
-    #draw content_bottom,content_top is a line list:
+    #draw content_bottom,content_bottom is a line list:
     
     max_row_num = (cfg_gui.twindows_rec2[3])//(font_size+1)
     counter_row = 0
@@ -1100,7 +1101,7 @@ def main(args):
         rect = pygame.Rect(cfg_gui.command_line_rec[0]+cmdline_bgimg.get_rect().width+sendimg.get_rect().width+20,cfg_gui.command_line_rec[1],cmd_window_img.get_rect().width,cmd_window_img.get_rect().height)        
         cmd_window_bt = Button(screen,cmd_window_img,None,None,pygame.font.Font('simhei.ttf', 16),font_color,rect,True)
         cmd_window_bt.draw_button() 
-        
+        #draw terminal-like windown
         if cmd_window_showed: 
             content_top = []
             content_bottom = []        
@@ -1113,6 +1114,22 @@ def main(args):
             for resp in cache_resp['other']:
                 content_bottom.append(resp)
             check_bt_list = drawTwindow(screen,filter_checked_dict,content_top,content_bottom)
+        #draw direction rec surface
+        direction_surface = pygame.Surface((cfg_gui.direction_rec[2], cfg_gui.direction_rec[3])).convert_alpha()
+        direction_surface.fill((255,255,255,0))
+        direction_bg = game_images['direction_bg']
+        #direction_surface.blit(direction_bg, (0, 0))
+        #draw the direct rec 
+        direction_rect_list = []
+        for d in current_room.directions:
+            try:
+                d_rect =cfg_gui.direction_rec_dict[d.lower()]
+            except Exception as e:
+                continue
+            direction_rect_list.append((d,d_rect))
+            direction_surface.blit(direction_bg,(d_rect.left,d_rect.top),d_rect)
+        screen.blit(direction_surface,(cfg_gui.direction_rec[0], cfg_gui.direction_rec[1]))
+        
 
         #event handle:
         for event in pygame.event.get():
@@ -1166,8 +1183,12 @@ def main(args):
                     rect = pygame.Rect(bt.rect.left+cfg_gui.twindows_rec[0],bt.rect.top+cfg_gui.twindows_rec[1],bt.rect.width,bt.rect.height)
                     if rect.collidepoint(mouse_x , mouse_y):
                         filter_checked_dict[bt.msg] = not filter_checked_dict[bt.msg]
-                                        
-                       
+
+                #check if direction rec is clicked:
+                for (d,d_rect) in direction_rect_list:                          
+                    if d_rect.collidepoint(mouse_x-cfg_gui.direction_rec[0], mouse_y-cfg_gui.direction_rec[1]):
+                        sendCmd(d)
+                        
 
 
         clock.tick(10)
