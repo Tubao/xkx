@@ -17,6 +17,9 @@ import cfg_gui
 import math
 import copy
 from Queue import Queue
+import hashlib
+import networkx as nx
+import matplotlib.pyplot as plt
 from gui_tools import TextBox
 
 reload(sys)
@@ -33,9 +36,18 @@ file_mtime_dict = defaultdict(float)
 trigger_flags = defaultdict(int)
 record_lines = defaultdict(list)
 
+G = nx.DiGraph()
+nodes_init_pos = {}
+rid_room_dict = {}
+rid_cname_dict = {}
+min_map = None
 ############################################################################
 #########             major classes           ################
 #############################################################################
+def md5digest(s):    
+    hash_md5 = hashlib.md5(s)
+    return hash_md5.hexdigest()
+
 class MudItem(object):
     def __init__(self):
         self.ename = ""
@@ -78,6 +90,22 @@ class Room(object):
         self.items = []
         self.npcs = []
         self.isUpdating = True
+        self.area = ""
+        self.rid = ""
+        self.bakid = ""
+        self.isct = False
+        self.xofct = 0
+        self.yofct = 0
+        self.zofct = 0
+    def gen_rid(self):
+        s = self.area + self.cname + self.desc + ",".join(self.directions) + str(self.xofct) + str(self.yofct) + str(self.zofct)
+        self.rid = md5digest(s)
+        s1 = self.area + self.cname + self.desc + ",".join(self.directions)
+        self.bakid = md5digest(s1)
+    def update_pos(self,preRoom,move):
+        self.xofct = preRoom.xofct+self.env.d2x[move]
+        self.yofct = preRoom.yofct+self.env.d2y[move]
+        self.zofct = preRoom.zofct+self.env.d2z[move]
     def __str__(self):
         ret = ""
         ret = ret + "room name: " + self.cname + "\n"
@@ -96,8 +124,12 @@ class Room(object):
         for d in self.npcs:
             ret = ret + str(d) + "\n"
         return ret
-    
-
+class MudEdge(object):
+    def __init__(self,room1,room2,action_from1to2,cost_from1to2):    
+        self.room1 = room1
+        self.room2 = room2
+        self.action_from1to2 = action_from1to2
+        self.cost_from1to2 = cost_from1to2
 
 class MudEnviroment(object):
     def __init__(self):
@@ -105,6 +137,10 @@ class MudEnviroment(object):
         self.drink_dict = {}
         self.wearing_dict = {}
         self.weapon_dict = {}
+        self.map_move = {}
+        self.d2x = {}
+        self.d2y = {}
+        self.d2z = {}
         
     def is_food(self,item):
         if item.lower() in self.food_dict.keys():
@@ -115,7 +151,8 @@ class MudEnviroment(object):
         if item.lower() in self.drink_dict.keys():
             return True
         else:
-            return False     
+            return False
+         
 
 class RoleStatus(object):
     def __init__(self):
@@ -261,10 +298,16 @@ def loadConfig(settingFileName="config.json"):
         myConfig['current_tickers'].append(t["name"])   
     start_new_ticker()
     
-def loadItems(settingFileName="items.json"):
+def loadItems(settingFileName="env.json"):
     setting = loadJsonSetting(settingFileName)
     env.food_dict = setting["food"]
     env.drink_dict = setting["drink"]
+    env.map_move = setting["map_move"]
+    env.d2x = setting["d2x"]
+    env.d2y = setting["d2y"]
+    env.d2z = setting["d2z"]
+
+    
     
 def clear_cmdfiles():
     p = Path.cwd()    
@@ -411,16 +454,28 @@ def func_trigger_score(line):
                     if s is not None:
                         mystatus.age = s.group(1)                        
                         break
-    
+recent_move = None    
 def func_trigger_update_roomInfo(line):
     global trigger_flags
     global record_lines
     global current_room
+    global pre_room
+    global recent_move
+    global env
+    global G
+    global rid_room_dict
+    global rid_cname_dict
+    global nodes_init_pos
+    global min_map
+
     if len(line)>8 and line[:8] == "##cmd:::":
+        if line[8:] in env.map_move.keys():
+            recent_move = line[8:]
         return
     p = re.compile(r'^(\S+) -\s+$')
     m = p.match(line)
-    if m is not None:        
+    if m is not None:
+        pre_room = copy.deepcopy(current_room)    
         current_room = Room(env)        
         record_lines["look_roomInfo"] = []
         current_room.cname = m.group(1)
@@ -511,14 +566,13 @@ def func_trigger_update_roomInfo(line):
                     current_room.weather_desc = "\n".join(lines[weather_start_index:items_start_index])
                 else:
                     current_room.weather_desc = "\n".join(lines[weather_start_index:])
-            if direct_start_index>=0:
-                current_room.direction_desc = lines[direct_start_index]
+            if direct_start_index>=0:                
                 p = re.compile(r'^\s+这里.*?的.*?有 (.*?)。'.decode("utf8"))
-                m = p.match(current_room.direction_desc)
+                m = p.match(lines[direct_start_index])
                 if m is not None:                        
-                    dstr = m.group(1)
+                    current_room.direction_desc = m.group(1)
                     p = re.compile(r'、| 和 '.decode("utf8"))
-                    current_room.directions = list(p.split(dstr))
+                    current_room.directions = sorted(list(p.split(current_room.direction_desc)))
             if items_start_index>=0:
                 for myline in lines[items_start_index:]:
                     p = re.compile(r'^\s*((一|二|三|四|五|六|七|八|九|十)(块|个|枚|位|只))?(.*?)\((.*?)\)( <(.*?)>)?$'.decode("utf8"))
@@ -581,7 +635,37 @@ def func_trigger_update_roomInfo(line):
                             mudnpc.status = status
                             current_room.npcs.append(mudnpc)
             current_room.isUpdating = False
-            #print current_room.directions
+            
+            #store room and edge in G:            
+            if len(pre_room.cname)>0:
+                current_room.update_pos(pre_room,recent_move)
+                current_room.gen_rid()
+                G.add_edge(pre_room.rid,current_room.rid,move=recent_move,weight=1)                
+            else:
+                current_room.gen_rid()                
+                G.add_node(current_room.rid)
+            nodes_init_pos[current_room.rid] = (current_room.xofct/5.0,current_room.yofct/-5.0)
+            rid_room_dict[current_room.rid] = copy.deepcopy(current_room)
+            rid_cname_dict[current_room.rid] = current_room.cname
+            #generate figure of G
+            plt.figure(figsize=(cfg_gui.gps_rec[2]/100.0,cfg_gui.gps_rec[3]/100.0))
+            plt.rcParams['savefig.dpi'] = 100 #图片像素
+            plt.rcParams['figure.dpi'] = 100 #分辨率
+            pos = nx.spring_layout(G,iterations=10,pos=nodes_init_pos)
+            colors = []
+            for n in list(G.nodes):
+                if n==current_room.rid:
+                    colors.append("red")
+                else:
+                    colors.append("grey")
+                
+
+            nx.draw(G,pos, node_size=200,  edge_color="blue",node_color=colors, font_size=10, with_labels=True,labels=rid_cname_dict, font_family ='SimHei')
+            plt.savefig('min_map.png', dpi=100, transparent=True)
+            
+
+
+            
 
 
 ########################################################################
@@ -899,6 +983,7 @@ def sendCmdCallback(textbox):
 env = MudEnviroment()
 mystatus =  RoleStatus()
 current_room = Room(env)
+pre_room = None
 rmq= RedisMQ()
   
 def main(args):    
@@ -915,6 +1000,7 @@ def main(args):
 
     # 初始化
     screen, game_images, game_sounds = initGame()
+    min_map = pygame.image.load('min_map.png')
     # 播放背景音乐
     pygame.mixer.music.load(cfg_gui.SOUNDS_PATHS['moonlight'])
     pygame.mixer.music.play(-1, 0.0)
@@ -1129,7 +1215,9 @@ def main(args):
             direction_rect_list.append((d,d_rect))
             direction_surface.blit(direction_bg,(d_rect.left,d_rect.top),d_rect)
         screen.blit(direction_surface,(cfg_gui.direction_rec[0], cfg_gui.direction_rec[1]))
-        
+        #draw min-map   
+        min_map = pygame.image.load('min_map.png')     
+        screen.blit(min_map,(cfg_gui.gps_rec[0],cfg_gui.gps_rec[1]))
 
         #event handle:
         for event in pygame.event.get():

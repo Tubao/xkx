@@ -3,7 +3,7 @@
     "func":"loadConfig"
 },
 {
-    "filename":"items.json",
+    "filename":"env.json",
     "func":"loadItems"
 }
 ]

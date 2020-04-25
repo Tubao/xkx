@@ -23,9 +23,9 @@ twindows_rec1 = (10,50,500,300)
 twindows_rec2 = (10,380,500,190)
 twindows_rec3 = (512,50,500,520)
 # gps area rec
-gps_rec = (520,55,280,300)
+gps_rec = (550,55,240,300)
 # direction area rec
-direction_rec = (540,300,240,240)
+direction_rec = (550,370,240,240)
 
 #direction rec dict
 direction_rec_dict = {
@@ -78,7 +78,7 @@ IMAGE_PATHS = {
                 'checked': os.path.join(os.path.dirname(__file__), 'resources/images/checked.png'),
                 'unchecked': os.path.join(os.path.dirname(__file__), 'resources/images/unchecked.png'),
                 'cmd_window': os.path.join(os.path.dirname(__file__), 'resources/images/cmd_window_edited.jpeg'),
-                'direction_bg': os.path.join(os.path.dirname(__file__), 'resources/images/direction.png')                 
+                'direction_bg': os.path.join(os.path.dirname(__file__), 'resources/images/direction.png')
                 
             }
 # 游戏声音路径
