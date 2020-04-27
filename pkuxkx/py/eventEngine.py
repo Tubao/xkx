@@ -97,15 +97,53 @@ class Room(object):
         self.xofct = 0
         self.yofct = 0
         self.zofct = 0
+        self.pos_x = 0
+        self.pos_y = 0
     def gen_rid(self):
-        s = self.area + self.cname + self.desc + ",".join(self.directions) + str(self.xofct) + str(self.yofct) + str(self.zofct)
+        s = self.area + self.cname + self.desc + str(self.xofct) + str(self.yofct) + str(self.zofct)
         self.rid = md5digest(s)
-        s1 = self.area + self.cname + self.desc + ",".join(self.directions)
+        s1 = self.area + self.cname + self.desc 
         self.bakid = md5digest(s1)
-    def update_pos(self,preRoom,move):
+    def update_xyz(self,preRoom,move):
         self.xofct = preRoom.xofct+self.env.d2x[move]
         self.yofct = preRoom.yofct+self.env.d2y[move]
         self.zofct = preRoom.zofct+self.env.d2z[move]
+        
+    def adjustPos(self,nodes_pos_dict):      
+        print "init pos: " + str(self.pos_x) + "," + str(self.pos_y)
+        flag = False
+        delta = 0.1
+        for i in range(10):
+            for j in [i,-1*i]:
+                for k in range(i+1):
+                    for l in [k,-1*k]:
+                        pos_x = self.pos_x + j*delta
+                        pos_y = self.pos_y + l*delta
+                        flag = False
+                        for (npos_x,npos_y) in nodes_pos_dict.values():
+                            if math.sqrt((pos_x-npos_x)*(pos_x-npos_x) + (pos_y-npos_y)*(pos_y-npos_y))<0.4:
+                                print str(pos_x),str(pos_y),str(npos_x),str(npos_y)
+                                flag = True
+                                break
+                        if not flag:
+                            break
+                    if not flag:
+                        break
+                if not flag:
+                    break
+            if not flag:
+                break
+        
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+
+    def getPos(self):
+        return (self.pos_x,self.pos_y)
+    def clear(self):
+        self.directions = []
+        self.items = []
+        self.npcs = []
+
     def __str__(self):
         ret = ""
         ret = ret + "room name: " + self.cname + "\n"
@@ -471,15 +509,22 @@ def func_trigger_update_roomInfo(line):
     if len(line)>8 and line[:8] == "##cmd:::":
         if line[8:] in env.map_move.keys():
             recent_move = line[8:]
+        if line[8:] in ['l','look']:
+            recent_move = "look"
         return
     p = re.compile(r'^(\S+) -\s+$')
     m = p.match(line)
     if m is not None:
-        pre_room = copy.deepcopy(current_room)    
-        current_room = Room(env)        
+        if pre_room is None or recent_move<>"look":
+            pre_room = copy.deepcopy(current_room)    
+            current_room = Room(env)     
+        else:
+            current_room.clear()   
         record_lines["look_roomInfo"] = []
         current_room.cname = m.group(1)
         trigger_flags["look_roomInfo"] = 1
+        #send hpbrief to accelerate the confirmation of room info
+        sendCmd("hpbrief")
         return
     if trigger_flags["look_roomInfo"] == 1:
         p = re.compile(r'^(\s+\S+.*)')
@@ -635,23 +680,42 @@ def func_trigger_update_roomInfo(line):
                             mudnpc.status = status
                             current_room.npcs.append(mudnpc)
             current_room.isUpdating = False
-            
+            if pre_room is not None and len(pre_room.cname)>0 and recent_move == "look":
+                return
             #store room and edge in G:            
             if len(pre_room.cname)>0:
-                current_room.update_pos(pre_room,recent_move)
+                current_room.update_xyz(pre_room,recent_move)
                 current_room.gen_rid()
-                G.add_edge(pre_room.rid,current_room.rid,move=recent_move,weight=1)                
+                G.add_edge(pre_room.rid,current_room.rid,move=recent_move,weight=1)  
+                if current_room.rid not in nodes_init_pos.keys():  
+                    print "changing room pos: " +    current_room.rid               
+                    current_room.pos_x = pre_room.pos_x + current_room.env.d2x[recent_move]
+                    current_room.pos_y = pre_room.pos_y - current_room.env.d2y[recent_move]
+                    current_room.adjustPos(nodes_init_pos)    
+                else:
+                    current_room.pos_x = rid_room_dict[current_room.rid].pos_x
+                    current_room.pos_y = rid_room_dict[current_room.rid].pos_y
             else:
                 current_room.gen_rid()                
                 G.add_node(current_room.rid)
-            nodes_init_pos[current_room.rid] = (current_room.xofct/5.0,current_room.yofct/-5.0)
+            #fixed_nodes = copy.copy(list(nodes_init_pos.keys()))
+            if current_room.rid not in nodes_init_pos.keys():           
+                nodes_init_pos[current_room.rid] = current_room.getPos()                
+                rid_cname_dict[current_room.rid] = current_room.cname
             rid_room_dict[current_room.rid] = copy.deepcopy(current_room)
-            rid_cname_dict[current_room.rid] = current_room.cname
+
+            if recent_move is not None:
+                print "recent_move: " + recent_move
+            print "pre room:" + pre_room.rid 
+            print "pre room posx: " + str(pre_room.pos_x)
+            print "pre room posy: " + str(pre_room.pos_y)
+            print "current room:" + current_room.rid
+            print nodes_init_pos
             #generate figure of G
             plt.figure(figsize=(cfg_gui.gps_rec[2]/100.0,cfg_gui.gps_rec[3]/100.0))
             plt.rcParams['savefig.dpi'] = 100 #图片像素
             plt.rcParams['figure.dpi'] = 100 #分辨率
-            pos = nx.spring_layout(G,iterations=10,pos=nodes_init_pos)
+            #nodes_init_pos = nx.spring_layout(G,iterations=10,fixed=fixed_nodes,pos=nodes_init_pos)
             colors = []
             for n in list(G.nodes):
                 if n==current_room.rid:
@@ -660,7 +724,7 @@ def func_trigger_update_roomInfo(line):
                     colors.append("grey")
                 
 
-            nx.draw(G,pos, node_size=200,  edge_color="blue",node_color=colors, font_size=10, with_labels=True,labels=rid_cname_dict, font_family ='SimHei')
+            nx.draw(G,pos=nodes_init_pos, node_size=200,  edge_color="blue",node_color=colors, font_size=10, with_labels=True,labels=rid_cname_dict, font_family ='SimHei')
             plt.savefig('min_map.png', dpi=100, transparent=True)
             
 
@@ -1059,8 +1123,8 @@ def main(args):
         for x in range(cfg_gui.SCREENSIZE[0]//game_images['split1'].get_width()+1):
 			screen.blit(game_images['split1'], (x*27, 40))
         #draw vertical split 
-        for x in range((cfg_gui.SCREENSIZE[1]-cfg_gui.gps_rec[1])//game_images['split2'].get_height()+1):
-			screen.blit(game_images['split2'], (cfg_gui.gps_rec[0], cfg_gui.gps_rec[1]+x*27))
+        #for x in range((cfg_gui.SCREENSIZE[1]-cfg_gui.gps_rec[1])//game_images['split2'].get_height()+1):
+		#	screen.blit(game_images['split2'], (cfg_gui.gps_rec[0], cfg_gui.gps_rec[1]+x*27))
 
         #deep copy current_room into drawing_room avoiding reading inconsistance
         if not current_room.isUpdating:
@@ -1216,8 +1280,11 @@ def main(args):
             direction_surface.blit(direction_bg,(d_rect.left,d_rect.top),d_rect)
         screen.blit(direction_surface,(cfg_gui.direction_rec[0], cfg_gui.direction_rec[1]))
         #draw min-map   
-        min_map = pygame.image.load('min_map.png')     
-        screen.blit(min_map,(cfg_gui.gps_rec[0],cfg_gui.gps_rec[1]))
+        try:
+            min_map = pygame.image.load('min_map.png')     
+            screen.blit(min_map,(cfg_gui.gps_rec[0],cfg_gui.gps_rec[1]))
+        except Exception as e:
+            print e
 
         #event handle:
         for event in pygame.event.get():
